@@ -358,28 +358,24 @@
   </div>
 
 <script>
-  // ============================================
-  // AOS-0.1 - ASISTENTE VIRTUAL ARGENTINO
-  // ============================================
   (function() {
-    // ----- VARIABLES GLOBALES -----
-    let currentLang = 'es';               // Idioma seleccionado
-    let mobilenetModel = null;           // Modelo de reconocimiento de imágenes
-    let isTyping = false;                // ¿Está escribiendo la IA?
-    let currentTheme = 'dark';           // Tema actual
-    let recognition = null;              // Objeto SpeechRecognition
-    let isRecording = false;             // ¿Está grabando?
-    let conversationContext = [];        // Historial de la conversación
-    let userName = 'Usuario';            // Nombre del usuario
-    let ttsEnabled = true;               // Voz activada por defecto
-    let privacyMode = false;             // Modo privado
-    let touchStartX = 0, touchStartY = 0; // Para gestos swipe
-    let voiceModeActive = false;         // ¿Modo voz activo?
-    let audioContext = null;             // Contexto de audio para ondas
-    let analyser = null;                 // Analizador de audio
-    let animationId = null;              // ID de animación de ondas
+    // ========== VARIABLES GLOBALES ==========
+    let currentLang = 'es';
+    let mobilenetModel = null;
+    let isTyping = false;
+    let currentTheme = 'dark';
+    let recognition = null;
+    let isRecording = false;
+    let conversationContext = [];
+    let userName = 'Usuario';
+    let ttsEnabled = true;
+    let privacyMode = false;
+    let touchStartX = 0, touchStartY = 0;
+    let voiceModeActive = false;
+    let audioContext = null;
+    let analyser = null;
+    let animationId = null;
 
-    // ----- ELEMENTOS DEL DOM -----
     const textarea = document.getElementById('textarea');
     const sendBtn = document.getElementById('send-btn');
     const messagesEl = document.getElementById('messages');
@@ -400,16 +396,13 @@
     const voiceCanvas = document.getElementById('voice-canvas');
     const voiceSubtitles = document.getElementById('voice-subtitles');
 
-    // ----- CARGA DEL MODELO DE IMAGEN -----
     (async function () {
       try { mobilenetModel = await mobilenet.load(); console.log("Modelo listo 🖼️"); } catch(e) { console.warn("Error cargando modelo"); }
     })();
 
-    // ----- SIDEBAR -----
     function toggleSidebar() { sidebar.classList.toggle('open'); sidebarBackdrop.classList.toggle('show'); }
     sidebarBackdrop.addEventListener('click', toggleSidebar);
 
-    // ----- SWIPE PARA ABRIR/CERRAR SIDEBAR EN MÓVILES -----
     document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY; }, {passive: true});
     document.addEventListener('touchend', e => {
       if (!touchStartX || !touchStartY) return;
@@ -422,7 +415,6 @@
       touchStartX = touchStartY = 0;
     });
 
-    // ----- LANDING: SELECCIÓN DE IDIOMA Y NOMBRE -----
     langButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         langButtons.forEach(b => b.classList.remove('selected'));
@@ -445,21 +437,19 @@
       app.style.display = 'flex';
       app.style.animation = 'fadeIn 0.6s ease';
       sidebar.classList.remove('open'); sidebarBackdrop.classList.remove('show');
-      // Activar TTS por defecto
-      ttsEnabled = localStorage.getItem('atlas_tts') !== 'false'; // true si no está guardado
+      ttsEnabled = localStorage.getItem('atlas_tts') !== 'false';
       updateTTSButton();
       updatePrivacyButton();
       if (privacyMode) clearPrivateData();
     }
 
-    // ----- TEMAS -----
     function cambiarTema() {
       const themes = ['dark', 'gray', 'light'];
       currentTheme = themes[(themes.indexOf(currentTheme) + 1) % themes.length];
       document.body.className = 'theme-' + currentTheme;
     }
 
-    // ----- VOZ SINTÉTICA (TTS) -----
+    // ========== VOZ SINTÉTICA (TTS) - COMPATIBLE CON FIREFOX Y OTROS ==========
     function toggleTTS() {
       ttsEnabled = !ttsEnabled;
       localStorage.setItem('atlas_tts', ttsEnabled);
@@ -469,7 +459,7 @@
     }
     function updateTTSButton() { ttsToggle.classList.toggle('active', ttsEnabled); }
     function speakText(text) {
-      if (!ttsEnabled) return;
+      if (!ttsEnabled || !window.speechSynthesis) return;
       const clean = text.replace(/\*\*/g, '').replace(/🐱|🐶|🌿|🧑|📚|🔗/g, '').replace(/\[.*?\]\(.*?\)/g, '').replace(/https?:\/\/\S+/g, '').replace(/```[\s\S]*?```/g, '').trim();
       if (!clean) return;
       speechSynthesis.cancel();
@@ -483,12 +473,12 @@
       }
     }
 
-    // ----- PRIVACIDAD -----
+    // ========== PRIVACIDAD ==========
     function togglePrivacy() { privacyMode = !privacyMode; localStorage.setItem('atlas_privacy', privacyMode); updatePrivacyButton(); if (privacyMode) clearPrivateData(); }
     function updatePrivacyButton() { privacyToggle.classList.toggle('active', privacyMode); }
     function clearPrivateData() { conversationContext = []; messagesEl.innerHTML = ''; messagesEl.style.display = 'none'; emptyState.style.display = 'flex'; }
 
-    // ----- VISUALIZACIÓN DE ONDAS DE VOZ -----
+    // ========== VISUALIZACIÓN DE ONDAS DE VOZ ==========
     function startVoiceVisualization() {
       if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -499,14 +489,12 @@
       const ctx = canvas.getContext('2d');
       const bufferLength = analyser.frequencyBinCount;
       const dataArray = new Uint8Array(bufferLength);
-      
       function draw() {
         animationId = requestAnimationFrame(draw);
         analyser.getByteFrequencyData(dataArray);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         const barWidth = (canvas.width / bufferLength) * 2.5;
-        let barHeight;
-        let x = 0;
+        let barHeight, x = 0;
         for (let i = 0; i < bufferLength; i++) {
           barHeight = dataArray[i] / 2;
           ctx.fillStyle = 'rgb(' + (barHeight + 100) + ', 100, 200)';
@@ -519,10 +507,7 @@
     }
 
     function stopVoiceVisualization() {
-      if (animationId) {
-        cancelAnimationFrame(animationId);
-        animationId = null;
-      }
+      if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
       const ctx = voiceCanvas.getContext('2d');
       ctx.clearRect(0, 0, voiceCanvas.width, voiceCanvas.height);
       voiceSubtitles.textContent = '';
@@ -535,10 +520,11 @@
       speechSynthesis.cancel();
     }
 
-    // ----- RECONOCIMIENTO DE VOZ -----
+    // ========== RECONOCIMIENTO DE VOZ (COMPATIBLE CON CHROME Y EDGE, AVISO EN FIREFOX) ==========
     function toggleVoice() {
-      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        alert('Reconocimiento de voz no soportado.');
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert('El reconocimiento de voz no está soportado en este navegador. Probá con Chrome o Edge.');
         return;
       }
       if (isRecording) {
@@ -551,8 +537,9 @@
       }
     }
     function startVoice() {
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition = new SR();
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) return;
+      recognition = new SpeechRecognition();
       recognition.lang = currentLang === 'en' ? 'en-US' : (currentLang === 'es_AR' ? 'es-AR' : 'es-ES');
       recognition.interimResults = true;
       recognition.continuous = true;
@@ -582,16 +569,16 @@
       micBtn.classList.remove('recording');
     }
 
-    // ----- EMOCIONES -----
+    // ========== EMOCIONES ==========
     const emociones = {
-      feliz: { en: ["happy","glad","joyful","i'm happy"], es: ["feliz","contento","alegre","estoy feliz","ando feliz"], es_AR: ["feliz","contento","alegre","joya","ando feliz","re feliz"] },
-      triste: { en: ["sad","unhappy","depressed","i'm sad"], es: ["triste","deprimido","bajón","estoy triste"], es_AR: ["triste","deprimido","bajón","hecho mierda","ando bajón"] },
-      enojado: { en: ["angry","mad","furious","i'm angry"], es: ["enojado","furioso","caliente","estoy enojado"], es_AR: ["enojado","caliente","bronca","re caliente","ando caliente"] },
-      miedo: { en: ["scared","afraid","fear","i'm scared"], es: ["miedo","asustado","aterrado","tengo miedo"], es_AR: ["miedo","cagaso","asustado","re cagado","tengo cagaso"] },
-      sorpresa: { en: ["surprised","shocked","amazed","i'm surprised"], es: ["sorprendido","sorprendente","impactado","estoy sorprendido"], es_AR: ["sorprendido","impactado","no lo puedo creer","estoy re sorprendido"] },
-      cansado: { en: ["tired","exhausted","i'm tired"], es: ["cansado","agotado","estoy cansado"], es_AR: ["cansado","agotado","re cansado","estoy muerto"] },
-      aburrido: { en: ["bored","i'm bored"], es: ["aburrido","estoy aburrido"], es_AR: ["aburrido","me embolo","estoy al pedo"] },
-      enamorado: { en: ["in love","i'm in love"], es: ["enamorado","estoy enamorado"], es_AR: ["enamorado","estoy enamorado","me enamoré"] }
+      feliz: { en: ["happy","glad","joyful"], es: ["feliz","contento","alegre"], es_AR: ["feliz","contento","alegre","joya","re feliz"] },
+      triste: { en: ["sad","unhappy","depressed"], es: ["triste","deprimido","bajón"], es_AR: ["triste","deprimido","bajón","hecho mierda"] },
+      enojado: { en: ["angry","mad","furious"], es: ["enojado","furioso","caliente"], es_AR: ["enojado","caliente","bronca","re caliente"] },
+      miedo: { en: ["scared","afraid","fear"], es: ["miedo","asustado","aterrado"], es_AR: ["miedo","cagaso","asustado","re cagado"] },
+      sorpresa: { en: ["surprised","shocked","amazed"], es: ["sorprendido","sorprendente","impactado"], es_AR: ["sorprendido","impactado","no lo puedo creer"] },
+      cansado: { en: ["tired","exhausted"], es: ["cansado","agotado"], es_AR: ["cansado","agotado","re cansado","estoy muerto"] },
+      aburrido: { en: ["bored"], es: ["aburrido"], es_AR: ["aburrido","me embolo","estoy al pedo"] },
+      enamorado: { en: ["in love"], es: ["enamorado"], es_AR: ["enamorado","me enamoré"] }
     };
     const respEmocion = {
       feliz: { en: ["That's great! 😊","Awesome!"], es: ["¡Qué bueno! 😊","¡Genial!"], es_AR: ["¡Qué bien, che! 😊","¡Joyita!"] },
@@ -614,47 +601,77 @@
       return null;
     }
 
-    // ----- CONOCIMIENTO PREPROGRAMADO -----
+    // ========== CONOCIMIENTO PREPROGRAMADO (MEJORADO) ==========
     const codeKnowledge = {
-      calculadora: ['```html\n<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Calculadora</title><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#1a1a2e;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif}.calc{background:#16213e;border-radius:20px;padding:20px;width:300px;box-shadow:0 20px 60px rgba(0,0,0,.5)}.display{background:#0f3460;border-radius:12px;padding:20px;text-align:right;margin-bottom:15px}.expr{color:#aaa;font-size:.85rem;min-height:20px}.result{color:#e94560;font-size:2rem;font-weight:700;word-break:break-all}.buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}button{padding:18px;border:none;border-radius:12px;font-size:1rem;cursor:pointer;transition:transform .1s;font-weight:600}button:active{transform:scale(.92)}.n{background:#1a1a2e;color:#fff}.o{background:#e94560;color:#fff}.e{background:#0f3460;color:#e94560;grid-column:span 2}.c{background:#533483;color:#fff}.z{grid-column:span 2}</style></head><body><div class="calc"><div class="display"><div class="expr" id="expr"></div><div class="result" id="res">0</div></div><div class="buttons"><button class="c" onclick="limpiar()">C</button><button class="c" onclick="borrar()">⌫</button><button class="c" onclick="agregar(\'%\')">%</button><button class="o" onclick="agregar(\'/\')">÷</button><button class="n" onclick="agregar(\'7\')">7</button><button class="n" onclick="agregar(\'8\')">8</button><button class="n" onclick="agregar(\'9\')">9</button><button class="o" onclick="agregar(\'*\')">×</button><button class="n" onclick="agregar(\'4\')">4</button><button class="n" onclick="agregar(\'5\')">5</button><button class="n" onclick="agregar(\'6\')">6</button><button class="o" onclick="agregar(\'-\')">−</button><button class="n" onclick="agregar(\'1\')">1</button><button class="n" onclick="agregar(\'2\')">2</button><button class="n" onclick="agregar(\'3\')">3</button><button class="o" onclick="agregar(\'+\')">+</button><button class="n z" onclick="agregar(\'0\')">0</button><button class="n" onclick="agregar(\'.\')">.</button><button class="e" onclick="calcular()">=</button></div></div><script>let expr=\'\';function agregar(v){expr+=v;document.getElementById(\'res\').textContent=expr}function limpiar(){expr=\'\';document.getElementById(\'res\').textContent=\'0\';document.getElementById(\'expr\').textContent=\'\'}function borrar(){expr=expr.slice(0,-1);document.getElementById(\'res\').textContent=expr||\'0\'}function calcular(){try{document.getElementById(\'expr\').textContent=expr+\' =\';let r=Function(\'"use strict";return(\'+expr+\')\')();document.getElementById(\'res\').textContent=parseFloat(r.toFixed(10));expr=String(r)}catch(e){document.getElementById(\'res\').textContent=\'Error\';expr=\'\'}}<\/script></body></html>\n```']
+      calculadora: [
+        '```html\n<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Calculadora</title><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#1a1a2e;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif}.calc{background:#16213e;border-radius:20px;padding:20px;width:300px;box-shadow:0 20px 60px rgba(0,0,0,.5)}.display{background:#0f3460;border-radius:12px;padding:20px;text-align:right;margin-bottom:15px}.expr{color:#aaa;font-size:.85rem;min-height:20px}.result{color:#e94560;font-size:2rem;font-weight:700;word-break:break-all}.buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}button{padding:18px;border:none;border-radius:12px;font-size:1rem;cursor:pointer;transition:transform .1s;font-weight:600}button:active{transform:scale(.92)}.n{background:#1a1a2e;color:#fff}.o{background:#e94560;color:#fff}.e{background:#0f3460;color:#e94560;grid-column:span 2}.c{background:#533483;color:#fff}.z{grid-column:span 2}</style></head><body><div class="calc"><div class="display"><div class="expr" id="expr"></div><div class="result" id="res">0</div></div><div class="buttons"><button class="c" onclick="limpiar()">C</button><button class="c" onclick="borrar()">⌫</button><button class="c" onclick="agregar(\'%\')">%</button><button class="o" onclick="agregar(\'/\')">÷</button><button class="n" onclick="agregar(\'7\')">7</button><button class="n" onclick="agregar(\'8\')">8</button><button class="n" onclick="agregar(\'9\')">9</button><button class="o" onclick="agregar(\'*\')">×</button><button class="n" onclick="agregar(\'4\')">4</button><button class="n" onclick="agregar(\'5\')">5</button><button class="n" onclick="agregar(\'6\')">6</button><button class="o" onclick="agregar(\'-\')">−</button><button class="n" onclick="agregar(\'1\')">1</button><button class="n" onclick="agregar(\'2\')">2</button><button class="n" onclick="agregar(\'3\')">3</button><button class="o" onclick="agregar(\'+\')">+</button><button class="n z" onclick="agregar(\'0\')">0</button><button class="n" onclick="agregar(\'.\')">.</button><button class="e" onclick="calcular()">=</button></div></div><script>let expr=\'\';function agregar(v){expr+=v;document.getElementById(\'res\').textContent=expr}function limpiar(){expr=\'\';document.getElementById(\'res\').textContent=\'0\';document.getElementById(\'expr\').textContent=\'\'}function borrar(){expr=expr.slice(0,-1);document.getElementById(\'res\').textContent=expr||\'0\'}function calcular(){try{document.getElementById(\'expr\').textContent=expr+\' =\';let r=Function(\'"use strict";return(\'+expr+\')\')();document.getElementById(\'res\').textContent=parseFloat(r.toFixed(10));expr=String(r)}catch(e){document.getElementById(\'res\').textContent=\'Error\';expr=\'\'}}<\/script></body></html>\n```'
+      ],
+      tareas: [
+        '```html\n<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Mis Tareas</title><style>*{box-sizing:border-box;margin:0;padding:0}body{background:#f0f2f5;font-family:"Segoe UI",sans-serif;min-height:100vh;padding:2rem}.app{max-width:520px;margin:0 auto}h1{font-size:1.8rem;color:#1a1a1a;margin-bottom:.3rem}.sub{color:#888;font-size:.9rem;margin-bottom:1.5rem}.row{display:flex;gap:10px;margin-bottom:1.5rem}.row input{flex:1;padding:14px 18px;border:2px solid #e0e0e0;border-radius:14px;font-size:1rem;outline:none;background:#fff;transition:border .2s}.row input:focus{border-color:#007aff}.add{padding:14px 22px;background:#007aff;color:#fff;border:none;border-radius:14px;cursor:pointer;font-weight:600;transition:background .2s}.add:hover{background:#0051d5}.filtros{display:flex;gap:8px;margin-bottom:1rem}.f{padding:7px 16px;border:1px solid #ddd;border-radius:20px;background:#fff;cursor:pointer;font-size:.85rem;transition:all .2s}.f.on,.f:hover{background:#007aff;color:#fff;border-color:#007aff}.lista{display:flex;flex-direction:column;gap:10px}.item{background:#fff;border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);transition:opacity .2s}.item.done{opacity:.55}.item.done .txt{text-decoration:line-through;color:#aaa}.cb{width:22px;height:22px;border-radius:50%;border:2px solid #007aff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}.cb.on{background:#007aff}.cb.on::after{content:"✓";color:#fff;font-size:13px;font-weight:700}.txt{flex:1;font-size:.95rem}.del{background:none;border:none;color:#ff3b30;cursor:pointer;font-size:1.1rem;padding:4px 8px;border-radius:8px;transition:background .2s}.del:hover{background:#fff0ee}.stats{text-align:center;margin-top:1.5rem;color:#aaa;font-size:.85rem}.vacio{text-align:center;padding:3rem;color:#bbb}</style></head><body><div class="app"><h1>📝 Mis Tareas</h1><p class="sub">Organizá tu día sin complicaciones</p><div class="row"><input id="inp" placeholder="Nueva tarea..." onkeydown="if(event.key===\'Enter\')add()"><button class="add" onclick="add()">+ Agregar</button></div><div class="filtros"><button class="f on" onclick="setF(\'all\',this)">Todas</button><button class="f" onclick="setF(\'pen\',this)">Pendientes</button><button class="f" onclick="setF(\'don\',this)">Completadas</button></div><div class="lista" id="lista"></div><div class="stats" id="stats"></div></div><script>let T=JSON.parse(localStorage.getItem(\'atlas_t\')||\'[]\'),filtro=\'all\';const save=()=>localStorage.setItem(\'atlas_t\',JSON.stringify(T));function add(){const v=document.getElementById(\'inp\').value.trim();if(!v)return;T.push({id:Date.now(),v,ok:false});document.getElementById(\'inp\').value=\'\';save();draw()}function tog(id){T=T.map(t=>t.id===id?{...t,ok:!t.ok}:t);save();draw()}function del(id){T=T.filter(t=>t.id!==id);save();draw()}function setF(f,btn){filtro=f;document.querySelectorAll(\'.f\').forEach(b=>b.classList.remove(\'on\'));btn.classList.add(\'on\');draw()}function draw(){let vis=T;if(filtro===\'pen\')vis=T.filter(t=>!t.ok);if(filtro===\'don\')vis=T.filter(t=>t.ok);const l=document.getElementById(\'lista\');l.innerHTML=vis.length?vis.map(t=>\'<div class="item\'+(t.ok?\' done\':\'\')+\'"><div class="cb\'+(t.ok?\' on\':\'\')+\'" onclick="tog(\'+t.id+\')"></div><span class="txt">\'+t.v+\'</span><button class="del" onclick="del(\'+t.id+\')">🗑</button></div>\').join(\'\'):\'<div class="vacio">No hay tareas acá 😌</div>\';const ok=T.filter(t=>t.ok).length;document.getElementById(\'stats\').textContent=T.length?ok+\' de \'+T.length+\' completadas\':\'\'}draw();<\/script></body></html>\n```'
+      ],
+      juego: [
+        '```html\n<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Snake</title><style>body{background:#0d0d0d;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0;font-family:sans-serif;color:#fff}h1{color:#4ade80;letter-spacing:4px;font-size:1.5rem;margin-bottom:8px}#info{color:#888;margin-bottom:12px;font-size:.9rem}canvas{border:2px solid #4ade80;border-radius:8px;box-shadow:0 0 30px rgba(74,222,128,.3)}#score{margin-top:12px;font-size:1.3rem;color:#4ade80}</style></head><body><h1>🐍 SNAKE</h1><div id="info">Usá las flechas para mover</div><canvas id="c" width="400" height="400"></canvas><div id="score">Puntaje: 0</div><script>const c=document.getElementById(\'c\'),ctx=c.getContext(\'2d\');const S=20,C=20,R=20;let snake,dir,food,pts,iv,alive;function init(){snake=[{x:10,y:10},{x:9,y:10},{x:8,y:10}];dir={x:1,y:0};pts=0;alive=true;newFood();clearInterval(iv);iv=setInterval(loop,130)}function newFood(){do{food={x:Math.floor(Math.random()*C),y:Math.floor(Math.random()*R)}}while(snake.some(s=>s.x===food.x&&s.y===food.y))}function loop(){if(!alive)return;const h={x:snake[0].x+dir.x,y:snake[0].y+dir.y};if(h.x<0||h.x>=C||h.y<0||h.y>=R||snake.some(s=>s.x===h.x&&s.y===h.y)){alive=false;clearInterval(iv);alert(\'Game Over - Puntaje: \'+pts);return}snake.unshift(h);if(h.x===food.x&&h.y===food.y){pts+=10;document.getElementById(\'score\').textContent=\'Puntaje: \'+pts;newFood()}else snake.pop();draw()}function draw(){ctx.fillStyle=\'#0d0d0d\';ctx.fillRect(0,0,400,400);ctx.fillStyle=\'#f87171\';ctx.beginPath();ctx.arc(food.x*S+S/2,food.y*S+S/2,S/2-2,0,Math.PI*2);ctx.fill();snake.forEach((s,i)=>{ctx.fillStyle=i===0?\'#4ade80\':\'#22c55e\';ctx.beginPath();ctx.roundRect(s.x*S+1,s.y*S+1,S-2,S-2,4);ctx.fill()})}document.addEventListener(\'keydown\',e=>{const m={ArrowUp:{x:0,y:-1},ArrowDown:{x:0,y:1},ArrowLeft:{x:-1,y:0},ArrowRight:{x:1,y:0}};const nd=m[e.key];if(nd&&!(nd.x===-dir.x&&nd.y===-dir.y)){dir=nd;e.preventDefault()}});init();<\/script></body></html>\n```'
+      ],
+      login: [
+        '```html\n<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Login</title><style>*{box-sizing:border-box;margin:0;padding:0}body{background:linear-gradient(135deg,#667eea,#764ba2);min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:"Segoe UI",sans-serif}.card{background:#fff;border-radius:24px;padding:2.5rem;width:100%;max-width:400px;box-shadow:0 25px 50px rgba(0,0,0,.2)}h1{text-align:center;font-size:1.5rem;color:#1a1a1a;margin-bottom:2rem}input{width:100%;padding:12px 16px;border:2px solid #e8e8e8;border-radius:12px;font-size:.95rem;outline:none;margin-bottom:1rem;transition:border .2s}input:focus{border-color:#667eea}.btn{width:100%;padding:14px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:600;cursor:pointer}.ok{display:none;text-align:center;padding:1rem;background:#e8f5e9;border-radius:12px;color:#2e7d32;margin-top:1rem;font-weight:600}.ok.on{display:block}.nota{font-size:.78rem;color:#bbb;text-align:center;margin-top:1rem}</style></head><body><div class="card"><h1>Bienvenido</h1><input type="email" id="email" placeholder="Email"><input type="password" id="pass" placeholder="Contraseña"><button class="btn" onclick="login()">Iniciar sesión</button><div class="ok" id="ok">✅ ¡Login exitoso!</div><p class="nota">Demo: demo@atlas.com / 123456</p></div><script>const USER={email:\'demo@atlas.com\',pass:\'123456\'};function login(){const em=document.getElementById(\'email\'),ps=document.getElementById(\'pass\');if(em.value===USER.email&&ps.value===USER.pass)document.getElementById(\'ok\').classList.add(\'on\');else alert(\'Datos incorrectos\')}<\/script></body></html>\n```'
+      ],
+      portfolio: [
+        '```html\n<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Portfolio</title><style>:root{--acc:#7c3aed;--bg:#0a0a0f;--card:#111118;--txt:#e2e8f0;--mut:#64748b}*{margin:0;padding:0;box-sizing:border-box}body{background:var(--bg);color:var(--txt);font-family:"Segoe UI",sans-serif;line-height:1.6}nav{position:fixed;top:0;width:100%;background:rgba(10,10,15,.85);backdrop-filter:blur(20px);padding:1rem 5%;display:flex;justify-content:space-between;border-bottom:1px solid #1e1e2e}.logo{font-weight:700;color:var(--acc)}nav ul{list-style:none;display:flex;gap:2rem}nav a{color:var(--mut);text-decoration:none;font-size:.9rem}.hero{min-height:100vh;display:flex;align-items:center;padding:0 5%}h1{font-size:clamp(2.5rem,6vw,4.5rem);font-weight:700;line-height:1.1}.sub{color:var(--mut);font-size:1.1rem;max-width:500px;margin:1.5rem 0}.btn{display:inline-block;background:var(--acc);color:#fff;padding:12px 28px;border-radius:100px;text-decoration:none;font-weight:600;margin-top:1rem}h2{font-size:2rem;margin:2rem 5%}.skills{display:flex;flex-wrap:wrap;gap:12px;padding:0 5%}.sk{background:var(--card);border:1px solid #1e1e2e;padding:8px 18px;border-radius:100px;font-size:.88rem;color:var(--mut)}.projs{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;padding:0 5%}.pr{background:var(--card);border:1px solid #1e1e2e;border-radius:20px;padding:1.5rem;transition:transform .2s}.pr:hover{transform:translateY(-6px)}footer{text-align:center;padding:2rem;color:var(--mut);font-size:.85rem}</style></head><body><nav><div class="logo">TU NOMBRE</div><ul><li><a href="#skills">Skills</a></li><li><a href="#proyectos">Proyectos</a></li><li><a href="#contacto">Contacto</a></li></ul></nav><section class="hero"><div><h1>Hola, soy<br><span style="color:var(--acc)">Tu Nombre</span></h1><p class="sub">Desarrollador fullstack apasionado por crear experiencias digitales.</p><a href="#proyectos" class="btn">Ver mi trabajo</a></div></section><section id="skills"><h2>Skills</h2><div class="skills"><div class="sk">HTML/CSS</div><div class="sk">JavaScript</div><div class="sk">React</div><div class="sk">Node.js</div><div class="sk">Python</div></div></section><section id="proyectos"><h2>Proyectos</h2><div class="projs"><div class="pr"><h3>🛒 E-commerce</h3><p>Tienda con carrito y panel admin.</p></div><div class="pr"><h3>📊 Dashboard</h3><p>Panel de estadísticas en tiempo real.</p></div></div></section><footer>Hecho con 💜 · 2025</footer></body></html>\n```'
+      ]
     };
-    const keywordMap = { calculadora: 'calculadora' };
+    const keywordMap = {
+      calculadora: 'calculadora', tareas: 'tareas', juego: 'juego', snake: 'juego',
+      login: 'login', portfolio: 'portfolio', portafolio: 'portfolio',
+      notas: 'tareas'
+    };
 
     function random(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
     function getRespuestas() { return respuestas[currentLang] || respuestas.es; }
     function getFallbacks() { return fallbacks[currentLang] || fallbacks.es; }
 
-    // ----- RESPUESTAS PREDEFINIDAS -----
+    // ========== RESPUESTAS PREDEFINIDAS (MEJORADAS) ==========
     const respuestas = {
       en: [
-        { claves: ["hello","hi","hey"], respuestas: ["Hello! 👋 How can I help you?"] },
-        { claves: ["how are you"], respuestas: ["I'm great, thanks! 😄"] },
-        { claves: ["thanks"], respuestas: ["You're welcome! 😊"] }
+        { claves: ["hello","hi","hey","good morning","good afternoon","good evening"], respuestas: ["Hello! 👋 How can I help you?","Hey! 😊 What do you need?","Good day! How can I assist you?"] },
+        { claves: ["how are you","how's it going","what's up","how you doing"], respuestas: ["I'm great, thanks! 😄 And you?","Doing well! Ready to help. What about you?"] },
+        { claves: ["name","what's your name","who are you"], respuestas: ["I'm AOS-0.1, your virtual assistant. Created by a single developer who loves Argentina 🇦🇷"] },
+        { claves: ["thanks","thank you","thx"], respuestas: ["You're welcome! 😊","No problem! Always here to help.","It was a pleasure!"] },
+        { claves: ["bye","goodbye","see you","adios"], respuestas: ["See you later! 👋","Bye! Come back whenever you want.","Goodbye! Take care."] },
+        { claves: ["help","what can you do"], respuestas: ["I can chat, recognize images, search Wikipedia, write code, teach math, and even talk! Just ask me."] },
+        { claves: ["what is artificial intelligence","explain ai","how does ai work"], respuestas: ["Artificial Intelligence (AI) is a branch of computer science that creates systems capable of performing tasks that normally require human intelligence. These include learning, reasoning, problem-solving, perception, and language understanding. Modern AI uses machine learning algorithms that learn patterns from large amounts of data."] }
       ],
       es: [
-        { claves: ["hola","buenas","hey"], respuestas: ["¡Hola! 👋 ¿En qué te puedo ayudar?"] },
-        { claves: ["cómo estás","como estas"], respuestas: ["¡Muy bien, gracias! 😄"] },
-        { claves: ["gracias"], respuestas: ["¡De nada! 😊"] }
+        { claves: ["hola","buenas","hey","saludos","buenos días","buenas tardes","buenas noches"], respuestas: ["¡Hola! 👋 ¿En qué te puedo ayudar?","¡Buenas! ¿Qué necesitás?","¡Hola! Un gusto verte."] },
+        { claves: ["cómo estás","como estas","qué tal","todo bien"], respuestas: ["¡Muy bien, gracias! 😄 ¿Y vos?","Todo excelente. ¿Qué contás?"] },
+        { claves: ["nombre","cómo te llamas","quién sos"], respuestas: ["Soy AOS-0.1, tu asistente virtual. Creado por una sola persona que ama Argentina 🇦🇷"] },
+        { claves: ["gracias","muchas gracias","te lo agradezco","grax"], respuestas: ["¡De nada! 😊 Para eso estoy.","¡Con gusto! Acá estoy cuando precises.","¡Un placer ayudarte!"] },
+        { claves: ["chau","adiós","hasta luego","nos vemos"], respuestas: ["¡Chau! 👋 Que andes bien.","¡Nos vemos! Volvé cuando quieras.","¡Hasta luego! Cuidate."] },
+        { claves: ["ayuda","qué podés hacer"], respuestas: ["Puedo charlar, reconocer imágenes, buscar en Wikipedia, programar, enseñar matemáticas... ¡y también hablar! Pedime lo que quieras."] },
+        { claves: ["qué es inteligencia artificial","explica ia","cómo funciona la ia"], respuestas: ["La Inteligencia Artificial (IA) es una rama de la informática que crea sistemas capaces de realizar tareas que normalmente requieren inteligencia humana. Estas incluyen aprender, razonar, resolver problemas, percibir y entender el lenguaje. La IA moderna usa algoritmos de aprendizaje automático que aprenden patrones de grandes cantidades de datos."] }
       ],
       es_AR: [
-        { claves: ["hola","buenas","hey"], respuestas: ["¡Hola, che! 👋 ¿En qué te puedo dar una mano?"] },
-        { claves: ["cómo estás","como estas","cómo andás"], respuestas: ["¡Joyita, gracias! 😄"] },
-        { claves: ["gracias"], respuestas: ["¡De nada, che! 😊"] }
+        { claves: ["hola","buenas","hey","saludos","buenos días","buenas tardes","buenas noches"], respuestas: ["¡Hola, che! 👋 ¿En qué te puedo dar una mano?","¡Buenas! ¿Qué precisás?","¡Hola, loco! ¿Qué andás buscando?"] },
+        { claves: ["cómo estás","como estas","qué tal","todo bien","cómo andás"], respuestas: ["¡Joyita, gracias! 😄 ¿Y vos?","Todo pipí cucú. ¿Vos qué contás?","De diez, che. ¿Y vos?"] },
+        { claves: ["nombre","cómo te llamás","quién sos"], respuestas: ["Soy AOS-0.1, un asistente virtual hecho por un solo pibe argentino 🇦🇷. ¿Qué te parece?"] },
+        { claves: ["gracias","muchas gracias","te lo agradezco","grax"], respuestas: ["¡De nada, che! 😊 Para eso estamos.","¡No hay problema! Cuando necesites, silbá.","¡Un placer, loco!"] },
+        { claves: ["chau","adiós","hasta luego","nos vemos","bye"], respuestas: ["¡Chau, che! 👋 Que te vaya bárbaro.","¡Nos vemos! Cuidate, eh.","¡Hasta luego! Pasá cuando quieras."] },
+        { claves: ["ayuda","qué podés hacer"], respuestas: ["Puedo charlar, reconocer imágenes, buscar en Wikipedia, programar, enseñar matemáticas... ¡y también hablar! Pedime lo que quieras, no tengo drama."] },
+        { claves: ["qué es inteligencia artificial","explica ia","cómo funciona la ia"], respuestas: ["La Inteligencia Artificial (IA) es una rama de la computación que crea sistemas que pueden hacer cosas que normalmente requieren inteligencia humana, como aprender, razonar, resolver problemas y entender el lenguaje. La IA moderna se basa en algoritmos de aprendizaje automático que aprenden patrones de montones de datos."] }
       ]
     };
     const fallbacks = {
-      en: ["I didn't quite get that 🤔."],
-      es: ["No entendí bien eso 🤔."],
-      es_AR: ["No te entendí, che 🤔. ¿Lo podés decir de otra forma?"]
+      en: ["I didn't quite get that 🤔. Can you rephrase it?","Hmm, I'm not sure how to answer that. Try again!"],
+      es: ["No entendí bien eso 🤔. ¿Podés reformularlo?","Mmm, no estoy seguro de cómo responder eso. ¿Probás de nuevo?"],
+      es_AR: ["No te entendí, che 🤔. ¿Lo podés decir de otra forma?","Mmm, no cazé bien. ¿Me lo repetís?","¡Uh, disculpá! No te entendí nada. ¿Probás de nuevo?","La verdad que no te entendí. ¿Lo decís más claro?","No te sigo... ¿me lo explicás de nuevo?"]
     };
 
-    // ----- FUNCIÓN PRINCIPAL DE RESPUESTA (CORREGIDA) -----
+    // ========== FUNCIÓN PRINCIPAL DE RESPUESTA ==========
     async function obtenerRespuesta(texto) {
       const t = texto.toLowerCase().trim();
       // 1. Emociones
       const emocion = detectarEmocion(texto);
       if (emocion) { updateContext(texto, emocion); return emocion; }
-      // 2. Conversacional especial (chistes, quién te creó, etc.)
+      // 2. Conversacional especial
       const conversacional = obtenerRespuestaConversacional(texto);
       if (conversacional) { updateContext(texto, conversacional); return conversacional; }
       // 3. Saludos y frases predefinidas
@@ -664,10 +681,10 @@
           const r = random(entrada.respuestas); updateContext(texto, r); return r;
         }
       }
-      // 4. Conocimiento preprogramado (calculadora, tareas, etc.)
+      // 4. Conocimiento preprogramado (código)
       const codeAnswer = obtenerDeConocimiento(t);
       if (codeAnswer) { updateContext(texto, codeAnswer); return codeAnswer; }
-      // 5. Wikipedia (para todo lo demás)
+      // 5. Wikipedia como último recurso
       const wiki = await buscarEnWikipedia(texto);
       if (wiki) {
         const oraciones = wiki.extract.split('. ');
@@ -680,11 +697,10 @@
       const fb = random(getFallbacks()); updateContext(texto, fb); return fb;
     }
 
-    // ----- RESPUESTAS CONVERSACIONALES ESPECIALES -----
     function obtenerRespuestaConversacional(texto) {
       const t = texto.toLowerCase().trim();
       if (currentLang === 'es_AR' && (t.includes('quién te creó') || t.includes('quien te hizo'))) {
-        return "Me creó un pibe argentino que está aprendiendo a programar y quiere hacer el mejor asistente del mundo.";
+        return "Me creó un pibe argentino que está aprendiendo a programar y quiere hacer el mejor asistente del mundo. ¿Viste? Bastante humilde no es, jaja.";
       }
       if (t.includes('te sentis solo') || t.includes('estás solo')) {
         return currentLang === 'es_AR' ? "¡Nunca estoy solo, che! Te tengo a vos para charlar. 😊" : "I'm never alone! I have you. 😊";
@@ -693,14 +709,16 @@
         const chistes = {
           en: ["Why don't scientists trust atoms? Because they make up everything! 😂"],
           es: ["¿Por qué los programadores confunden Halloween y Navidad? Porque Oct 31 == Dec 25. 😂"],
-          es_AR: ["¿Cuál es el colmo de un electricista? Tener un hijo que no le da ni pelota. 😂"]
+          es_AR: ["¿Cuál es el colmo de un electricista? Tener un hijo que no le da ni pelota. 😂", "¿Qué le dice un jardinero a otro? Seamos felices mientras podamos. 😂"]
         };
         return random(chistes[currentLang] || chistes.es);
+      }
+      if (t.includes('que lindo día') || t.includes('hermoso día') || t.includes('dia lindo')) {
+        return currentLang === 'es_AR' ? "¡Posta! Ideal para tomar unos mates. ¿Vos tomás?" : "¡Qué bueno! Disfrutalo.";
       }
       return null;
     }
 
-    // ----- BÚSQUEDA EN WIKIPEDIA -----
     async function buscarEnWikipedia(consulta) {
       const url = 'https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=' + encodeURIComponent(consulta) + '&format=json&origin=*';
       try {
@@ -715,7 +733,6 @@
       } catch(e) { return null; }
     }
 
-    // ----- OBTENER CONOCIMIENTO PREPROGRAMADO -----
     function obtenerDeConocimiento(input) {
       const t = input.toLowerCase().trim();
       for (const [keyword, category] of Object.entries(keywordMap)) {
@@ -724,17 +741,19 @@
           if (arr && arr.length) return random(arr);
         }
       }
+      if (t.includes('programa') || t.includes('código') || t.includes('html')) {
+        const arr = codeKnowledge.calculadora;
+        return arr ? random(arr) : null;
+      }
       return null;
     }
 
-    // ----- CONTEXTO DE CONVERSACIÓN -----
     function updateContext(userText, assistantText) {
       if (privacyMode) return;
       conversationContext.push({ user: userText, assistant: assistantText });
       if (conversationContext.length > 10) conversationContext.shift();
     }
 
-    // ----- GESTIÓN DE MENSAJES -----
     function showMessages() { emptyState.style.display = 'none'; messagesEl.style.display = 'block'; }
     function addMessage(text, role) {
       const row = document.createElement('div'); row.className = 'msg-row ' + role;
@@ -783,7 +802,6 @@
       if (window.innerWidth < 769) toggleSidebar();
     }
 
-    // ----- FEEDBACK -----
     function openFeedback() { document.getElementById('feedback-modal').style.display = 'flex'; document.getElementById('feedback-text').focus(); }
     function closeFeedback() { document.getElementById('feedback-modal').style.display = 'none'; document.getElementById('feedback-text').value = ''; }
     function enviarFeedback() {
@@ -793,7 +811,6 @@
       closeFeedback();
     }
 
-    // ----- PROCESAMIENTO DE CÓDIGO HTML -----
     function processCodeBlocks(text) {
       const regex = /```(\w*)\n([\s\S]*?)```/g; let result = text, match;
       while ((match = regex.exec(text)) !== null) {
@@ -810,7 +827,6 @@
     window.runCode = (id) => { const code = document.getElementById(id).querySelector('code').textContent; const modal = document.getElementById('run-modal'); document.getElementById('run-frame').srcdoc = code; modal.classList.add('open'); };
     window.closeRunModal = () => { document.getElementById('run-modal').classList.remove('open'); document.getElementById('run-frame').srcdoc = ''; };
 
-    // ----- EXPONER FUNCIONES GLOBALES -----
     window.iniciarChat = iniciarChat;
     window.toggleSidebar = toggleSidebar;
     window.cambiarTema = cambiarTema;
@@ -824,14 +840,12 @@
     window.toggleTTS = toggleTTS;
     window.togglePrivacy = togglePrivacy;
 
-    // ----- EVENTOS DEL TEXTAREA -----
     textarea.addEventListener('input', () => {
       sendBtn.disabled = textarea.value.trim() === '' || isTyping;
       textarea.style.height = 'auto'; textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
     });
     textarea.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (!sendBtn.disabled) sendMessage(); } });
 
-    // ----- RECONOCIMIENTO DE IMÁGENES -----
     const imageInput = document.getElementById('imageInput');
     const explicacionesGato = { es: ["🐱 Gato"], en: ["🐱 Cat"], es_AR: ["🐱 Gato"] };
     const explicacionesPerro = { es: ["🐶 Perro"], en: ["🐶 Dog"], es_AR: ["🐶 Perro"] };
@@ -863,11 +877,9 @@
       reader.readAsDataURL(file); this.value = '';
     });
 
-    // ----- RESTAURAR NOMBRE GUARDADO -----
     const savedName = localStorage.getItem('atlas_username');
     if (savedName) { nameInput.value = savedName; nameSection.style.display = 'block'; checkStartButton(); }
 
-    // ----- AJUSTE DE SIDEBAR EN REDIMENSIÓN -----
     window.addEventListener('resize', () => {
       if (window.innerWidth >= 769) { sidebar.classList.remove('open'); sidebarBackdrop.classList.remove('show'); }
     });
