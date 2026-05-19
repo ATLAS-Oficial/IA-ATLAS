@@ -449,7 +449,7 @@
       document.body.className = 'theme-' + currentTheme;
     }
 
-    // ========== VOZ SINTÉTICA (TTS) - COMPATIBLE CON FIREFOX Y OTROS ==========
+    // ========== VOZ SINTÉTICA (TTS) ==========
     function toggleTTS() {
       ttsEnabled = !ttsEnabled;
       localStorage.setItem('atlas_tts', ttsEnabled);
@@ -520,7 +520,7 @@
       speechSynthesis.cancel();
     }
 
-    // ========== RECONOCIMIENTO DE VOZ (COMPATIBLE CON CHROME Y EDGE, AVISO EN FIREFOX) ==========
+    // ========== RECONOCIMIENTO DE VOZ ==========
     function toggleVoice() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
@@ -601,7 +601,7 @@
       return null;
     }
 
-    // ========== CONOCIMIENTO PREPROGRAMADO (MEJORADO) ==========
+    // ========== CONOCIMIENTO PREPROGRAMADO ==========
     const codeKnowledge = {
       calculadora: [
         '```html\n<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Calculadora</title><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#1a1a2e;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif}.calc{background:#16213e;border-radius:20px;padding:20px;width:300px;box-shadow:0 20px 60px rgba(0,0,0,.5)}.display{background:#0f3460;border-radius:12px;padding:20px;text-align:right;margin-bottom:15px}.expr{color:#aaa;font-size:.85rem;min-height:20px}.result{color:#e94560;font-size:2rem;font-weight:700;word-break:break-all}.buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}button{padding:18px;border:none;border-radius:12px;font-size:1rem;cursor:pointer;transition:transform .1s;font-weight:600}button:active{transform:scale(.92)}.n{background:#1a1a2e;color:#fff}.o{background:#e94560;color:#fff}.e{background:#0f3460;color:#e94560;grid-column:span 2}.c{background:#533483;color:#fff}.z{grid-column:span 2}</style></head><body><div class="calc"><div class="display"><div class="expr" id="expr"></div><div class="result" id="res">0</div></div><div class="buttons"><button class="c" onclick="limpiar()">C</button><button class="c" onclick="borrar()">⌫</button><button class="c" onclick="agregar(\'%\')">%</button><button class="o" onclick="agregar(\'/\')">÷</button><button class="n" onclick="agregar(\'7\')">7</button><button class="n" onclick="agregar(\'8\')">8</button><button class="n" onclick="agregar(\'9\')">9</button><button class="o" onclick="agregar(\'*\')">×</button><button class="n" onclick="agregar(\'4\')">4</button><button class="n" onclick="agregar(\'5\')">5</button><button class="n" onclick="agregar(\'6\')">6</button><button class="o" onclick="agregar(\'-\')">−</button><button class="n" onclick="agregar(\'1\')">1</button><button class="n" onclick="agregar(\'2\')">2</button><button class="n" onclick="agregar(\'3\')">3</button><button class="o" onclick="agregar(\'+\')">+</button><button class="n z" onclick="agregar(\'0\')">0</button><button class="n" onclick="agregar(\'.\')">.</button><button class="e" onclick="calcular()">=</button></div></div><script>let expr=\'\';function agregar(v){expr+=v;document.getElementById(\'res\').textContent=expr}function limpiar(){expr=\'\';document.getElementById(\'res\').textContent=\'0\';document.getElementById(\'expr\').textContent=\'\'}function borrar(){expr=expr.slice(0,-1);document.getElementById(\'res\').textContent=expr||\'0\'}function calcular(){try{document.getElementById(\'expr\').textContent=expr+\' =\';let r=Function(\'"use strict";return(\'+expr+\')\')();document.getElementById(\'res\').textContent=parseFloat(r.toFixed(10));expr=String(r)}catch(e){document.getElementById(\'res\').textContent=\'Error\';expr=\'\'}}<\/script></body></html>\n```'
@@ -629,7 +629,7 @@
     function getRespuestas() { return respuestas[currentLang] || respuestas.es; }
     function getFallbacks() { return fallbacks[currentLang] || fallbacks.es; }
 
-    // ========== RESPUESTAS PREDEFINIDAS (MEJORADAS) ==========
+    // ========== RESPUESTAS PREDEFINIDAS ==========
     const respuestas = {
       en: [
         { claves: ["hello","hi","hey","good morning","good afternoon","good evening"], respuestas: ["Hello! 👋 How can I help you?","Hey! 😊 What do you need?","Good day! How can I assist you?"] },
@@ -665,7 +665,7 @@
       es_AR: ["No te entendí, che 🤔. ¿Lo podés decir de otra forma?","Mmm, no cazé bien. ¿Me lo repetís?","¡Uh, disculpá! No te entendí nada. ¿Probás de nuevo?","La verdad que no te entendí. ¿Lo decís más claro?","No te sigo... ¿me lo explicás de nuevo?"]
     };
 
-    // ========== FUNCIÓN PRINCIPAL DE RESPUESTA ==========
+    // ========== FUNCIÓN PRINCIPAL DE RESPUESTA (CON EXPLICACIÓN PROPIA DE WIKIPEDIA) ==========
     async function obtenerRespuesta(texto) {
       const t = texto.toLowerCase().trim();
       // 1. Emociones
@@ -684,13 +684,23 @@
       // 4. Conocimiento preprogramado (código)
       const codeAnswer = obtenerDeConocimiento(t);
       if (codeAnswer) { updateContext(texto, codeAnswer); return codeAnswer; }
-      // 5. Wikipedia como último recurso
+      // 5. Wikipedia como último recurso (ahora explicado a su manera)
       const wiki = await buscarEnWikipedia(texto);
       if (wiki) {
         const oraciones = wiki.extract.split('. ');
-        const resumen = oraciones.slice(0,2).join('. ') + (oraciones.length>2?'.':'');
+        const resumenCrudo = oraciones.slice(0,2).join('. ') + (oraciones.length>2?'.':'');
         const link = 'https://es.wikipedia.org/wiki/' + encodeURIComponent(wiki.title);
-        const respuesta = resumen + '\n\n🔗 Fuente: ' + link;
+        let respuesta;
+        if (currentLang === 'es_AR') {
+          respuesta = 'Che, según estuve viendo en Wikipedia, ' + resumenCrudo.charAt(0).toLowerCase() + resumenCrudo.slice(1);
+          respuesta += '\n\n🔗 Fuente: ' + link + '\n¿Querés que te amplíe algo en particular?';
+        } else if (currentLang === 'en') {
+          respuesta = 'According to what I found on Wikipedia, ' + resumenCrudo.charAt(0).toLowerCase() + resumenCrudo.slice(1);
+          respuesta += '\n\n🔗 Source: ' + link + '\nWant me to go deeper into any part?';
+        } else {
+          respuesta = 'Según Wikipedia, ' + resumenCrudo.charAt(0).toLowerCase() + resumenCrudo.slice(1);
+          respuesta += '\n\n🔗 Fuente: ' + link + '\n¿Necesitás más detalles?';
+        }
         updateContext(texto, respuesta); return respuesta;
       }
       // 6. Fallback
