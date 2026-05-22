@@ -3,15 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>AOS-0.2 | Chat seguro </title>
+  <title>AOS-0.2 | Secure Neural Node</title>
   
-  <!-- Iconos y Tipografía -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons@latest/iconfont/tabler-icons.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   
-  <!-- TensorFlow y MobileNet -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
 
@@ -35,6 +33,20 @@
       --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
+    body.light-mode {
+      --bg-main: #f5f5f7;
+      --bg-surface: #ffffff;
+      --bg-sidebar: #e8e8ec;
+      --border: rgba(0, 0, 0, 0.08);
+      --border-focus: rgba(0, 0, 0, 0.2);
+      --text-main: #1a1a1a;
+      --text-muted: #555;
+      --text-ghost: #999;
+      --accent: #007aff;
+      --accent-bg: rgba(0, 122, 255, 0.08);
+      --shadow: 0 20px 40px -15px rgba(0,0,0,0.1);
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: var(--font-sans);
@@ -49,89 +61,50 @@
 
     /* Pantalla de autenticación */
     #auth-screen {
-      max-width: 400px;
-      width: 100%;
-      padding: 32px 24px;
-      text-align: center;
-      animation: fadeIn 0.4s ease;
+      max-width: 400px; width: 100%; padding: 32px 24px;
+      text-align: center; animation: fadeIn 0.4s ease;
     }
     #auth-screen h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; margin-bottom: 24px; }
-    
     .lang-selector {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-bottom: 24px;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 24px;
     }
     .lang-btn {
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      padding: 12px;
-      font-size: 13px;
-      font-weight: 500;
-      border-radius: var(--radius-md);
-      cursor: pointer;
-      transition: var(--transition);
+      background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-muted);
+      padding: 12px; font-size: 13px; font-weight: 500; border-radius: var(--radius-md);
+      cursor: pointer; transition: var(--transition);
     }
     .lang-btn:hover { border-color: var(--border-focus); color: var(--text-main); }
     .lang-btn.selected { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
-
-    #auth-forms-container {
-      display: none;
-      animation: fadeIn 0.3s ease;
-    }
-
+    #auth-forms-container { display: none; animation: fadeIn 0.3s ease; }
     .auth-card {
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 24px;
-      margin-bottom: 16px;
-      text-align: left;
+      background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md);
+      padding: 24px; margin-bottom: 16px; text-align: left;
     }
     .auth-card label { display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;}
-    
     .code-display {
-      background: var(--bg-main);
-      border: 1px solid var(--border);
-      padding: 14px;
-      border-radius: 8px;
-      font-family: monospace;
-      font-size: 16px;
-      letter-spacing: 2px;
-      color: var(--accent);
-      text-align: center;
-      margin-bottom: 12px;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
+      background: var(--bg-main); border: 1px solid var(--border); padding: 14px;
+      border-radius: 8px; font-family: monospace; font-size: 16px; letter-spacing: 2px;
+      color: var(--accent); text-align: center; margin-bottom: 12px; display: none;
+      align-items: center; justify-content: center; gap: 10px;
     }
-
     .text-input {
-      width: 100%; padding: 14px; background: var(--bg-main);
-      border: 1px solid var(--border); border-radius: 8px;
-      color: var(--text-main); font-family: monospace; font-size: 15px;
+      width: 100%; padding: 14px; background: var(--bg-main); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text-main); font-family: monospace; font-size: 15px;
       outline: none; transition: var(--transition); text-align: center;
     }
     .text-input:focus { border-color: var(--border-focus); }
-
     .btn {
-      width: 100%; padding: 14px; border: none; border-radius: 8px;
-      font-size: 14px; font-weight: 600; cursor: pointer; transition: var(--transition);
-      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px;
     }
     .btn-primary { background: var(--text-main); color: var(--bg-main); }
     .btn-primary:hover { opacity: 0.9; }
     .btn-secondary { background: transparent; color: var(--text-muted); border: 1px solid var(--border); margin-top: 10px; }
     .btn-secondary:hover { color: var(--text-main); border-color: var(--border-focus); }
-
     .separator { text-align: center; margin: 16px 0; font-size: 12px; color: var(--text-ghost); text-transform: uppercase; }
 
     /* App principal */
     #app { display: none; width: 100vw; height: 100dvh; position: relative; }
-    
     #sidebar {
       width: var(--sidebar-width); background: var(--bg-sidebar); border-right: 1px solid var(--border);
       display: flex; flex-direction: column; position: fixed; top: 0; bottom: 0; left: 0; z-index: 200;
@@ -140,25 +113,41 @@
     #sidebar.open { transform: translateX(0); }
     #sidebar-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 199; }
     #sidebar-backdrop.show { display: block; }
-
     .sidebar-header { padding: 24px 20px; display: flex; align-items: center; justify-content: space-between; font-weight: 600; font-size: 15px; }
     .chat-list { flex: 1; overflow-y: auto; padding: 0 12px; font-size: 14px; color: var(--text-muted); }
-    .sidebar-footer { padding: 20px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-ghost); font-family: monospace; }
+    
+    /* Ajustes en la barra lateral */
+    .sidebar-settings {
+      padding: 12px 20px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .sidebar-settings .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-settings .setting-row:last-child { border-bottom: none; }
+    .sidebar-settings label { font-size: 12px; color: var(--text-main); }
+    .sidebar-settings .toggle-switch { width: 40px; height: 22px; }
+    .sidebar-settings .slider:before { height: 16px; width: 16px; left: 3px; bottom: 3px; }
+    .sidebar-settings input:checked + .slider:before { transform: translateX(18px); }
 
+    .sidebar-footer { padding: 12px 20px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-ghost); font-family: monospace; }
+    
     #main-container { flex: 1; display: flex; flex-direction: column; width: 100%; height: 100%; }
     .top-bar { height: 64px; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; }
-    
     .icon-btn {
       background: none; border: none; color: var(--text-muted); width: 38px; height: 38px; border-radius: 8px;
       display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition);
     }
     .icon-btn:hover { background: var(--border); color: var(--text-main); }
-
     .chat-view { flex: 1; overflow-y: auto; display: flex; flex-direction: column; padding: 20px; }
     .welcome-screen { max-width: 600px; width: 100%; margin: auto; text-align: center; }
     .welcome-screen h2 { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 8px; }
-    
-    /* Mensajes */
     #messages { display: none; flex-direction: column; gap: 12px; }
     .msg-row { display: flex; animation: messagePop 0.3s ease both; }
     .msg-row.user { justify-content: flex-end; }
@@ -170,20 +159,21 @@
     .bubble { padding: 8px 14px; border-radius: 16px; font-size: 14px; line-height: 1.5; color: var(--text-main); word-break: break-word; overflow-wrap: anywhere; white-space: pre-wrap; }
     .msg-row.user .bubble { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 16px 16px 4px 16px; }
     .msg-row.assistant .bubble { background: none; padding: 2px 0; border-radius: 0; border: none; }
-    
+    .msg-row.assistant .bubble-footer { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+    .audio-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 2px; border-radius: 4px; }
+    .audio-btn:hover { color: var(--text-main); background: var(--border); }
+
     .typing-indicator { display: flex; gap: 4px; align-items: center; padding: 4px 0; }
     .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--text-ghost); animation: bounce 1.2s infinite; }
     .dot:nth-child(2){animation-delay:0.2s} .dot:nth-child(3){animation-delay:0.4s}
     @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
-
-    /* Código */
     .code-container { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin: 8px 0; position: relative; overflow-x: auto; }
     .code-container pre { margin: 0; padding: 0; font-size: 13px; font-family: monospace; color: var(--text-main); white-space: pre-wrap; word-break: break-word; }
     .code-toolbar { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; flex-wrap: wrap; }
     .code-btn { padding: 5px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-main); color: var(--text-muted); cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 4px; transition: var(--transition); }
     .code-btn.run { background: var(--accent-bg); color: var(--accent); border-color: var(--accent); }
+    .wiki-image { max-width: 100%; border-radius: 12px; margin-top: 8px; border: 1px solid var(--border); }
 
-    /* Input */
     .input-area { padding: 16px 24px 32px; background: linear-gradient(to top, var(--bg-main) 60%, transparent); }
     .input-wrapper {
       max-width: 720px; margin: 0 auto; background: rgba(20, 20, 23, 0.8); border: 1px solid var(--border);
@@ -193,69 +183,52 @@
     .input-wrapper textarea { width: 100%; background: none; border: none; outline: none; resize: none; font-family: inherit; font-size: 15px; color: var(--text-main); padding: 10px 4px; min-height: 40px; max-height: 120px; }
     .toolbar { display: flex; align-items: center; justify-content: space-between; padding-top: 6px; }
     .tools { display: flex; gap: 4px; }
-    
     .send-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--text-main); color: var(--bg-main); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
     .send-btn:disabled { background: var(--border); color: var(--text-ghost); cursor: not-allowed; }
 
-    /* Onboarding modal */
+    /* Onboarding (aún se usa) */
     #onboarding-modal {
       display: none; position: fixed; inset: 0; background: rgba(5, 5, 6, 0.85);
       backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
       z-index: 1000; align-items: center; justify-content: center; padding: 24px;
     }
     #onboarding-modal.active { display: flex; animation: fadeIn 0.3s ease; }
-    
-    .onboarding-card {
+    .modal-card {
       background: var(--bg-surface); border: 1px solid var(--border);
       max-width: 480px; width: 100%; padding: 32px; border-radius: var(--radius-md);
       box-shadow: var(--shadow); text-align: left;
     }
-    .onboarding-card h3 { font-size: 24px; font-weight: 600; margin-bottom: 16px; letter-spacing: -0.02em; }
-    .onboarding-card p { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; }
+    .modal-card h3 { font-size: 24px; font-weight: 600; margin-bottom: 16px; }
+    .modal-card p { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; }
     .onboarding-badge {
       display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px;
       background: var(--accent-bg); border: 1px solid var(--accent);
       color: var(--accent); border-radius: 6px; font-size: 12px; font-weight: 500; margin-bottom: 20px;
     }
 
-    /* Voice overlay */
-    #voice-overlay {
-      display: none; position: fixed; inset: 0; background: #040406; z-index: 500;
-      flex-direction: column; align-items: center; justify-content: space-between; padding: 48px 24px;
-    }
+    #voice-overlay { display: none; position: fixed; inset: 0; background: #040406; z-index: 500; flex-direction: column; align-items: center; justify-content: space-between; padding: 48px 24px; }
     #voice-overlay.active { display: flex; animation: fadeIn 0.3s ease; }
-
     .light-mesh-container { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; }
-    .blur-light {
-      position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.35;
-      animation: floatLight var(--speed, 12s) infinite alternate ease-in-out;
-    }
+    .blur-light { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.35; animation: floatLight var(--speed, 12s) infinite alternate ease-in-out; }
     .light-blue { width: 400px; height: 400px; background: #0284c7; top: 20%; left: 15%; }
     .light-cyan { width: 350px; height: 350px; background: #38bdf8; bottom: 15%; right: 10%; animation-delay: -3s; }
     .light-white { width: 300px; height: 300px; background: #ffffff; top: 40%; right: 25%; animation-delay: -6s; opacity: 0.15; }
-
     .voice-ui-content { z-index: 2; text-align: center; margin: auto; }
     .voice-status { font-size: 14px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
     .voice-indicator-text { font-size: 24px; font-weight: 600; color: var(--text-main); }
     #voice-subtitles { font-size: 18px; color: var(--text-muted); margin-top: 16px; min-height: 28px; }
-    
     .voice-footer { z-index: 2; width: 100%; display: flex; justify-content: center; }
     .close-voice-btn { width: 56px; height: 56px; border-radius: 50%; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.1); color: #ef4444; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: var(--transition); }
     .close-voice-btn:hover { background: #ef4444; color: #fff; transform: scale(1.05); }
 
-    /* Run modal */
     #run-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 600; align-items: center; justify-content: center; padding: 20px; }
     #run-modal.open { display: flex; }
     #run-modal-content { background: var(--bg-surface); border-radius: 16px; width: 100%; max-width: 900px; height: 80dvh; display: flex; flex-direction: column; overflow: hidden; }
     #run-modal-header { padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
     #run-frame { flex: 1; width: 100%; border: none; }
-
-    /* Feedback modal */
     #feedback-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 700; align-items: center; justify-content: center; padding: 24px; }
     #feedback-modal.open { display: flex; }
-
     .disclaimer { text-align: center; font-size: 10px; color: var(--text-ghost); margin-top: 6px; }
-
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes floatLight {
       0% { transform: translate(0, 0) scale(1); }
@@ -270,22 +243,18 @@
   <!-- Autenticación -->
   <div id="auth-screen">
     <h1>AOS-0.2</h1>
-    
     <div class="lang-selector">
       <button class="lang-btn" onclick="selectLanguage(this, 'en')">English</button>
       <button class="lang-btn" onclick="selectLanguage(this, 'es')">Español</button>
       <button class="lang-btn" onclick="selectLanguage(this, 'es_AR')">Argentino</button>
     </div>
-
     <div id="auth-forms-container">
       <div class="auth-card">
         <label id="lbl-existing">Acceder con cuenta existente</label>
         <input type="text" id="loginCodeInput" class="text-input" placeholder="---- ---- ---- ----" maxlength="19" oninput="formatInput(this)">
         <button class="btn btn-primary" style="margin-top: 12px;" onclick="login()" id="btn-login">Entrar</button>
       </div>
-
       <div class="separator" id="lbl-or">ó</div>
-
       <div class="auth-card" style="text-align: center;">
         <label style="text-align: left;" id="lbl-new">¿No tenés una cuenta?</label>
         <div id="generatedCodeDisplay" class="code-display"></div>
@@ -297,11 +266,11 @@
 
   <!-- Onboarding -->
   <div id="onboarding-modal">
-    <div class="onboarding-card">
+    <div class="modal-card">
       <div class="onboarding-badge"><i class="ti ti-shield-check"></i> Local Node Active</div>
       <h3 id="modal-title">Bienvenido al ecosistema</h3>
-      <p id="modal-desc1">Este entorno opera bajo un aislamiento criptográfico completo. Toda la memoria, procesamiento de texto e hilos de conversación se quedan confinados localmente dentro de este dispositivo. Absolutamente nada se transmite hacia servidores externos.</p>
-      <p id="modal-desc2">AOS-0.2 es un proyecto independiente en constante desarrollo continuo. Recibirás actualizaciones frecuentes de optimización del motor local y refinamiento de la interfaz.</p>
+      <p id="modal-desc1">Este entorno opera bajo un aislamiento criptográfico completo...</p>
+      <p id="modal-desc2">AOS-0.2 es un proyecto independiente en constante desarrollo...</p>
       <button class="btn btn-primary" onclick="closeOnboarding()">Entendido</button>
     </div>
   </div>
@@ -309,13 +278,35 @@
   <!-- App principal -->
   <div id="app">
     <div id="sidebar-backdrop" onclick="toggleSidebar()"></div>
-    
     <div id="sidebar">
       <div class="sidebar-header">
-        <span>Memoria Local</span>
+        <span>Menú</span>
         <button class="icon-btn" onclick="toggleSidebar()"><i class="ti ti-x"></i></button>
       </div>
       <div class="chat-list" id="chatHistoryList"></div>
+      
+      <!-- Ajustes integrados en la barra lateral -->
+      <div class="sidebar-settings">
+        <div class="setting-row">
+          <label>Tema claro</label>
+          <label class="toggle-switch">
+            <input type="checkbox" id="lightModeToggleSide" onchange="toggleLightModeSide()">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <label>Sonido en voz</label>
+          <label class="toggle-switch">
+            <input type="checkbox" id="ttsAutoToggleSide" checked onchange="toggleAutoTTSSide()">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <label>Contacto</label>
+          <span style="font-size:11px; color:var(--accent);">supportaos5@gmail.com</span>
+        </div>
+      </div>
+      
       <div class="sidebar-footer" id="accountBadge">ID: ---- ---- ---- ----</div>
     </div>
 
@@ -374,7 +365,7 @@
   <div id="feedback-modal">
     <div style="background:var(--bg-surface); border-radius:16px; padding:24px; width:100%; max-width:400px; border:1px solid var(--border); color:var(--text-main);">
       <h3 style="margin-bottom:0.5rem;">✉️ Enviar sugerencia</h3>
-      <p style="color:var(--text-muted); margin-bottom:1rem; font-size:0.9rem;">¿Encontraste un error o tenés una idea? Escribila acá y me llegará a mi correo.</p>
+      <p style="color:var(--text-muted); margin-bottom:1rem; font-size:0.9rem;">Tus comentarios llegan a supportaos5@gmail.com</p>
       <textarea id="feedback-text" rows="5" placeholder="Escribe tu sugerencia..." style="width:100%; padding:12px; background:var(--bg-main); border:1px solid var(--border); border-radius:12px; color:var(--text-main); font-family:inherit; resize:vertical; margin-bottom:1rem;"></textarea>
       <div style="display:flex; gap:8px; justify-content:flex-end;">
         <button onclick="closeFeedback()" style="padding:8px 16px; border-radius:10px; border:1px solid var(--border); background:transparent; color:var(--text-muted); cursor:pointer;">Cancelar</button>
@@ -385,23 +376,19 @@
 
   <script>
     (function() {
-      // ========== ESTADO GLOBAL ==========
+      // Estado
       let currentAccount = '';
       let currentLang = 'es';
       let mobilenetModel = null;
       let isTyping = false;
       let recognition = null;
       let isRecording = false;
-      let conversationContext = [];
-      let ttsEnabled = true;
-      let privacyMode = false;
+      let ttsAutoEnabled = true;
       let voiceModeActive = false;
-      let audioContext = null;
-      let analyser = null;
-      let animationId = null;
-      let speechInterval = null;
+      let lightMode = false;
+      let forceSpeak = false;
 
-      // Elementos UI
+      // UI Elements
       const authScreen = document.getElementById('auth-screen');
       const app = document.getElementById('app');
       const messagesEl = document.getElementById('messages');
@@ -413,18 +400,21 @@
       const voiceStatus = document.getElementById('voiceStatus');
       const voicePrompt = document.getElementById('voicePrompt');
       const voiceSubtitles = document.getElementById('voice-subtitles');
-      const meshContainer = document.getElementById('meshContainer');
       const sidebar = document.getElementById('sidebar');
       const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+      
+      // Elementos de ajustes en el sidebar
+      const lightModeToggleSide = document.getElementById('lightModeToggleSide');
+      const ttsAutoToggleSide = document.getElementById('ttsAutoToggleSide');
 
-      // ========== TRADUCCIONES ==========
+      // Traducciones
       const translations = {
         en: {
           existing: "Access with existing account", login: "Enter", or: "or", new: "Don't have an account?",
           indicator: "SECURE LOCAL NODE", welcome: "Active Channel", placeholder: "Send encrypted local message...",
           mTitle: "Welcome to the Ecosystem",
-          mD1: "This environment operates under complete cryptographic isolation. All memory, text processing, and conversation threads remain confined locally within this device. Absolutely nothing is transmitted to external servers.",
-          mD2: "AOS-0.2 is an independent project under constant, continuous development. You will receive frequent updates optimizing the local engine and refining the user interface.",
+          mD1: "This environment operates under complete cryptographic isolation...",
+          mD2: "AOS-0.2 is an independent project under constant, continuous development...",
           vListen: "AOS Listening", vListenPrompt: "Speak now safely...", vSpeak: "AOS Responding", vSpeakPrompt: "Processing neural response...",
           listening: "Listening...", errorSpeech: "Speech recognition not supported. Try Chrome or Edge."
         },
@@ -432,8 +422,8 @@
           existing: "Acceder con cuenta existente", login: "Entrar", or: "ó", new: "¿No tienes una cuenta?",
           indicator: "NODO LOCAL SEGURO", welcome: "Canal Activo", placeholder: "Enviar mensaje local cifrado...",
           mTitle: "Bienvenido al Ecosistema",
-          mD1: "Este entorno opera bajo un aislamiento criptográfico completo. Toda la memoria, procesamiento de texto e hilos de conversación se quedan confinados localmente dentro de este dispositivo. Absolutamente nada se transmite hacia servidores externos.",
-          mD2: "AOS-0.2 es un proyecto independiente en constante desarrollo continuo. Recibirás actualizaciones frecuentes de optimización del motor local y refinamiento de la interfaz.",
+          mD1: "Este entorno opera bajo un aislamiento criptográfico completo...",
+          mD2: "AOS-0.2 es un proyecto independiente en constante desarrollo continuo...",
           vListen: "AOS Escuchando", vListenPrompt: "Habla ahora de forma segura...", vSpeak: "AOS Respondiendo", vSpeakPrompt: "Procesando respuesta...",
           listening: "Escuchando...", errorSpeech: "Reconocimiento de voz no soportado. Probá con Chrome o Edge."
         },
@@ -441,15 +431,15 @@
           existing: "Entrá con tu cuenta existente", login: "Entrar", or: "ó", new: "¿No tenés una cuenta?",
           indicator: "NODO LOCAL SEGURO", welcome: "Canal Activo", placeholder: "Mandá un mensaje local cifrado...",
           mTitle: "Bienvenido al Ecosistema",
-          mD1: "Este entorno corre bajo un aislamiento completo, che. Toda la memoria, los textos y los hilos de charla se quedan guardados en tu dispositivo. De acá no sale absolutamente nada para internet.",
-          mD2: "AOS-0.2 es un proyecto independiente que está en constante desarrollo. Vas a ver actualizaciones frecuentes para que el motor local vuele y la interfaz quede impecable.",
+          mD1: "Este entorno corre bajo un aislamiento completo, che...",
+          mD2: "AOS-0.2 es un proyecto independiente que está en constante desarrollo...",
           vListen: "AOS Escuchando", vListenPrompt: "Hablá ahora, tranquilo...", vSpeak: "AOS Respondiendo", vSpeakPrompt: "Armando la respuesta...",
           listening: "Escuchando...", errorSpeech: "El reconocimiento de voz no anda en este navegador. Probá con Chrome o Edge."
         }
       };
 
       // ========== AUTENTICACIÓN ==========
-      window.selectLanguage = function(btn, lang) {
+      window.selectLanguage = (btn, lang) => {
         document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
         currentLang = lang;
@@ -461,20 +451,17 @@
         document.getElementById('top-indicator').innerText = t.indicator;
         document.getElementById('chat-welcome').innerText = t.welcome;
         chatInput.placeholder = t.placeholder;
-        document.getElementById('modal-title').innerText = t.mTitle;
-        document.getElementById('modal-desc1').innerText = t.mD1;
-        document.getElementById('modal-desc2').innerText = t.mD2;
         document.getElementById('auth-forms-container').style.display = 'block';
       };
 
-      window.formatInput = function(el) {
+      window.formatInput = el => {
         let v = el.value.replace(/\s+/g, '').replace(/[^0-9]/g, '');
         let parts = [];
         for (let i=0; i<v.length && i<16; i+=4) parts.push(v.substring(i, i+4));
         el.value = parts.join(' ');
       };
 
-      window.generateAccount = function() {
+      window.generateAccount = () => {
         let code = '';
         for (let i = 0; i < 16; i++) code += Math.floor(Math.random() * 10);
         let formatted = code.match(/.{1,4}/g).join(' ');
@@ -486,7 +473,7 @@
         currentAccount = code;
       };
 
-      window.confirmNewAccount = function() {
+      window.confirmNewAccount = () => {
         if(currentAccount) {
           localStorage.setItem(`aos_mem_${currentAccount}`, JSON.stringify([]));
           localStorage.setItem(`aos_first_${currentAccount}`, 'true');
@@ -494,7 +481,7 @@
         }
       };
 
-      window.login = function() {
+      window.login = () => {
         let input = document.getElementById('loginCodeInput').value.replace(/\s+/g, '');
         if(input.length === 16) {
           if (!localStorage.getItem(`aos_mem_${input}`)) {
@@ -513,18 +500,20 @@
         if (localStorage.getItem(`aos_first_${currentAccount}`) === 'true') {
           document.getElementById('onboarding-modal').classList.add('active');
         }
-        // Cargar modelo
+        // Sincronizar los toggles del sidebar con los valores actuales
+        lightModeToggleSide.checked = lightMode;
+        ttsAutoToggleSide.checked = ttsAutoEnabled;
         if (!mobilenetModel) {
-          mobilenet.load().then(model => { mobilenetModel = model; console.log("Modelo listo"); }).catch(e => console.warn("Error modelo"));
+          mobilenet.load().then(model => { mobilenetModel = model; }).catch(e => console.warn("Error modelo"));
         }
       }
 
-      window.closeOnboarding = function() {
+      window.closeOnboarding = () => {
         document.getElementById('onboarding-modal').classList.remove('active');
         localStorage.removeItem(`aos_first_${currentAccount}`);
       };
 
-      window.logout = function() {
+      window.logout = () => {
         currentAccount = '';
         app.style.display = 'none';
         authScreen.style.display = 'block';
@@ -532,76 +521,80 @@
         document.getElementById('confirmGenBtn').style.display = 'none';
         document.getElementById('generatedCodeDisplay').style.display = 'none';
         document.getElementById('loginCodeInput').value = '';
-        conversationContext = [];
         messagesEl.innerHTML = '';
         messagesEl.style.display = 'none';
         welcomeScreen.style.display = 'flex';
       };
 
-      window.toggleSidebar = function() {
+      window.toggleSidebar = () => {
         sidebar.classList.toggle('open');
         sidebarBackdrop.classList.toggle('show');
+        // Actualizar checkboxes cada vez que se abre
+        if (sidebar.classList.contains('open')) {
+          lightModeToggleSide.checked = lightMode;
+          ttsAutoToggleSide.checked = ttsAutoEnabled;
+        }
+      };
+
+      // ========== AJUSTES DESDE LA BARRA LATERAL ==========
+      window.toggleLightModeSide = () => {
+        lightMode = lightModeToggleSide.checked;
+        document.body.classList.toggle('light-mode', lightMode);
+      };
+      window.toggleAutoTTSSide = () => {
+        ttsAutoEnabled = ttsAutoToggleSide.checked;
       };
 
       // ========== LÓGICA DE CHAT ==========
       const emociones = {
-        feliz: { en: ["happy","glad","joyful"], es: ["feliz","contento","alegre"], es_AR: ["feliz","contento","alegre","joya","re feliz"] },
-        triste: { en: ["sad","unhappy","depressed"], es: ["triste","deprimido","bajón"], es_AR: ["triste","deprimido","bajón","hecho mierda"] },
-        enojado: { en: ["angry","mad","furious"], es: ["enojado","furioso","caliente"], es_AR: ["enojado","caliente","bronca","re caliente"] },
-        miedo: { en: ["scared","afraid","fear"], es: ["miedo","asustado","aterrado"], es_AR: ["miedo","cagaso","asustado","re cagado"] },
-        sorpresa: { en: ["surprised","shocked","amazed"], es: ["sorprendido","sorprendente","impactado"], es_AR: ["sorprendido","impactado","no lo puedo creer"] },
-        cansado: { en: ["tired","exhausted"], es: ["cansado","agotado"], es_AR: ["cansado","agotado","re cansado","estoy muerto"] },
-        aburrido: { en: ["bored"], es: ["aburrido"], es_AR: ["aburrido","me embolo","estoy al pedo"] },
-        enamorado: { en: ["in love"], es: ["enamorado"], es_AR: ["enamorado","me enamoré"] }
+        feliz: { en: ["happy","glad"], es: ["feliz","contento"], es_AR: ["feliz","contento","joya"] },
+        triste: { en: ["sad","unhappy"], es: ["triste","deprimido"], es_AR: ["triste","bajón"] },
+        enojado: { en: ["angry","mad"], es: ["enojado","furioso"], es_AR: ["enojado","bronca"] },
+        miedo: { en: ["scared","afraid"], es: ["miedo","asustado"], es_AR: ["miedo","cagaso"] },
+        sorpresa: { en: ["surprised"], es: ["sorprendido"], es_AR: ["sorprendido","impactado"] },
+        cansado: { en: ["tired"], es: ["cansado"], es_AR: ["cansado","re cansado"] },
+        aburrido: { en: ["bored"], es: ["aburrido"], es_AR: ["aburrido","embolo"] },
+        enamorado: { en: ["love"], es: ["enamorado"], es_AR: ["enamorado"] }
       };
       const respEmocion = {
-        feliz: { en: ["That's great! 😊","Awesome!"], es: ["¡Qué bueno! 😊","¡Genial!"], es_AR: ["¡Qué bien, che! 😊","¡Joyita!"] },
+        feliz: { en: ["That's great! 😊"], es: ["¡Qué bueno! 😊"], es_AR: ["¡Qué bien, che! 😊"] },
         triste: { en: ["I'm sorry... Want to talk?"], es: ["Lamento eso. ¿Querés hablar?"], es_AR: ["Uh, qué bajón. ¿Querés hablar?"] },
-        enojado: { en: ["I understand. Want to vent?"], es: ["Entiendo tu bronca. ¿Querés desahogarte?"], es_AR: ["Te entiendo. ¿Querés putear un rato?"] },
-        miedo: { en: ["Fear is normal. What worries you?"], es: ["El miedo es normal. ¿Qué te preocupa?"], es_AR: ["El cagaso es normal. ¿Qué te preocupa?"] },
-        sorpresa: { en: ["What a surprise! Tell me more."], es: ["¡Qué sorpresa! Contame más."], es_AR: ["¡Qué sorpresa, che! Contame más."] },
-        cansado: { en: ["Rest up! You deserve it."], es: ["¡Descansá! Te lo merecés."], es_AR: ["Tiráte a descansar, te lo re merecés."] },
-        aburrido: { en: ["Want to play something?"], es: ["¿Querés que te cuente algo?"], es_AR: ["¿Querés un juego o un chiste?"] },
-        enamorado: { en: ["Love is beautiful! Tell me more."], es: ["El amor es hermoso. ¡Contame más!"], es_AR: ["¡Qué lindo, che! Contame más."] }
+        enojado: { en: ["I understand. Want to vent?"], es: ["Entiendo tu bronca."], es_AR: ["Te entiendo. ¿Querés putear?"] },
+        miedo: { en: ["Fear is normal."], es: ["El miedo es normal."], es_AR: ["El cagaso es normal."] },
+        sorpresa: { en: ["What a surprise!"], es: ["¡Qué sorpresa!"], es_AR: ["¡Qué sorpresa, che!"] },
+        cansado: { en: ["Rest up!"], es: ["¡Descansá!"], es_AR: ["Tiráte a descansar."] },
+        aburrido: { en: ["Want to play something?"], es: ["¿Querés un juego?"], es_AR: ["¿Querés un chiste?"] },
+        enamorado: { en: ["Love is beautiful!"], es: ["¡El amor es hermoso!"], es_AR: ["¡Qué lindo, che!"] }
       };
 
       const respuestas = {
         en: [
-          { claves: ["hello","hi","hey"], respuestas: ["Hello! 👋 How can I help you?","Hey! 😊 What do you need?"] },
-          { claves: ["how are you"], respuestas: ["I'm great, thanks! 😄"] },
-          { claves: ["name"], respuestas: ["I'm AOS-0.2, your virtual assistant. 🇦🇷"] },
-          { claves: ["thanks"], respuestas: ["You're welcome! 😊"] },
-          { claves: ["bye"], respuestas: ["See you later! 👋"] },
-          { claves: ["help"], respuestas: ["I can chat, recognize images, search Wikipedia, write code, teach math, and talk!"] }
+          { claves: ["hello","hi","hey"], respuestas: ["Hello! 👋"] },
+          { claves: ["how are you"], respuestas: ["I'm great! 😄"] },
+          { claves: ["name"], respuestas: ["I'm AOS-0.2. 🇦🇷"] },
+          { claves: ["thanks"], respuestas: ["You're welcome!"] },
+          { claves: ["bye"], respuestas: ["See you! 👋"] }
         ],
         es: [
-          { claves: ["hola","buenas"], respuestas: ["¡Hola! 👋 ¿En qué te puedo ayudar?"] },
-          { claves: ["cómo estás"], respuestas: ["¡Muy bien, gracias! 😄"] },
-          { claves: ["nombre"], respuestas: ["Soy AOS-0.2, tu asistente virtual. 🇦🇷"] },
-          { claves: ["gracias"], respuestas: ["¡De nada! 😊"] },
-          { claves: ["chau"], respuestas: ["¡Chau! 👋"] },
-          { claves: ["ayuda"], respuestas: ["Puedo charlar, reconocer imágenes, buscar en Wikipedia, programar, enseñar matemáticas y hablar."] }
+          { claves: ["hola","buenas"], respuestas: ["¡Hola! 👋"] },
+          { claves: ["cómo estás"], respuestas: ["¡Muy bien! 😄"] },
+          { claves: ["nombre"], respuestas: ["Soy AOS-0.2. 🇦🇷"] },
+          { claves: ["gracias"], respuestas: ["¡De nada!"] },
+          { claves: ["chau"], respuestas: ["¡Chau! 👋"] }
         ],
         es_AR: [
-          { claves: ["hola","buenas"], respuestas: ["¡Hola, che! 👋 ¿En qué te puedo dar una mano?"] },
-          { claves: ["cómo estás"], respuestas: ["¡Joyita, gracias! 😄"] },
-          { claves: ["nombre"], respuestas: ["Soy AOS-0.2, un asistente virtual hecho por un pibe argentino. 🇦🇷"] },
-          { claves: ["gracias"], respuestas: ["¡De nada, che! 😊"] },
-          { claves: ["chau"], respuestas: ["¡Chau, che! 👋"] },
-          { claves: ["ayuda"], respuestas: ["Puedo charlar, reconocer imágenes, buscar en Wikipedia, programar, enseñar matemáticas y hablar."] }
+          { claves: ["hola","buenas"], respuestas: ["¡Hola, che! 👋"] },
+          { claves: ["cómo estás"], respuestas: ["¡Joyita! 😄"] },
+          { claves: ["nombre"], respuestas: ["Soy AOS-0.2. 🇦🇷"] },
+          { claves: ["gracias"], respuestas: ["¡De nada, che!"] },
+          { claves: ["chau"], respuestas: ["¡Chau! 👋"] }
         ]
-      };
-      const fallbacks = {
-        en: ["I didn't quite get that 🤔", "Hmm, try again!"],
-        es: ["No entendí bien eso 🤔", "¿Probás de nuevo?"],
-        es_AR: ["No te entendí, che 🤔", "¿Me lo repetís?"]
       };
 
       const codeKnowledge = {
-        calculadora: ['```html\n<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Calculadora</title><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#1a1a2e;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif}.calc{background:#16213e;border-radius:20px;padding:20px;width:300px;box-shadow:0 20px 60px rgba(0,0,0,.5)}.display{background:#0f3460;border-radius:12px;padding:20px;text-align:right;margin-bottom:15px}.expr{color:#aaa;font-size:.85rem;min-height:20px}.result{color:#e94560;font-size:2rem;font-weight:700;word-break:break-all}.buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}button{padding:18px;border:none;border-radius:12px;font-size:1rem;cursor:pointer;transition:transform .1s;font-weight:600}button:active{transform:scale(.92)}.n{background:#1a1a2e;color:#fff}.o{background:#e94560;color:#fff}.e{background:#0f3460;color:#e94560;grid-column:span 2}.c{background:#533483;color:#fff}.z{grid-column:span 2}</style></head><body><div class="calc"><div class="display"><div class="expr" id="expr"></div><div class="result" id="res">0</div></div><div class="buttons"><button class="c" onclick="limpiar()">C</button><button class="c" onclick="borrar()">⌫</button><button class="c" onclick="agregar(\'%\')">%</button><button class="o" onclick="agregar(\'/\')">÷</button><button class="n" onclick="agregar(\'7\')">7</button><button class="n" onclick="agregar(\'8\')">8</button><button class="n" onclick="agregar(\'9\')">9</button><button class="o" onclick="agregar(\'*\')">×</button><button class="n" onclick="agregar(\'4\')">4</button><button class="n" onclick="agregar(\'5\')">5</button><button class="n" onclick="agregar(\'6\')">6</button><button class="o" onclick="agregar(\'-\')">−</button><button class="n" onclick="agregar(\'1\')">1</button><button class="n" onclick="agregar(\'2\')">2</button><button class="n" onclick="agregar(\'3\')">3</button><button class="o" onclick="agregar(\'+\')">+</button><button class="n z" onclick="agregar(\'0\')">0</button><button class="n" onclick="agregar(\'.\')">.</button><button class="e" onclick="calcular()">=</button></div></div><script>let expr=\'\';function agregar(v){expr+=v;document.getElementById(\'res\').textContent=expr}function limpiar(){expr=\'\';document.getElementById(\'res\').textContent=\'0\'}function borrar(){expr=expr.slice(0,-1);document.getElementById(\'res\').textContent=expr||\'0\'}function calcular(){try{let r=Function(\'"use strict";return(\'+expr+\')\')();document.getElementById(\'res\').textContent=parseFloat(r.toFixed(10));expr=String(r)}catch(e){document.getElementById(\'res\').textContent=\'Error\'}}<\/script></body></html>\n```'],
-        tareas: ['```html\n<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Tareas</title><style>*{box-sizing:border-box;margin:0;padding:0}body{background:#f0f2f5;font-family:sans-serif;padding:2rem}.app{max-width:520px;margin:0 auto}h1{font-size:1.8rem;color:#1a1a1a}.row{display:flex;gap:10px;margin:1rem 0}.row input{flex:1;padding:14px;border:2px solid #e0e0e0;border-radius:14px;font-size:1rem}.add{padding:14px 22px;background:#007aff;color:#fff;border:none;border-radius:14px;cursor:pointer}.lista{display:flex;flex-direction:column;gap:10px}.item{background:#fff;border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.06)}.item.done{opacity:.55}.item.done .txt{text-decoration:line-through}.cb{width:22px;height:22px;border-radius:50%;border:2px solid #007aff;cursor:pointer}.cb.on{background:#007aff}.cb.on::after{content:"✓";color:#fff;font-size:13px;font-weight:700}.txt{flex:1}.del{background:none;border:none;color:#ff3b30;cursor:pointer}</style></head><body><div class="app"><h1>📝 Mis Tareas</h1><div class="row"><input id="inp" placeholder="Nueva tarea..."><button class="add" onclick="add()">+</button></div><div class="lista" id="lista"></div></div><script>let T=JSON.parse(localStorage.getItem(\'atlas_t\')||\'[]\');function save(){localStorage.setItem(\'atlas_t\',JSON.stringify(T))}function add(){const v=document.getElementById(\'inp\').value.trim();if(!v)return;T.push({id:Date.now(),v,ok:false});document.getElementById(\'inp\').value=\'\';save();draw()}function tog(id){T=T.map(t=>t.id===id?{...t,ok:!t.ok}:t);save();draw()}function del(id){T=T.filter(t=>t.id!==id);save();draw()}function draw(){document.getElementById(\'lista\').innerHTML=T.map(t=>\'<div class="item\'+(t.ok?\' done\':\'\')+\'"><div class="cb\'+(t.ok?\' on\':\'\')+\'" onclick="tog(\'+t.id+\')"></div><span class="txt">\'+t.v+\'</span><button class="del" onclick="del(\'+t.id+\')">🗑</button></div>\').join(\'\')}draw();<\/script></body></html>\n```']
+        calculadora: ['```html\n<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Calculadora</title><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#1a1a2e;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif}.calc{background:#16213e;border-radius:20px;padding:20px;width:300px;box-shadow:0 20px 60px rgba(0,0,0,.5)}.display{background:#0f3460;border-radius:12px;padding:20px;text-align:right;margin-bottom:15px}.expr{color:#aaa;font-size:.85rem;min-height:20px}.result{color:#e94560;font-size:2rem;font-weight:700;word-break:break-all}.buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}button{padding:18px;border:none;border-radius:12px;font-size:1rem;cursor:pointer;transition:transform .1s;font-weight:600}button:active{transform:scale(.92)}.n{background:#1a1a2e;color:#fff}.o{background:#e94560;color:#fff}.e{background:#0f3460;color:#e94560;grid-column:span 2}.c{background:#533483;color:#fff}.z{grid-column:span 2}</style></head><body><div class="calc"><div class="display"><div class="expr" id="expr"></div><div class="result" id="res">0</div></div><div class="buttons"><button class="c" onclick="limpiar()">C</button><button class="c" onclick="borrar()">⌫</button><button class="c" onclick="agregar(\'%\')">%</button><button class="o" onclick="agregar(\'/\')">÷</button><button class="n" onclick="agregar(\'7\')">7</button><button class="n" onclick="agregar(\'8\')">8</button><button class="n" onclick="agregar(\'9\')">9</button><button class="o" onclick="agregar(\'*\')">×</button><button class="n" onclick="agregar(\'4\')">4</button><button class="n" onclick="agregar(\'5\')">5</button><button class="n" onclick="agregar(\'6\')">6</button><button class="o" onclick="agregar(\'-\')">−</button><button class="n" onclick="agregar(\'1\')">1</button><button class="n" onclick="agregar(\'2\')">2</button><button class="n" onclick="agregar(\'3\')">3</button><button class="o" onclick="agregar(\'+\')">+</button><button class="n z" onclick="agregar(\'0\')">0</button><button class="n" onclick="agregar(\'.\')">.</button><button class="e" onclick="calcular()">=</button></div></div><script>let expr=\'\';function agregar(v){expr+=v;document.getElementById(\'res\').textContent=expr}function limpiar(){expr=\'\';document.getElementById(\'res\').textContent=\'0\'}function borrar(){expr=expr.slice(0,-1);document.getElementById(\'res\').textContent=expr||\'0\'}function calcular(){try{let r=Function(\'"use strict";return(\'+expr+\')\')();document.getElementById(\'res\').textContent=parseFloat(r.toFixed(10));expr=String(r)}catch(e){document.getElementById(\'res\').textContent=\'Error\'}}<\/script></body></html>\n```']
       };
-      const keywordMap = { calculadora: 'calculadora', tareas: 'tareas', juego: 'calculadora', snake: 'calculadora', notas: 'tareas' };
+      const keywordMap = { calculadora: 'calculadora', tareas: 'tareas', notas: 'tareas' };
 
       function random(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
@@ -609,8 +602,30 @@
         const t = texto.toLowerCase().trim();
         for (const [emocion, claves] of Object.entries(emociones)) {
           const palabras = claves[currentLang] || claves.es;
-          if (palabras.some(p => t.includes(p))) return random(respEmocion[emocion][currentLang] || respEmocion[emocion].es);
+          if (palabras.some(p => t.includes(p))) {
+            return random(respEmocion[emocion][currentLang] || respEmocion[emocion].es);
+          }
         }
+        return null;
+      }
+
+      function obtenerRespuestaRapida(texto) {
+        const t = texto.toLowerCase().trim();
+        const emocion = detectarEmocion(texto);
+        if (emocion) return emocion;
+        const arr = respuestas[currentLang] || respuestas.es;
+        for (const entrada of arr) {
+          if (entrada.claves.some(c => t.includes(c))) return random(entrada.respuestas);
+        }
+        return null;
+      }
+
+      function obtenerDeConocimiento(input) {
+        const t = input.toLowerCase().trim();
+        for (const [keyword, category] of Object.entries(keywordMap)) {
+          if (t.includes(keyword)) return random(codeKnowledge[category] || codeKnowledge.calculadora);
+        }
+        if (t.includes('programa') || t.includes('código') || t.includes('html')) return random(codeKnowledge.calculadora);
         return null;
       }
 
@@ -620,100 +635,213 @@
           const resp = await fetch(url); const data = await resp.json();
           if (!data.query.search.length) return null;
           const titulo = data.query.search[0].title;
-          const extractUrl = 'https://es.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&titles=' + encodeURIComponent(titulo) + '&format=json&origin=*';
-          const extResp = await fetch(extractUrl); const extData = await extResp.json();
-          const page = extData.query.pages; const pageId = Object.keys(page)[0];
-          if (page[pageId].missing) return null;
-          return { extract: page[pageId].extract, title: titulo };
+          const [extractResp, imageResp] = await Promise.all([
+            fetch(`https://es.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&titles=${encodeURIComponent(titulo)}&format=json&origin=*`).then(r=>r.json()),
+            fetch(`https://es.wikipedia.org/w/api.php?action=query&prop=pageimages&pithumbsize=400&titles=${encodeURIComponent(titulo)}&format=json&origin=*`).then(r=>r.json())
+          ]);
+          const pageId = Object.keys(extractResp.query.pages)[0];
+          if (extractResp.query.pages[pageId].missing) return null;
+          const extract = extractResp.query.pages[pageId].extract;
+          const imagePage = imageResp.query.pages[pageId];
+          let imageUrl = '';
+          if (imagePage && imagePage.thumbnail) imageUrl = imagePage.thumbnail.source;
+          return { extract, title: titulo, imageUrl };
         } catch(e) { return null; }
       }
 
-      function obtenerDeConocimiento(input) {
-        const t = input.toLowerCase().trim();
-        for (const [keyword, category] of Object.entries(keywordMap)) {
-          if (t.includes(keyword)) {
-            const arr = codeKnowledge[category];
-            if (arr && arr.length) return random(arr);
-          }
+      const explicaciones = {
+        programacion: {
+          en: "Programming is the process of creating instructions for computers. It involves logic, algorithms, and data structures.",
+          es: "La programación es el proceso de crear instrucciones para computadoras. Involucra lógica, algoritmos y estructuras de datos.",
+          es_AR: "Programar es darle órdenes a la compu. Se usa lógica, algoritmos y estructuras de datos."
+        },
+        fisica: {
+          en: "Physics studies matter, energy, and the fundamental forces of nature.",
+          es: "La física estudia la materia, la energía y las fuerzas fundamentales de la naturaleza.",
+          es_AR: "La física estudia la materia, la energía y las fuerzas del universo."
+        },
+        termodinamica: {
+          en: "Thermodynamics deals with heat, work, and energy transfer.",
+          es: "La termodinámica trata sobre calor, trabajo y transferencia de energía.",
+          es_AR: "La termodinámica es la rama que estudia el calor, el laburo y la energía."
+        },
+        matematicas: {
+          en: "Mathematics is the science of numbers, quantities, and shapes.",
+          es: "Las matemáticas son la ciencia de los números, cantidades y formas.",
+          es_AR: "Matemática: números, formas y mucho razonamiento."
         }
+      };
+
+      function obtenerExplicacionAdicional(input) {
+        const t = input.toLowerCase();
+        if (t.includes('programa') || t.includes('código') || t.includes('html')) return explicaciones.programacion[currentLang] || explicaciones.programacion.es;
+        if (t.includes('física') || t.includes('fisica')) return explicaciones.fisica[currentLang] || explicaciones.fisica.es;
+        if (t.includes('termodinámica') || t.includes('termodinamica')) return explicaciones.termodinamica[currentLang] || explicaciones.termodinamica.es;
+        if (t.includes('matemática') || t.includes('matematicas')) return explicaciones.matematicas[currentLang] || explicaciones.matematicas.es;
         return null;
       }
 
-      async function obtenerRespuesta(texto) {
-        const t = texto.toLowerCase().trim();
-        const emocion = detectarEmocion(texto);
-        if (emocion) return emocion;
-        for (const entrada of (respuestas[currentLang] || respuestas.es)) {
-          if (entrada.claves.some(c => t.includes(c))) return random(entrada.respuestas);
+      const fallbacks = {
+        en: ["I'm not sure 🤔", "Could you rephrase that?"],
+        es: ["No entendí bien 🤔", "¿Lo podés reformular?"],
+        es_AR: ["No te cazé 🤔", "¿Me lo tirás de nuevo?"]
+      };
+
+      async function obtenerRespuestaFinal(input) {
+        const code = obtenerDeConocimiento(input);
+        if (code) return { text: code, instant: true, image: null };
+        const rapida = obtenerRespuestaRapida(input);
+        if (rapida) return { text: rapida, instant: false, image: null };
+        const explicacion = obtenerExplicacionAdicional(input);
+        if (input.trim().length > 5) {
+          try {
+            const wiki = await Promise.race([
+              buscarEnWikipedia(input),
+              new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000))
+            ]);
+            if (wiki) {
+              let texto = (currentLang === 'en' ? 'According to Wikipedia, ' : (currentLang === 'es_AR' ? 'Che, según Wikipedia, ' : 'Según Wikipedia, ')) +
+                         wiki.extract.split('. ').slice(0,2).join('. ') + '.';
+              if (explicacion) texto += '\n\n' + explicacion;
+              return { text: texto + '\n\n🔗 https://es.wikipedia.org/wiki/' + encodeURIComponent(wiki.title), instant: false, image: wiki.imageUrl };
+            }
+          } catch(e) {}
         }
-        const codeAnswer = obtenerDeConocimiento(t);
-        if (codeAnswer) return codeAnswer;
-        const wiki = await buscarEnWikipedia(texto);
-        if (wiki) {
-          const oraciones = wiki.extract.split('. ');
-          const resumen = oraciones.slice(0,2).join('. ') + (oraciones.length>2?'.':'');
-          const link = 'https://es.wikipedia.org/wiki/' + encodeURIComponent(wiki.title);
-          return (currentLang === 'en' ? 'According to Wikipedia, ' : (currentLang === 'es_AR' ? 'Che, según Wikipedia, ' : 'Según Wikipedia, ')) + resumen.charAt(0).toLowerCase() + resumen.slice(1) + '\n\n🔗 ' + link;
-        }
-        return random(fallbacks[currentLang] || fallbacks.es);
+        return { text: random(fallbacks[currentLang] || fallbacks.es), instant: false, image: null };
       }
 
+      // ========== INTERFAZ ==========
       function showMessages() { welcomeScreen.style.display = 'none'; messagesEl.style.display = 'flex'; }
-      function addMessage(text, role) {
-        const row = document.createElement('div'); row.className = 'msg-row ' + role;
-        if (role === 'user') row.innerHTML = '<div class="msg-content"><div class="bubble">' + text + '</div></div>';
-        else {
-          const processed = processCodeBlocks(text);
-          row.innerHTML = '<div class="msg-content"><div class="assistant-icon"><i class="ti ti-robot"></i></div><div><div class="bubble">' + processed + '</div></div></div>';
-          setTimeout(() => speakText(text), 200);
-        }
+      
+      function addUserMessage(text) {
+        const row = document.createElement('div'); row.className = 'msg-row user';
+        row.innerHTML = '<div class="msg-content"><div class="bubble">' + text + '</div></div>';
         messagesEl.appendChild(row);
         document.querySelector('.chat-view').scrollTop = document.querySelector('.chat-view').scrollHeight;
       }
-      function addImageMessage(url) {
-        const row = document.createElement('div'); row.className = 'msg-row user';
-        row.innerHTML = '<div class="msg-content"><div class="bubble"><img src="' + url + '" style="max-width:200px;border-radius:10px;width:100%;" /></div></div>';
+
+      function addAssistantMessageSkeleton() {
+        const row = document.createElement('div'); row.className = 'msg-row assistant';
+        row.innerHTML = `<div class="msg-content">
+          <div class="assistant-icon"><i class="ti ti-robot"></i></div>
+          <div>
+            <div class="bubble assistant-bubble-text"></div>
+            <div class="bubble-footer"></div>
+          </div>
+        </div>`;
         messagesEl.appendChild(row);
+        document.querySelector('.chat-view').scrollTop = document.querySelector('.chat-view').scrollHeight;
+        return {
+          bubble: row.querySelector('.assistant-bubble-text'),
+          footer: row.querySelector('.bubble-footer')
+        };
       }
-      function addTyping() {
+
+      function addAudioButton(footerElement, text) {
+        const btn = document.createElement('button');
+        btn.className = 'audio-btn';
+        btn.innerHTML = '<i class="ti ti-volume"></i>';
+        btn.onclick = () => speakText(text);
+        footerElement.appendChild(btn);
+      }
+
+      function addTypingIndicator() {
         const row = document.createElement('div'); row.className = 'msg-row assistant'; row.id = 'typing-row';
         row.innerHTML = '<div class="msg-content"><div class="assistant-icon"><i class="ti ti-robot"></i></div><div><div class="bubble"><div class="typing-indicator"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div></div></div>';
         messagesEl.appendChild(row);
-        document.querySelector('.chat-view').scrollTop = document.querySelector('.chat-view').scrollHeight;
       }
 
-      async function sendMessage(msgText) {
-        const text = msgText || chatInput.value.trim();
-        if (!text || isTyping) return;
-        showMessages(); addMessage(text, 'user');
-        chatInput.value = ''; chatInput.style.height = 'auto'; sendBtn.disabled = true; isTyping = true;
-        addTyping();
-        try {
-          const respuesta = await obtenerRespuesta(text);
-          const typingRow = document.getElementById('typing-row'); if (typingRow) typingRow.remove();
-          addMessage(respuesta, 'assistant');
-        } catch(e) {
-          const typingRow = document.getElementById('typing-row'); if (typingRow) typingRow.remove();
-          addMessage('Error. Intenta de nuevo.', 'assistant');
-        }
-        isTyping = false; sendBtn.disabled = (chatInput.value.trim() === '');
+      function removeTypingIndicator() {
+        const row = document.getElementById('typing-row');
+        if (row) row.remove();
       }
 
-      // ========== VOZ ==========
+      function typeWords(text, bubbleElement, callback) {
+        const words = text.split(' ');
+        let i = 0;
+        bubbleElement.textContent = '';
+        const interval = setInterval(() => {
+          if (i < words.length) {
+            bubbleElement.textContent += (i === 0 ? '' : ' ') + words[i];
+            i++;
+            document.querySelector('.chat-view').scrollTop = document.querySelector('.chat-view').scrollHeight;
+          } else {
+            clearInterval(interval);
+            if (callback) callback();
+          }
+        }, 40);
+      }
+
       function speakText(text) {
-        if (!ttsEnabled || !window.speechSynthesis) return;
-        const clean = text.replace(/\*\*/g, '').replace(/[^\w\sáéíóúñÁÉÍÓÚÑ.,;:!?¿¡@()\-+]/g, '').replace(/```[\s\S]*?```/g, '').trim();
+        if (!window.speechSynthesis) return;
+        const clean = text.replace(/```[\s\S]*?```/g, '').replace(/[^\w\sáéíóúñÁÉÍÓÚÑ.,;:!?¿¡@()\-+]/g, '').trim();
         if (!clean) return;
         speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance(clean);
         u.lang = currentLang === 'en' ? 'en-US' : (currentLang === 'es_AR' ? 'es-AR' : 'es-ES');
         u.volume = 1; u.rate = 1.1;
         speechSynthesis.speak(u);
-        if (voiceModeActive) {
-          voiceSubtitles.textContent = clean;
-        }
+        if (voiceModeActive) voiceSubtitles.textContent = clean;
       }
 
+      async function sendMessage(msgText) {
+        const text = msgText || chatInput.value.trim();
+        if (!text || isTyping) return;
+        showMessages();
+        addUserMessage(text);
+        chatInput.value = ''; chatInput.style.height = 'auto'; sendBtn.disabled = true; isTyping = true;
+        addTypingIndicator();
+        try {
+          const respuesta = await obtenerRespuestaFinal(text);
+          removeTypingIndicator();
+          const { bubble, footer } = addAssistantMessageSkeleton();
+
+          const finalizar = () => {
+            if (respuesta.image) {
+              const img = document.createElement('img');
+              img.src = respuesta.image;
+              img.className = 'wiki-image';
+              footer.appendChild(img);
+            }
+            addAudioButton(footer, respuesta.text);
+            if (forceSpeak) {
+              speakText(respuesta.text);
+              forceSpeak = false;
+            }
+          };
+
+          if (respuesta.instant) {
+            bubble.innerHTML = processCodeBlocks(respuesta.text);
+            finalizar();
+          } else {
+            typeWords(respuesta.text, bubble, finalizar);
+          }
+        } catch(e) {
+          removeTypingIndicator();
+          const { bubble, footer } = addAssistantMessageSkeleton();
+          bubble.textContent = 'Error. Intenta de nuevo.';
+          addAudioButton(footer, 'Error. Intenta de nuevo.');
+        }
+        isTyping = false; sendBtn.disabled = (chatInput.value.trim() === '');
+      }
+
+      function processCodeBlocks(text) {
+        const regex = /```(\w*)\n([\s\S]*?)```/g; let result = text, match;
+        while ((match = regex.exec(text)) !== null) {
+          const code = match[2]; const isHTML = match[1] === 'html' || code.includes('<!DOCTYPE html>') || code.includes('<html');
+          const blockId = 'code-' + Math.random().toString(36).substr(2,8);
+          const escaped = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+          const toolbar = '<div class="code-toolbar"><button class="code-btn" onclick="copyCode(\'' + blockId + '\')"><i class="ti ti-copy"></i> Copiar</button><button class="code-btn" onclick="downloadCode(\'' + blockId + '\',\'archivo' + (isHTML?'.html':'.txt') + '\')"><i class="ti ti-download"></i> Descargar</button>' + (isHTML ? '<button class="code-btn run" onclick="runCode(\'' + blockId + '\')"><i class="ti ti-player-play"></i> Ejecutar</button>' : '') + '</div>';
+          result = result.replace(match[0], '<div class="code-container" id="' + blockId + '"><pre><code>' + escaped + '</code></pre>' + toolbar + '</div>');
+        }
+        return result;
+      }
+      window.copyCode = (id) => { navigator.clipboard.writeText(document.getElementById(id).querySelector('code').textContent); };
+      window.downloadCode = (id, filename) => { const blob = new Blob([document.getElementById(id).querySelector('code').textContent], {type:'text/plain'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click(); URL.revokeObjectURL(a.href); };
+      window.runCode = (id) => { document.getElementById('run-frame').srcdoc = document.getElementById(id).querySelector('code').textContent; document.getElementById('run-modal').classList.add('open'); };
+      window.closeRunModal = () => { document.getElementById('run-modal').classList.remove('open'); document.getElementById('run-frame').srcdoc = ''; };
+
+      // ========== VOZ ==========
       window.toggleVoice = function() {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SpeechRecognition) { alert(translations[currentLang]?.errorSpeech); return; }
@@ -744,6 +872,7 @@
           if (isRecording && voiceSubtitles.textContent && voiceSubtitles.textContent !== (translations[currentLang]?.listening || 'Listening...')) {
             const text = voiceSubtitles.textContent.trim();
             stopVoice();
+            forceSpeak = ttsAutoEnabled;
             sendMessage(text);
             setTimeout(() => { if (voiceModeActive) startVoice(); }, 500);
           } else { stopVoice(); stopVoiceMode(); }
@@ -763,24 +892,8 @@
         stopVoice();
         speechSynthesis.cancel();
         voiceSubtitles.textContent = '';
+        forceSpeak = false;
       };
-
-      // ========== CÓDIGO ==========
-      function processCodeBlocks(text) {
-        const regex = /```(\w*)\n([\s\S]*?)```/g; let result = text, match;
-        while ((match = regex.exec(text)) !== null) {
-          const code = match[2]; const isHTML = match[1] === 'html' || code.includes('<!DOCTYPE html>') || code.includes('<html');
-          const blockId = 'code-' + Math.random().toString(36).substr(2,8);
-          const escaped = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-          const toolbar = '<div class="code-toolbar"><button class="code-btn" onclick="copyCode(\'' + blockId + '\')"><i class="ti ti-copy"></i> Copiar</button><button class="code-btn" onclick="downloadCode(\'' + blockId + '\',\'archivo' + (isHTML?'.html':'.txt') + '\')"><i class="ti ti-download"></i> Descargar</button>' + (isHTML ? '<button class="code-btn run" onclick="runCode(\'' + blockId + '\')"><i class="ti ti-player-play"></i> Ejecutar</button>' : '') + '</div>';
-          result = result.replace(match[0], '<div class="code-container" id="' + blockId + '"><pre><code>' + escaped + '</code></pre>' + toolbar + '</div>');
-        }
-        return result;
-      }
-      window.copyCode = (id) => { navigator.clipboard.writeText(document.getElementById(id).querySelector('code').textContent); };
-      window.downloadCode = (id, filename) => { const blob = new Blob([document.getElementById(id).querySelector('code').textContent], {type:'text/plain'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click(); URL.revokeObjectURL(a.href); };
-      window.runCode = (id) => { document.getElementById('run-frame').srcdoc = document.getElementById(id).querySelector('code').textContent; document.getElementById('run-modal').classList.add('open'); };
-      window.closeRunModal = () => { document.getElementById('run-modal').classList.remove('open'); document.getElementById('run-frame').srcdoc = ''; };
 
       // ========== FEEDBACK ==========
       window.openFeedback = () => document.getElementById('feedback-modal').classList.add('open');
@@ -798,23 +911,25 @@
         const file = this.files[0]; if (!file) return;
         const reader = new FileReader();
         reader.onload = async (e) => {
-          const url = e.target.result; showMessages(); addImageMessage(url);
-          if (!mobilenetModel) { addMessage('Modelo cargando...', 'assistant'); return; }
+          const url = e.target.result; showMessages(); addUserMessage('<img src="' + url + '" style="max-width:200px;border-radius:10px;">');
+          if (!mobilenetModel) { const { bubble } = addAssistantMessageSkeleton(); bubble.textContent = 'Modelo cargando...'; return; }
           const img = new Image(); img.src = url;
           img.onload = async () => {
             try {
               const predictions = await mobilenetModel.classify(img);
-              if (!predictions.length) { addMessage('No reconocí nada 🧐', 'assistant'); return; }
+              const { bubble, footer } = addAssistantMessageSkeleton();
+              if (!predictions.length) { bubble.textContent = 'No reconocí nada 🧐'; return; }
               const top = predictions[0]; const className = top.className.toLowerCase(); const confianza = Math.round(top.probability * 100);
-              let explicacion = 'Objeto: ' + className;
-              addMessage(explicacion + ' (' + confianza + '% certeza)', 'assistant');
-            } catch { addMessage('Error al analizar 😥', 'assistant'); }
+              const text = 'Objeto: ' + className + ' (' + confianza + '% certeza)';
+              bubble.textContent = text;
+              addAudioButton(footer, text);
+            } catch { const { bubble } = addAssistantMessageSkeleton(); bubble.textContent = 'Error al analizar 😥'; }
           };
         };
         reader.readAsDataURL(file); this.value = '';
       });
 
-      // ========== EVENTOS ==========
+      // Eventos
       chatInput.addEventListener('input', () => {
         sendBtn.disabled = chatInput.value.trim() === '' || isTyping;
         chatInput.style.height = 'auto'; chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
@@ -823,7 +938,7 @@
       sendBtn.addEventListener('click', () => sendMessage());
       sidebarBackdrop.addEventListener('click', toggleSidebar);
 
-      // ========== EXPORTACIONES GLOBALES ==========
+      // Exportaciones globales
       window.sendMessage = sendMessage;
       window.toggleSidebar = toggleSidebar;
       window.toggleVoice = window.toggleVoice;
@@ -837,6 +952,9 @@
       window.downloadCode = window.downloadCode;
       window.runCode = window.runCode;
       window.closeRunModal = closeRunModal;
+      // Ajustes desde sidebar
+      window.toggleLightModeSide = toggleLightModeSide;
+      window.toggleAutoTTSSide = toggleAutoTTSSide;
     })();
   </script>
 </body>
