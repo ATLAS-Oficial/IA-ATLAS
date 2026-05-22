@@ -5,10 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>AOS-0.2 | Secure Neural Node</title>
   
+  <!-- Iconos y Tipografía -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons@latest/iconfont/tabler-icons.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- TensorFlow y MobileNet -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
 
   <style>
     :root {
@@ -42,9 +47,7 @@
       overflow: hidden;
     }
 
-    /* ==========================================================================
-       PANTALLA DE REGISTRO / LOGIN (Estilo Mullvad VPN)
-       ========================================================================== */
+    /* Pantalla de autenticación */
     #auth-screen {
       max-width: 400px;
       width: 100%;
@@ -75,7 +78,7 @@
     .lang-btn.selected { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
 
     #auth-forms-container {
-      display: none; /* Se revela solo al elegir idioma */
+      display: none;
       animation: fadeIn 0.3s ease;
     }
 
@@ -126,9 +129,7 @@
 
     .separator { text-align: center; margin: 16px 0; font-size: 12px; color: var(--text-ghost); text-transform: uppercase; }
 
-    /* ==========================================================================
-       UI PRINCIPAL (Canvas Limpio de Chat)
-       ========================================================================== */
+    /* App principal */
     #app { display: none; width: 100vw; height: 100dvh; position: relative; }
     
     #sidebar {
@@ -142,14 +143,10 @@
 
     .sidebar-header { padding: 24px 20px; display: flex; align-items: center; justify-content: space-between; font-weight: 600; font-size: 15px; }
     .chat-list { flex: 1; overflow-y: auto; padding: 0 12px; font-size: 14px; color: var(--text-muted); }
-    .history-item { padding: 12px; border-radius: 8px; margin-bottom: 4px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border: 1px solid transparent; }
-    .history-item:hover { background: var(--bg-surface); color: var(--text-main); }
-    .history-item.active { background: var(--accent-bg); border-color: var(--accent); color: var(--text-main); }
-    
     .sidebar-footer { padding: 20px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-ghost); font-family: monospace; }
 
-    #main-container { flex: 1; display: flex; flex-direction: column; width: 100%; height: 100%; overflow: hidden; }
-    .top-bar { height: 64px; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    #main-container { flex: 1; display: flex; flex-direction: column; width: 100%; height: 100%; }
+    .top-bar { height: 64px; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; }
     
     .icon-btn {
       background: none; border: none; color: var(--text-muted); width: 38px; height: 38px; border-radius: 8px;
@@ -157,17 +154,37 @@
     }
     .icon-btn:hover { background: var(--border); color: var(--text-main); }
 
-    .chat-view { flex: 1; overflow-y: auto; display: flex; flex-direction: column; padding: 24px; gap: 16px; scroll-behavior: smooth; }
-    .welcome-screen { max-width: 600px; width: 100%; margin: auto; text-align: center; display: flex; flex-direction: column; gap: 8px; }
+    .chat-view { flex: 1; overflow-y: auto; display: flex; flex-direction: column; padding: 20px; }
+    .welcome-screen { max-width: 600px; width: 100%; margin: auto; text-align: center; }
     .welcome-screen h2 { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 8px; }
-    .welcome-screen p { color: var(--text-muted); font-size: 14px; }
+    
+    /* Mensajes */
+    #messages { display: none; flex-direction: column; gap: 12px; }
+    .msg-row { display: flex; animation: messagePop 0.3s ease both; }
+    .msg-row.user { justify-content: flex-end; }
+    .msg-row.assistant { justify-content: flex-start; }
+    .msg-content { max-width: 85%; word-break: break-word; overflow-wrap: anywhere; }
+    .msg-row.assistant .msg-content { display: flex; gap: 8px; align-items: flex-start; }
+    .assistant-icon { width: 24px; height: 24px; min-width: 24px; border-radius: 50%; background: var(--bg-surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; }
+    .assistant-icon i { font-size: 12px; color: var(--text-muted); }
+    .bubble { padding: 8px 14px; border-radius: 16px; font-size: 14px; line-height: 1.5; color: var(--text-main); word-break: break-word; overflow-wrap: anywhere; white-space: pre-wrap; }
+    .msg-row.user .bubble { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 16px 16px 4px 16px; }
+    .msg-row.assistant .bubble { background: none; padding: 2px 0; border-radius: 0; border: none; }
+    
+    .typing-indicator { display: flex; gap: 4px; align-items: center; padding: 4px 0; }
+    .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--text-ghost); animation: bounce 1.2s infinite; }
+    .dot:nth-child(2){animation-delay:0.2s} .dot:nth-child(3){animation-delay:0.4s}
+    @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
 
-    /* Inteligencia Inyectada: Burbujas de Chat Hermosas */
-    .chat-bubble { max-width: 75%; padding: 14px 18px; border-radius: 16px; font-size: 15px; line-height: 1.5; animation: fadeIn 0.25s ease; word-break: break-word; }
-    .bubble-user { background: var(--accent-bg); border: 1px solid rgba(56, 189, 248, 0.2); color: var(--text-main); align-self: flex-end; border-bottom-right-radius: 4px; }
-    .bubble-aos { background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 4px; }
+    /* Código */
+    .code-container { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin: 8px 0; position: relative; overflow-x: auto; }
+    .code-container pre { margin: 0; padding: 0; font-size: 13px; font-family: monospace; color: var(--text-main); white-space: pre-wrap; word-break: break-word; }
+    .code-toolbar { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; flex-wrap: wrap; }
+    .code-btn { padding: 5px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-main); color: var(--text-muted); cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 4px; transition: var(--transition); }
+    .code-btn.run { background: var(--accent-bg); color: var(--accent); border-color: var(--accent); }
 
-    .input-area { padding: 16px 24px 32px; background: linear-gradient(to top, var(--bg-main) 60%, transparent); flex-shrink: 0; }
+    /* Input */
+    .input-area { padding: 16px 24px 32px; background: linear-gradient(to top, var(--bg-main) 60%, transparent); }
     .input-wrapper {
       max-width: 720px; margin: 0 auto; background: rgba(20, 20, 23, 0.8); border: 1px solid var(--border);
       border-radius: var(--radius-lg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
@@ -180,9 +197,7 @@
     .send-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--text-main); color: var(--bg-main); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
     .send-btn:disabled { background: var(--border); color: var(--text-ghost); cursor: not-allowed; }
 
-    /* ==========================================================================
-       MODAL DE BIENVENIDA / PRIMERA VEZ (Onboarding Premium)
-       ========================================================================== */
+    /* Onboarding modal */
     #onboarding-modal {
       display: none; position: fixed; inset: 0; background: rgba(5, 5, 6, 0.85);
       backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
@@ -203,9 +218,7 @@
       color: var(--accent); border-radius: 6px; font-size: 12px; font-weight: 500; margin-bottom: 20px;
     }
 
-    /* ==========================================================================
-       PANTALLA INTERACTIVA DE VOZ (Luces Fluidas Mesh)
-       ========================================================================== */
+    /* Voice overlay */
     #voice-overlay {
       display: none; position: fixed; inset: 0; background: #040406; z-index: 500;
       flex-direction: column; align-items: center; justify-content: space-between; padding: 48px 24px;
@@ -221,24 +234,40 @@
     .light-cyan { width: 350px; height: 350px; background: #38bdf8; bottom: 15%; right: 10%; animation-delay: -3s; }
     .light-white { width: 300px; height: 300px; background: #ffffff; top: 40%; right: 25%; animation-delay: -6s; opacity: 0.15; }
 
-    .voice-ui-content { z-index: 2; text-align: center; margin: auto; max-width: 500px; }
+    .voice-ui-content { z-index: 2; text-align: center; margin: auto; }
     .voice-status { font-size: 14px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
-    .voice-indicator-text { font-size: 24px; font-weight: 600; color: var(--text-main); transition: var(--transition); }
+    .voice-indicator-text { font-size: 24px; font-weight: 600; color: var(--text-main); }
+    #voice-subtitles { font-size: 18px; color: var(--text-muted); margin-top: 16px; min-height: 28px; }
     
     .voice-footer { z-index: 2; width: 100%; display: flex; justify-content: center; }
     .close-voice-btn { width: 56px; height: 56px; border-radius: 50%; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.1); color: #ef4444; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: var(--transition); }
     .close-voice-btn:hover { background: #ef4444; color: #fff; transform: scale(1.05); }
 
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    /* Run modal */
+    #run-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 600; align-items: center; justify-content: center; padding: 20px; }
+    #run-modal.open { display: flex; }
+    #run-modal-content { background: var(--bg-surface); border-radius: 16px; width: 100%; max-width: 900px; height: 80dvh; display: flex; flex-direction: column; overflow: hidden; }
+    #run-modal-header { padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+    #run-frame { flex: 1; width: 100%; border: none; }
+
+    /* Feedback modal */
+    #feedback-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 700; align-items: center; justify-content: center; padding: 24px; }
+    #feedback-modal.open { display: flex; }
+
+    .disclaimer { text-align: center; font-size: 10px; color: var(--text-ghost); margin-top: 6px; }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes floatLight {
       0% { transform: translate(0, 0) scale(1); }
       50% { transform: translate(80px, 60px) scale(1.15); }
       100% { transform: translate(-40px, -80px) scale(0.9); }
     }
+    @keyframes messagePop { from { opacity:0; transform:translateY(20px) } to { opacity:1; transform:translateY(0) } }
   </style>
 </head>
 <body>
 
+  <!-- Autenticación -->
   <div id="auth-screen">
     <h1>AOS-0.2</h1>
     
@@ -266,6 +295,7 @@
     </div>
   </div>
 
+  <!-- Onboarding -->
   <div id="onboarding-modal">
     <div class="onboarding-card">
       <div class="onboarding-badge"><i class="ti ti-shield-check"></i> Local Node Active</div>
@@ -276,12 +306,13 @@
     </div>
   </div>
 
+  <!-- App principal -->
   <div id="app">
     <div id="sidebar-backdrop" onclick="toggleSidebar()"></div>
     
     <div id="sidebar">
       <div class="sidebar-header">
-        <span id="lbl-sidebar-title">Memoria Local</span>
+        <span>Memoria Local</span>
         <button class="icon-btn" onclick="toggleSidebar()"><i class="ti ti-x"></i></button>
       </div>
       <div class="chat-list" id="chatHistoryList"></div>
@@ -295,11 +326,11 @@
         <button class="icon-btn" onclick="logout()"><i class="ti ti-logout"></i></button>
       </div>
 
-      <div class="chat-view" id="chatContainer">
+      <div class="chat-view" id="chatView">
         <div class="welcome-screen" id="welcomeScreen">
           <h2 id="chat-welcome">Canal Activo</h2>
-          <p id="chat-welcome-sub">Escribí tu instrucción abajo para iniciar el procesamiento aislado.</p>
         </div>
+        <div id="messages"></div>
       </div>
 
       <div class="input-area">
@@ -307,15 +338,19 @@
           <textarea id="chatInput" placeholder="..." rows="1"></textarea>
           <div class="toolbar">
             <div class="tools">
-              <button class="icon-btn" onclick="toggleVoiceView(true)"><i class="ti ti-microphone"></i></button>
+              <input type="file" id="imageInput" accept="image/*" style="display:none" />
+              <button class="icon-btn" onclick="document.getElementById('imageInput').click()"><i class="ti ti-photo"></i></button>
+              <button class="icon-btn" id="mic-btn" onclick="toggleVoice()"><i class="ti ti-microphone"></i></button>
             </div>
-            <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled><i class="ti ti-arrow-up"></i></button>
+            <button class="send-btn" id="sendBtn" disabled><i class="ti ti-arrow-up"></i></button>
           </div>
         </div>
+        <p class="disclaimer">La IA puede cometer errores. Considera verificar la información importante.</p>
       </div>
     </div>
   </div>
 
+  <!-- Voice overlay -->
   <div id="voice-overlay">
     <div class="light-mesh-container" id="meshContainer">
       <div class="blur-light light-blue"></div>
@@ -325,355 +360,484 @@
     <div class="voice-ui-content">
       <div class="voice-status" id="voiceStatus">---</div>
       <div class="voice-indicator-text" id="voicePrompt">---</div>
+      <div id="voice-subtitles"></div>
     </div>
     <div class="voice-footer">
-      <button class="close-voice-btn" onclick="toggleVoiceView(false)"><i class="ti ti-phone-off"></i></button>
+      <button class="close-voice-btn" onclick="stopVoiceMode()"><i class="ti ti-phone-off"></i></button>
+    </div>
+  </div>
+
+  <!-- Run modal -->
+  <div id="run-modal"><div id="run-modal-content"><div id="run-modal-header"><span>Ejecutando código</span><button class="icon-btn" onclick="closeRunModal()"><i class="ti ti-x"></i></button></div><iframe id="run-frame" sandbox="allow-scripts"></iframe></div></div>
+
+  <!-- Feedback modal -->
+  <div id="feedback-modal">
+    <div style="background:var(--bg-surface); border-radius:16px; padding:24px; width:100%; max-width:400px; border:1px solid var(--border); color:var(--text-main);">
+      <h3 style="margin-bottom:0.5rem;">✉️ Enviar sugerencia</h3>
+      <p style="color:var(--text-muted); margin-bottom:1rem; font-size:0.9rem;">¿Encontraste un error o tenés una idea? Escribila acá y me llegará a mi correo.</p>
+      <textarea id="feedback-text" rows="5" placeholder="Escribe tu sugerencia..." style="width:100%; padding:12px; background:var(--bg-main); border:1px solid var(--border); border-radius:12px; color:var(--text-main); font-family:inherit; resize:vertical; margin-bottom:1rem;"></textarea>
+      <div style="display:flex; gap:8px; justify-content:flex-end;">
+        <button onclick="closeFeedback()" style="padding:8px 16px; border-radius:10px; border:1px solid var(--border); background:transparent; color:var(--text-muted); cursor:pointer;">Cancelar</button>
+        <button onclick="enviarFeedback()" style="padding:8px 16px; border-radius:10px; border:none; background:var(--text-main); color:var(--bg-main); cursor:pointer; font-weight:600;">Enviar</button>
+      </div>
     </div>
   </div>
 
   <script>
-    let currentAccount = '';
-    let currentLang = '';
-    let memory = [];
-    let recognition = null;
-    let isVoiceResponding = false;
+    (function() {
+      // ========== ESTADO GLOBAL ==========
+      let currentAccount = '';
+      let currentLang = 'es';
+      let mobilenetModel = null;
+      let isTyping = false;
+      let recognition = null;
+      let isRecording = false;
+      let conversationContext = [];
+      let ttsEnabled = true;
+      let privacyMode = false;
+      let voiceModeActive = false;
+      let audioContext = null;
+      let analyser = null;
+      let animationId = null;
+      let speechInterval = null;
 
-    // Traducciones dinámicas y Local Brain Context
-    const translations = {
-      en: {
-        existing: "Access with existing account", login: "Enter", or: "or", new: "Don't have an account?",
-        indicator: "SECURE LOCAL NODE", welcome: "Active Channel", subWelcome: "Write your instruction below to start isolated processing.",
-        placeholder: "Send encrypted local message...", sidebarTitle: "Local Memory",
-        mTitle: "Welcome to the Ecosystem",
-        mD1: "This environment operates under complete cryptographic isolation. All memory, text processing, and conversation threads remain confined locally within this device. Absolutely nothing is transmitted to external servers.",
-        mD2: "AOS-0.2 is an independent project under constant, continuous development. You will receive frequent updates optimizing the local engine and refining the user interface.",
-        vListen: "AOS Listening", vListenPrompt: "Speak now, listening securely...", vSpeak: "AOS Responding", vSpeakPrompt: "Processing neural synthesis...",
-        sysDefault: "Neural thread sync completed. Secure node operation fully active.",
-        sysGreeting: "Hello. How can I assist you inside this local node today?",
-        sysVoiceErr: "Voice system initialized. Please check microphone permissions."
-      },
-      es: {
-        existing: "Acceder con cuenta existente", login: "Entrar", or: "ó", new: "¿No tienes una cuenta?",
-        indicator: "NODO LOCAL SEGURO", welcome: "Canal Activo", subWelcome: "Escribe tu instrucción abajo para iniciar el procesamiento aislado.",
-        placeholder: "Enviar mensaje local cifrado...", sidebarTitle: "Memoria Local",
-        mTitle: "Bienvenido al Ecosistema",
-        mD1: "Este entorno opera bajo un aislamiento criptográfico completo. Toda la memoria, procesamiento de texto e hilos de conversación se quedan confinados localmente dentro de este dispositivo. Absolutamente nada se transmite hacia servidores externos.",
-        mD2: "AOS-0.2 es un proyecto independiente en constante desarrollo continuo. Recibirás actualizaciones frecuentes de optimización del motor local y refinamiento de la interfaz.",
-        vListen: "AOS Escuchando", vListenPrompt: "Habla ahora de forma segura...", vSpeak: "AOS Respondiendo", vSpeakPrompt: "Procesando respuesta neural...",
-        sysDefault: "Sincronización del hilo neural completada. Operación de nodo seguro activa.",
-        sysGreeting: "Hola. ¿En qué puedo asistirte dentro de este nodo local hoy?",
-        sysVoiceErr: "Sistema de voz iniciado. Por favor verifica los permisos del micrófono."
-      },
-      es_AR: {
-        existing: "Entrá con tu cuenta existente", login: "Entrar", or: "ó", new: "¿No tenés una cuenta?",
-        indicator: "NODO LOCAL SEGURO", welcome: "Canal Activo", subWelcome: "Mandá un mensaje acá abajo para procesar en un entorno aislado.",
-        placeholder: "Mandá un mensaje local cifrado...", sidebarTitle: "Charlas Guardadas",
-        mTitle: "Bienvenido al Ecosistema",
-        mD1: "Este entorno corre bajo un aislamiento completo, che. Toda la memoria, los textos y los hilos de charla se quedan guardados en tu dispositivo. De acá no sale absolutamente nada para internet.",
-        mD2: "AOS-0.2 es un proyecto independiente que está en constante desarrollo. Vas a ver actualizaciones frecuentes para que el motor local vuele y la interfaz quede impecable.",
-        vListen: "AOS Escuchando", vListenPrompt: "Hablá ahora, tranquilo...", vSpeak: "AOS Respondiendo", vSpeakPrompt: "Armando la respuesta...",
-        sysDefault: "Hilo de datos sincronizado, che. Todo joya y operativo a nivel local.",
-        sysGreeting: "Buenas. ¿En qué te puedo dar una mano hoy acá en el nodo?",
-        sysVoiceErr: "Se inició el sistema de voz, pero fijate si no tenés bloqueado el micrófono."
-      }
-    };
+      // Elementos UI
+      const authScreen = document.getElementById('auth-screen');
+      const app = document.getElementById('app');
+      const messagesEl = document.getElementById('messages');
+      const welcomeScreen = document.getElementById('welcomeScreen');
+      const chatInput = document.getElementById('chatInput');
+      const sendBtn = document.getElementById('sendBtn');
+      const micBtn = document.getElementById('mic-btn');
+      const voiceOverlay = document.getElementById('voice-overlay');
+      const voiceStatus = document.getElementById('voiceStatus');
+      const voicePrompt = document.getElementById('voicePrompt');
+      const voiceSubtitles = document.getElementById('voice-subtitles');
+      const meshContainer = document.getElementById('meshContainer');
+      const sidebar = document.getElementById('sidebar');
+      const sidebarBackdrop = document.getElementById('sidebar-backdrop');
 
-    function selectLanguage(btn, lang) {
-      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      currentLang = lang;
-      
-      const t = translations[lang];
-      document.getElementById('lbl-existing').innerText = t.existing;
-      document.getElementById('btn-login').innerText = t.login;
-      document.getElementById('lbl-or').innerText = t.or;
-      document.getElementById('lbl-new').innerText = t.new;
-      document.getElementById('top-indicator').innerText = t.indicator;
-      document.getElementById('chat-welcome').innerText = t.welcome;
-      document.getElementById('chat-welcome-sub').innerText = t.subWelcome;
-      document.getElementById('chatInput').placeholder = t.placeholder;
-      document.getElementById('lbl-sidebar-title').innerText = t.sidebarTitle;
-      
-      document.getElementById('modal-title').innerText = t.mTitle;
-      document.getElementById('modal-desc1').innerText = t.mD1;
-      document.getElementById('modal-desc2').innerText = t.mD2;
-
-      document.getElementById('auth-forms-container').style.display = 'block';
-      initVoiceEngine();
-    }
-
-    function formatInput(el) {
-      let v = el.value.replace(/\s+/g, '').replace(/[^0-9]/g, '');
-      let matches = v.match(/\d{4,16}/g);
-      let match = matches && matches[0] || '';
-      let parts = [];
-      for (let i=0, len=match.length; i<len; i+=4) { parts.push(match.substring(i, i+4)); }
-      el.value = parts.length > 0 ? parts.join(' ') : v;
-    }
-
-    function generateAccount() {
-      let code = '';
-      for (let i = 0; i < 16; i++) { code += Math.floor(Math.random() * 10); }
-      let formatted = code.match(/.{1,4}/g).join(' ');
-      const display = document.getElementById('generatedCodeDisplay');
-      display.style.display = 'flex';
-      display.innerText = formatted;
-      
-      document.getElementById('genBtn').style.display = 'none';
-      document.getElementById('confirmGenBtn').style.display = 'block';
-      currentAccount = code;
-    }
-
-    function confirmNewAccount() {
-      if(currentAccount) {
-        localStorage.setItem(`aos_mem_${currentAccount}`, JSON.stringify([]));
-        localStorage.setItem(`aos_first_${currentAccount}`, 'true');
-        launchApp(currentAccount);
-      }
-    }
-
-    function login() {
-      let input = document.getElementById('loginCodeInput').value.replace(/\s+/g, '');
-      if(input.length === 16) {
-        if (!localStorage.getItem(`aos_mem_${input}`)) {
-          localStorage.setItem(`aos_mem_${input}`, JSON.stringify([]));
-          localStorage.setItem(`aos_first_${input}`, 'true');
-        }
-        launchApp(input);
-      }
-    }
-
-    function launchApp(accountId) {
-      currentAccount = accountId;
-      document.getElementById('auth-screen').style.display = 'none';
-      document.getElementById('app').style.display = 'flex';
-      document.getElementById('accountBadge').innerText = `ID: ${accountId.match(/.{1,4}/g).join(' ')}`;
-      
-      // Cargar memoria local real
-      const savedMemory = localStorage.getItem(`aos_mem_${currentAccount}`);
-      memory = savedMemory ? JSON.parse(savedMemory) : [];
-      
-      renderMessages();
-      renderSidebarHistory();
-
-      if (localStorage.getItem(`aos_first_${currentAccount}`) === 'true') {
-        document.getElementById('onboarding-modal').classList.add('active');
-      }
-    }
-
-    function closeOnboarding() {
-      document.getElementById('onboarding-modal').classList.remove('active');
-      localStorage.removeItem(`aos_first_${currentAccount}`);
-    }
-
-    /* ==========================================================================
-       INTELLIGENCE ENGINE: MANEJO DE CHAT Y RENDERIZADO REAL
-       ========================================================================== */
-    const chatInput = document.getElementById('chatInput');
-    const sendBtn = document.getElementById('sendBtn');
-    const chatContainer = document.getElementById('chatContainer');
-
-    chatInput.addEventListener('input', function() {
-      sendBtn.disabled = this.value.trim().length === 0;
-    });
-
-    chatInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
-      }
-    });
-
-    function sendMessage() {
-      const text = chatInput.value.trim();
-      if (!text) return;
-
-      // Guardar y renderizar mensaje usuario
-      appendMessage('user', text);
-      chatInput.value = '';
-      sendBtn.disabled = true;
-
-      // Simular procesamiento de AOS Neural Node
-      setTimeout(() => {
-        let responseText = generateLocalNeuralResponse(text);
-        appendMessage('aos', responseText);
-      }, 750);
-    }
-
-    function appendMessage(role, text) {
-      memory.push({ role, text, timestamp: Date.now() });
-      localStorage.setItem(`aos_mem_${currentAccount}`, JSON.stringify(memory));
-      renderMessages();
-      renderSidebarHistory();
-    }
-
-    function renderMessages() {
-      // Remover pantallas de bienvenida si hay contenido
-      const welcome = document.getElementById('welcomeScreen');
-      if (memory.length > 0 && welcome) {
-        welcome.style.display = 'none';
-      } else if (memory.length === 0 && welcome) {
-        welcome.style.display = 'flex';
-      }
-
-      // Limpiar burbujas previas respetando el welcome screen
-      const elements = chatContainer.querySelectorAll('.chat-bubble');
-      elements.forEach(el => el.remove());
-
-      memory.forEach(msg => {
-        const bubble = document.createElement('div');
-        bubble.className = `chat-bubble bubble-${msg.role}`;
-        bubble.innerText = msg.text;
-        chatContainer.appendChild(bubble);
-      });
-
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
-
-    function renderSidebarHistory() {
-      const list = document.getElementById('chatHistoryList');
-      list.innerHTML = '';
-      if(memory.length === 0) return;
-
-      // Agrupar o simplemente mostrar los últimos inputs del usuario como hilos
-      const userMessages = memory.filter(m => m.role === 'user');
-      if(userMessages.length > 0) {
-        const lastMsg = userMessages[userMessages.length - 1];
-        const item = document.createElement('div');
-        item.className = 'history-item active';
-        item.innerText = lastMsg.text;
-        list.appendChild(item);
-      }
-    }
-
-    // Cerebro de Respuestas Contextuales Locales Autónomas
-    function generateLocalNeuralResponse(input) {
-      const cleanInput = input.toLowerCase();
-      const t = translations[currentLang];
-
-      if (currentLang === 'es_AR') {
-        if (cleanInput.includes('hola') || cleanInput.includes('buenas')) return "¡Buenas! ¿Todo bien? Decime en qué te puedo ayudar hoy desde este nodo.";
-        if (cleanInput.includes('quien sos') || cleanInput.includes('qué sos')) return "Soy el AOS-0.2, un nodo neural seguro y completamente aislado. Corro 100% acá en tu máquina, sin mandarle nada a servidores raros.";
-        if (cleanInput.includes('seguro')) return "Olvidate, che. Todo lo que escribís encripta la memoria local al toque y muere en este dispositivo.";
-        return `Entendido tu prompt. Analicé "${input}" de forma aislada. ${t.sysDefault}`;
-      } else {
-        if (cleanInput.includes('hola')) return t.sysGreeting;
-        if (cleanInput.includes('quien eres') || cleanInput.includes('que eres')) return "AOS-0.2 es un nodo de procesamiento de lenguaje local independiente que opera bajo aislamiento criptográfico absoluto.";
-        if (cleanInput.includes('seguridad') || cleanInput.includes('seguro')) return "Confirmado. Toda la heurística de este hilo se encuentra confinada y cifrada en la partición local de almacenamiento.";
-        return `Instrucción local procesada con éxito. Resultados asignados al búfer seguro. ${t.sysDefault}`;
-      }
-    }
-
-    function logout() {
-      currentAccount = '';
-      memory = [];
-      document.getElementById('app').style.display = 'none';
-      document.getElementById('auth-screen').style.display = 'block';
-      document.getElementById('genBtn').style.display = 'block';
-      document.getElementById('confirmGenBtn').style.display = 'none';
-      document.getElementById('generatedCodeDisplay').style.display = 'none';
-      document.getElementById('loginCodeInput').value = '';
-    }
-
-    function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('open');
-      document.getElementById('sidebar-backdrop').classList.toggle('show');
-    }
-
-    /* ==========================================================================
-       VOICE CONTEXT: INTEGRACIÓN REAL CON SPEECH API (INTELIGENCIA DE AUDIO)
-       ========================================================================== */
-    function initVoiceEngine() {
-      window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (window.SpeechRecognition) {
-        recognition = new SpeechRecognition();
-        recognition.interimResults = false;
-        
-        if(currentLang === 'es_AR') recognition.lang = 'es-AR';
-        else if(currentLang === 'es') recognition.lang = 'es-ES';
-        else recognition.lang = 'en-US';
-
-        recognition.addEventListener('result', e => {
-          const transcript = e.results[0][0].transcript;
-          if(transcript.trim().length > 0) {
-            handleVoiceInput(transcript);
-          }
-        });
-
-        recognition.addEventListener('end', () => {
-          // Volver a escuchar si la pantalla de voz sigue abierta y el sistema no está hablando
-          if(document.getElementById('voice-overlay').classList.contains('active') && !isVoiceResponding) {
-            recognition.start();
-          }
-        });
-      }
-    }
-
-    function toggleVoiceView(activate) {
-      const overlay = document.getElementById('voice-overlay');
-      const statusText = document.getElementById('voiceStatus');
-      const promptText = document.getElementById('voicePrompt');
-      const mesh = document.getElementById('meshContainer');
-      const t = translations[currentLang];
-
-      if (activate) {
-        overlay.classList.add('active');
-        isVoiceResponding = false;
-        statusText.innerText = t.vListen;
-        promptText.innerText = t.vListenPrompt;
-        mesh.style.setProperty('--speed', '12s'); // Animación relajada (escuchando)
-
-        if (recognition) {
-          try { recognition.start(); } catch(e) { console.log("Re-init voice avoidance loop"); }
-        } else {
-          promptText.innerText = t.sysVoiceErr;
-        }
-      } else {
-        overlay.classList.remove('active');
-        if (recognition) recognition.stop();
-        window.speechSynthesis.cancel();
-      }
-    }
-
-    function handleVoiceInput(text) {
-      const statusText = document.getElementById('voiceStatus');
-      const promptText = document.getElementById('voicePrompt');
-      const mesh = document.getElementById('meshContainer');
-      const t = translations[currentLang];
-
-      isVoiceResponding = true;
-      if(recognition) recognition.stop();
-
-      // Añadir lo escuchado al chat general
-      appendMessage('user', text);
-
-      // Cambiar UI de voz a "Respondiendo"
-      statusText.innerText = t.vSpeak;
-      promptText.innerText = t.vSpeakPrompt;
-      mesh.style.setProperty('--speed', '1.5s'); // Luces hiperactivas (AOS hablando)
-
-      const answer = generateLocalNeuralResponse(text);
-
-      // Síntesis de voz real del dispositivo
-      const utterance = new SpeechSynthesisUtterance(answer);
-      if(currentLang === 'es_AR') utterance.lang = 'es-AR';
-      else if(currentLang === 'es') utterance.lang = 'es-ES';
-      else utterance.lang = 'en-US';
-
-      utterance.onend = () => {
-        // Al terminar de hablar, agregar a memoria visual y volver a escuchar
-        appendMessage('aos', answer);
-        isVoiceResponding = false;
-        if(document.getElementById('voice-overlay').classList.contains('active')) {
-          statusText.innerText = t.vListen;
-          promptText.innerText = t.vListenPrompt;
-          mesh.style.setProperty('--speed', '12s');
-          if(recognition) recognition.start();
+      // ========== TRADUCCIONES ==========
+      const translations = {
+        en: {
+          existing: "Access with existing account", login: "Enter", or: "or", new: "Don't have an account?",
+          indicator: "SECURE LOCAL NODE", welcome: "Active Channel", placeholder: "Send encrypted local message...",
+          mTitle: "Welcome to the Ecosystem",
+          mD1: "This environment operates under complete cryptographic isolation. All memory, text processing, and conversation threads remain confined locally within this device. Absolutely nothing is transmitted to external servers.",
+          mD2: "AOS-0.2 is an independent project under constant, continuous development. You will receive frequent updates optimizing the local engine and refining the user interface.",
+          vListen: "AOS Listening", vListenPrompt: "Speak now safely...", vSpeak: "AOS Responding", vSpeakPrompt: "Processing neural response...",
+          listening: "Listening...", errorSpeech: "Speech recognition not supported. Try Chrome or Edge."
+        },
+        es: {
+          existing: "Acceder con cuenta existente", login: "Entrar", or: "ó", new: "¿No tienes una cuenta?",
+          indicator: "NODO LOCAL SEGURO", welcome: "Canal Activo", placeholder: "Enviar mensaje local cifrado...",
+          mTitle: "Bienvenido al Ecosistema",
+          mD1: "Este entorno opera bajo un aislamiento criptográfico completo. Toda la memoria, procesamiento de texto e hilos de conversación se quedan confinados localmente dentro de este dispositivo. Absolutamente nada se transmite hacia servidores externos.",
+          mD2: "AOS-0.2 es un proyecto independiente en constante desarrollo continuo. Recibirás actualizaciones frecuentes de optimización del motor local y refinamiento de la interfaz.",
+          vListen: "AOS Escuchando", vListenPrompt: "Habla ahora de forma segura...", vSpeak: "AOS Respondiendo", vSpeakPrompt: "Procesando respuesta...",
+          listening: "Escuchando...", errorSpeech: "Reconocimiento de voz no soportado. Probá con Chrome o Edge."
+        },
+        es_AR: {
+          existing: "Entrá con tu cuenta existente", login: "Entrar", or: "ó", new: "¿No tenés una cuenta?",
+          indicator: "NODO LOCAL SEGURO", welcome: "Canal Activo", placeholder: "Mandá un mensaje local cifrado...",
+          mTitle: "Bienvenido al Ecosistema",
+          mD1: "Este entorno corre bajo un aislamiento completo, che. Toda la memoria, los textos y los hilos de charla se quedan guardados en tu dispositivo. De acá no sale absolutamente nada para internet.",
+          mD2: "AOS-0.2 es un proyecto independiente que está en constante desarrollo. Vas a ver actualizaciones frecuentes para que el motor local vuele y la interfaz quede impecable.",
+          vListen: "AOS Escuchando", vListenPrompt: "Hablá ahora, tranquilo...", vSpeak: "AOS Respondiendo", vSpeakPrompt: "Armando la respuesta...",
+          listening: "Escuchando...", errorSpeech: "El reconocimiento de voz no anda en este navegador. Probá con Chrome o Edge."
         }
       };
 
-      window.speechSynthesis.speak(utterance);
-    }
+      // ========== AUTENTICACIÓN ==========
+      window.selectLanguage = function(btn, lang) {
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        currentLang = lang;
+        const t = translations[lang];
+        document.getElementById('lbl-existing').innerText = t.existing;
+        document.getElementById('btn-login').innerText = t.login;
+        document.getElementById('lbl-or').innerText = t.or;
+        document.getElementById('lbl-new').innerText = t.new;
+        document.getElementById('top-indicator').innerText = t.indicator;
+        document.getElementById('chat-welcome').innerText = t.welcome;
+        chatInput.placeholder = t.placeholder;
+        document.getElementById('modal-title').innerText = t.mTitle;
+        document.getElementById('modal-desc1').innerText = t.mD1;
+        document.getElementById('modal-desc2').innerText = t.mD2;
+        document.getElementById('auth-forms-container').style.display = 'block';
+      };
+
+      window.formatInput = function(el) {
+        let v = el.value.replace(/\s+/g, '').replace(/[^0-9]/g, '');
+        let parts = [];
+        for (let i=0; i<v.length && i<16; i+=4) parts.push(v.substring(i, i+4));
+        el.value = parts.join(' ');
+      };
+
+      window.generateAccount = function() {
+        let code = '';
+        for (let i = 0; i < 16; i++) code += Math.floor(Math.random() * 10);
+        let formatted = code.match(/.{1,4}/g).join(' ');
+        const display = document.getElementById('generatedCodeDisplay');
+        display.style.display = 'flex';
+        display.innerText = formatted;
+        document.getElementById('genBtn').style.display = 'none';
+        document.getElementById('confirmGenBtn').style.display = 'block';
+        currentAccount = code;
+      };
+
+      window.confirmNewAccount = function() {
+        if(currentAccount) {
+          localStorage.setItem(`aos_mem_${currentAccount}`, JSON.stringify([]));
+          localStorage.setItem(`aos_first_${currentAccount}`, 'true');
+          launchApp(currentAccount);
+        }
+      };
+
+      window.login = function() {
+        let input = document.getElementById('loginCodeInput').value.replace(/\s+/g, '');
+        if(input.length === 16) {
+          if (!localStorage.getItem(`aos_mem_${input}`)) {
+            localStorage.setItem(`aos_mem_${input}`, JSON.stringify([]));
+            localStorage.setItem(`aos_first_${input}`, 'true');
+          }
+          launchApp(input);
+        }
+      };
+
+      function launchApp(accountId) {
+        currentAccount = accountId;
+        authScreen.style.display = 'none';
+        app.style.display = 'flex';
+        document.getElementById('accountBadge').innerText = `ID: ${accountId.match(/.{1,4}/g).join(' ')}`;
+        if (localStorage.getItem(`aos_first_${currentAccount}`) === 'true') {
+          document.getElementById('onboarding-modal').classList.add('active');
+        }
+        // Cargar modelo
+        if (!mobilenetModel) {
+          mobilenet.load().then(model => { mobilenetModel = model; console.log("Modelo listo"); }).catch(e => console.warn("Error modelo"));
+        }
+      }
+
+      window.closeOnboarding = function() {
+        document.getElementById('onboarding-modal').classList.remove('active');
+        localStorage.removeItem(`aos_first_${currentAccount}`);
+      };
+
+      window.logout = function() {
+        currentAccount = '';
+        app.style.display = 'none';
+        authScreen.style.display = 'block';
+        document.getElementById('genBtn').style.display = 'block';
+        document.getElementById('confirmGenBtn').style.display = 'none';
+        document.getElementById('generatedCodeDisplay').style.display = 'none';
+        document.getElementById('loginCodeInput').value = '';
+        conversationContext = [];
+        messagesEl.innerHTML = '';
+        messagesEl.style.display = 'none';
+        welcomeScreen.style.display = 'flex';
+      };
+
+      window.toggleSidebar = function() {
+        sidebar.classList.toggle('open');
+        sidebarBackdrop.classList.toggle('show');
+      };
+
+      // ========== LÓGICA DE CHAT ==========
+      const emociones = {
+        feliz: { en: ["happy","glad","joyful"], es: ["feliz","contento","alegre"], es_AR: ["feliz","contento","alegre","joya","re feliz"] },
+        triste: { en: ["sad","unhappy","depressed"], es: ["triste","deprimido","bajón"], es_AR: ["triste","deprimido","bajón","hecho mierda"] },
+        enojado: { en: ["angry","mad","furious"], es: ["enojado","furioso","caliente"], es_AR: ["enojado","caliente","bronca","re caliente"] },
+        miedo: { en: ["scared","afraid","fear"], es: ["miedo","asustado","aterrado"], es_AR: ["miedo","cagaso","asustado","re cagado"] },
+        sorpresa: { en: ["surprised","shocked","amazed"], es: ["sorprendido","sorprendente","impactado"], es_AR: ["sorprendido","impactado","no lo puedo creer"] },
+        cansado: { en: ["tired","exhausted"], es: ["cansado","agotado"], es_AR: ["cansado","agotado","re cansado","estoy muerto"] },
+        aburrido: { en: ["bored"], es: ["aburrido"], es_AR: ["aburrido","me embolo","estoy al pedo"] },
+        enamorado: { en: ["in love"], es: ["enamorado"], es_AR: ["enamorado","me enamoré"] }
+      };
+      const respEmocion = {
+        feliz: { en: ["That's great! 😊","Awesome!"], es: ["¡Qué bueno! 😊","¡Genial!"], es_AR: ["¡Qué bien, che! 😊","¡Joyita!"] },
+        triste: { en: ["I'm sorry... Want to talk?"], es: ["Lamento eso. ¿Querés hablar?"], es_AR: ["Uh, qué bajón. ¿Querés hablar?"] },
+        enojado: { en: ["I understand. Want to vent?"], es: ["Entiendo tu bronca. ¿Querés desahogarte?"], es_AR: ["Te entiendo. ¿Querés putear un rato?"] },
+        miedo: { en: ["Fear is normal. What worries you?"], es: ["El miedo es normal. ¿Qué te preocupa?"], es_AR: ["El cagaso es normal. ¿Qué te preocupa?"] },
+        sorpresa: { en: ["What a surprise! Tell me more."], es: ["¡Qué sorpresa! Contame más."], es_AR: ["¡Qué sorpresa, che! Contame más."] },
+        cansado: { en: ["Rest up! You deserve it."], es: ["¡Descansá! Te lo merecés."], es_AR: ["Tiráte a descansar, te lo re merecés."] },
+        aburrido: { en: ["Want to play something?"], es: ["¿Querés que te cuente algo?"], es_AR: ["¿Querés un juego o un chiste?"] },
+        enamorado: { en: ["Love is beautiful! Tell me more."], es: ["El amor es hermoso. ¡Contame más!"], es_AR: ["¡Qué lindo, che! Contame más."] }
+      };
+
+      const respuestas = {
+        en: [
+          { claves: ["hello","hi","hey"], respuestas: ["Hello! 👋 How can I help you?","Hey! 😊 What do you need?"] },
+          { claves: ["how are you"], respuestas: ["I'm great, thanks! 😄"] },
+          { claves: ["name"], respuestas: ["I'm AOS-0.2, your virtual assistant. 🇦🇷"] },
+          { claves: ["thanks"], respuestas: ["You're welcome! 😊"] },
+          { claves: ["bye"], respuestas: ["See you later! 👋"] },
+          { claves: ["help"], respuestas: ["I can chat, recognize images, search Wikipedia, write code, teach math, and talk!"] }
+        ],
+        es: [
+          { claves: ["hola","buenas"], respuestas: ["¡Hola! 👋 ¿En qué te puedo ayudar?"] },
+          { claves: ["cómo estás"], respuestas: ["¡Muy bien, gracias! 😄"] },
+          { claves: ["nombre"], respuestas: ["Soy AOS-0.2, tu asistente virtual. 🇦🇷"] },
+          { claves: ["gracias"], respuestas: ["¡De nada! 😊"] },
+          { claves: ["chau"], respuestas: ["¡Chau! 👋"] },
+          { claves: ["ayuda"], respuestas: ["Puedo charlar, reconocer imágenes, buscar en Wikipedia, programar, enseñar matemáticas y hablar."] }
+        ],
+        es_AR: [
+          { claves: ["hola","buenas"], respuestas: ["¡Hola, che! 👋 ¿En qué te puedo dar una mano?"] },
+          { claves: ["cómo estás"], respuestas: ["¡Joyita, gracias! 😄"] },
+          { claves: ["nombre"], respuestas: ["Soy AOS-0.2, un asistente virtual hecho por un pibe argentino. 🇦🇷"] },
+          { claves: ["gracias"], respuestas: ["¡De nada, che! 😊"] },
+          { claves: ["chau"], respuestas: ["¡Chau, che! 👋"] },
+          { claves: ["ayuda"], respuestas: ["Puedo charlar, reconocer imágenes, buscar en Wikipedia, programar, enseñar matemáticas y hablar."] }
+        ]
+      };
+      const fallbacks = {
+        en: ["I didn't quite get that 🤔", "Hmm, try again!"],
+        es: ["No entendí bien eso 🤔", "¿Probás de nuevo?"],
+        es_AR: ["No te entendí, che 🤔", "¿Me lo repetís?"]
+      };
+
+      const codeKnowledge = {
+        calculadora: ['```html\n<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Calculadora</title><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#1a1a2e;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif}.calc{background:#16213e;border-radius:20px;padding:20px;width:300px;box-shadow:0 20px 60px rgba(0,0,0,.5)}.display{background:#0f3460;border-radius:12px;padding:20px;text-align:right;margin-bottom:15px}.expr{color:#aaa;font-size:.85rem;min-height:20px}.result{color:#e94560;font-size:2rem;font-weight:700;word-break:break-all}.buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}button{padding:18px;border:none;border-radius:12px;font-size:1rem;cursor:pointer;transition:transform .1s;font-weight:600}button:active{transform:scale(.92)}.n{background:#1a1a2e;color:#fff}.o{background:#e94560;color:#fff}.e{background:#0f3460;color:#e94560;grid-column:span 2}.c{background:#533483;color:#fff}.z{grid-column:span 2}</style></head><body><div class="calc"><div class="display"><div class="expr" id="expr"></div><div class="result" id="res">0</div></div><div class="buttons"><button class="c" onclick="limpiar()">C</button><button class="c" onclick="borrar()">⌫</button><button class="c" onclick="agregar(\'%\')">%</button><button class="o" onclick="agregar(\'/\')">÷</button><button class="n" onclick="agregar(\'7\')">7</button><button class="n" onclick="agregar(\'8\')">8</button><button class="n" onclick="agregar(\'9\')">9</button><button class="o" onclick="agregar(\'*\')">×</button><button class="n" onclick="agregar(\'4\')">4</button><button class="n" onclick="agregar(\'5\')">5</button><button class="n" onclick="agregar(\'6\')">6</button><button class="o" onclick="agregar(\'-\')">−</button><button class="n" onclick="agregar(\'1\')">1</button><button class="n" onclick="agregar(\'2\')">2</button><button class="n" onclick="agregar(\'3\')">3</button><button class="o" onclick="agregar(\'+\')">+</button><button class="n z" onclick="agregar(\'0\')">0</button><button class="n" onclick="agregar(\'.\')">.</button><button class="e" onclick="calcular()">=</button></div></div><script>let expr=\'\';function agregar(v){expr+=v;document.getElementById(\'res\').textContent=expr}function limpiar(){expr=\'\';document.getElementById(\'res\').textContent=\'0\'}function borrar(){expr=expr.slice(0,-1);document.getElementById(\'res\').textContent=expr||\'0\'}function calcular(){try{let r=Function(\'"use strict";return(\'+expr+\')\')();document.getElementById(\'res\').textContent=parseFloat(r.toFixed(10));expr=String(r)}catch(e){document.getElementById(\'res\').textContent=\'Error\'}}<\/script></body></html>\n```'],
+        tareas: ['```html\n<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Tareas</title><style>*{box-sizing:border-box;margin:0;padding:0}body{background:#f0f2f5;font-family:sans-serif;padding:2rem}.app{max-width:520px;margin:0 auto}h1{font-size:1.8rem;color:#1a1a1a}.row{display:flex;gap:10px;margin:1rem 0}.row input{flex:1;padding:14px;border:2px solid #e0e0e0;border-radius:14px;font-size:1rem}.add{padding:14px 22px;background:#007aff;color:#fff;border:none;border-radius:14px;cursor:pointer}.lista{display:flex;flex-direction:column;gap:10px}.item{background:#fff;border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.06)}.item.done{opacity:.55}.item.done .txt{text-decoration:line-through}.cb{width:22px;height:22px;border-radius:50%;border:2px solid #007aff;cursor:pointer}.cb.on{background:#007aff}.cb.on::after{content:"✓";color:#fff;font-size:13px;font-weight:700}.txt{flex:1}.del{background:none;border:none;color:#ff3b30;cursor:pointer}</style></head><body><div class="app"><h1>📝 Mis Tareas</h1><div class="row"><input id="inp" placeholder="Nueva tarea..."><button class="add" onclick="add()">+</button></div><div class="lista" id="lista"></div></div><script>let T=JSON.parse(localStorage.getItem(\'atlas_t\')||\'[]\');function save(){localStorage.setItem(\'atlas_t\',JSON.stringify(T))}function add(){const v=document.getElementById(\'inp\').value.trim();if(!v)return;T.push({id:Date.now(),v,ok:false});document.getElementById(\'inp\').value=\'\';save();draw()}function tog(id){T=T.map(t=>t.id===id?{...t,ok:!t.ok}:t);save();draw()}function del(id){T=T.filter(t=>t.id!==id);save();draw()}function draw(){document.getElementById(\'lista\').innerHTML=T.map(t=>\'<div class="item\'+(t.ok?\' done\':\'\')+\'"><div class="cb\'+(t.ok?\' on\':\'\')+\'" onclick="tog(\'+t.id+\')"></div><span class="txt">\'+t.v+\'</span><button class="del" onclick="del(\'+t.id+\')">🗑</button></div>\').join(\'\')}draw();<\/script></body></html>\n```']
+      };
+      const keywordMap = { calculadora: 'calculadora', tareas: 'tareas', juego: 'calculadora', snake: 'calculadora', notas: 'tareas' };
+
+      function random(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+      function detectarEmocion(texto) {
+        const t = texto.toLowerCase().trim();
+        for (const [emocion, claves] of Object.entries(emociones)) {
+          const palabras = claves[currentLang] || claves.es;
+          if (palabras.some(p => t.includes(p))) return random(respEmocion[emocion][currentLang] || respEmocion[emocion].es);
+        }
+        return null;
+      }
+
+      async function buscarEnWikipedia(consulta) {
+        const url = 'https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=' + encodeURIComponent(consulta) + '&format=json&origin=*';
+        try {
+          const resp = await fetch(url); const data = await resp.json();
+          if (!data.query.search.length) return null;
+          const titulo = data.query.search[0].title;
+          const extractUrl = 'https://es.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&titles=' + encodeURIComponent(titulo) + '&format=json&origin=*';
+          const extResp = await fetch(extractUrl); const extData = await extResp.json();
+          const page = extData.query.pages; const pageId = Object.keys(page)[0];
+          if (page[pageId].missing) return null;
+          return { extract: page[pageId].extract, title: titulo };
+        } catch(e) { return null; }
+      }
+
+      function obtenerDeConocimiento(input) {
+        const t = input.toLowerCase().trim();
+        for (const [keyword, category] of Object.entries(keywordMap)) {
+          if (t.includes(keyword)) {
+            const arr = codeKnowledge[category];
+            if (arr && arr.length) return random(arr);
+          }
+        }
+        return null;
+      }
+
+      async function obtenerRespuesta(texto) {
+        const t = texto.toLowerCase().trim();
+        const emocion = detectarEmocion(texto);
+        if (emocion) return emocion;
+        for (const entrada of (respuestas[currentLang] || respuestas.es)) {
+          if (entrada.claves.some(c => t.includes(c))) return random(entrada.respuestas);
+        }
+        const codeAnswer = obtenerDeConocimiento(t);
+        if (codeAnswer) return codeAnswer;
+        const wiki = await buscarEnWikipedia(texto);
+        if (wiki) {
+          const oraciones = wiki.extract.split('. ');
+          const resumen = oraciones.slice(0,2).join('. ') + (oraciones.length>2?'.':'');
+          const link = 'https://es.wikipedia.org/wiki/' + encodeURIComponent(wiki.title);
+          return (currentLang === 'en' ? 'According to Wikipedia, ' : (currentLang === 'es_AR' ? 'Che, según Wikipedia, ' : 'Según Wikipedia, ')) + resumen.charAt(0).toLowerCase() + resumen.slice(1) + '\n\n🔗 ' + link;
+        }
+        return random(fallbacks[currentLang] || fallbacks.es);
+      }
+
+      function showMessages() { welcomeScreen.style.display = 'none'; messagesEl.style.display = 'flex'; }
+      function addMessage(text, role) {
+        const row = document.createElement('div'); row.className = 'msg-row ' + role;
+        if (role === 'user') row.innerHTML = '<div class="msg-content"><div class="bubble">' + text + '</div></div>';
+        else {
+          const processed = processCodeBlocks(text);
+          row.innerHTML = '<div class="msg-content"><div class="assistant-icon"><i class="ti ti-robot"></i></div><div><div class="bubble">' + processed + '</div></div></div>';
+          setTimeout(() => speakText(text), 200);
+        }
+        messagesEl.appendChild(row);
+        document.querySelector('.chat-view').scrollTop = document.querySelector('.chat-view').scrollHeight;
+      }
+      function addImageMessage(url) {
+        const row = document.createElement('div'); row.className = 'msg-row user';
+        row.innerHTML = '<div class="msg-content"><div class="bubble"><img src="' + url + '" style="max-width:200px;border-radius:10px;width:100%;" /></div></div>';
+        messagesEl.appendChild(row);
+      }
+      function addTyping() {
+        const row = document.createElement('div'); row.className = 'msg-row assistant'; row.id = 'typing-row';
+        row.innerHTML = '<div class="msg-content"><div class="assistant-icon"><i class="ti ti-robot"></i></div><div><div class="bubble"><div class="typing-indicator"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div></div></div>';
+        messagesEl.appendChild(row);
+        document.querySelector('.chat-view').scrollTop = document.querySelector('.chat-view').scrollHeight;
+      }
+
+      async function sendMessage(msgText) {
+        const text = msgText || chatInput.value.trim();
+        if (!text || isTyping) return;
+        showMessages(); addMessage(text, 'user');
+        chatInput.value = ''; chatInput.style.height = 'auto'; sendBtn.disabled = true; isTyping = true;
+        addTyping();
+        try {
+          const respuesta = await obtenerRespuesta(text);
+          const typingRow = document.getElementById('typing-row'); if (typingRow) typingRow.remove();
+          addMessage(respuesta, 'assistant');
+        } catch(e) {
+          const typingRow = document.getElementById('typing-row'); if (typingRow) typingRow.remove();
+          addMessage('Error. Intenta de nuevo.', 'assistant');
+        }
+        isTyping = false; sendBtn.disabled = (chatInput.value.trim() === '');
+      }
+
+      // ========== VOZ ==========
+      function speakText(text) {
+        if (!ttsEnabled || !window.speechSynthesis) return;
+        const clean = text.replace(/\*\*/g, '').replace(/[^\w\sáéíóúñÁÉÍÓÚÑ.,;:!?¿¡@()\-+]/g, '').replace(/```[\s\S]*?```/g, '').trim();
+        if (!clean) return;
+        speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(clean);
+        u.lang = currentLang === 'en' ? 'en-US' : (currentLang === 'es_AR' ? 'es-AR' : 'es-ES');
+        u.volume = 1; u.rate = 1.1;
+        speechSynthesis.speak(u);
+        if (voiceModeActive) {
+          voiceSubtitles.textContent = clean;
+        }
+      }
+
+      window.toggleVoice = function() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) { alert(translations[currentLang]?.errorSpeech); return; }
+        if (isRecording) { stopVoice(); stopVoiceMode(); }
+        else { voiceModeActive = true; voiceOverlay.classList.add('active'); startVoice(); }
+      };
+
+      function startVoice() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) return;
+        recognition = new SpeechRecognition();
+        recognition.lang = currentLang === 'en' ? 'en-US' : (currentLang === 'es_AR' ? 'es-AR' : 'es-ES');
+        recognition.interimResults = true;
+        recognition.continuous = true;
+        recognition.onstart = () => {
+          isRecording = true; micBtn.classList.add('recording');
+          voiceStatus.innerText = translations[currentLang]?.vListen || 'Listening';
+          voicePrompt.innerText = translations[currentLang]?.vListenPrompt || 'Speak';
+          voiceSubtitles.textContent = translations[currentLang]?.listening || 'Listening...';
+        };
+        recognition.onresult = e => {
+          let t = '';
+          for (let i = e.resultIndex; i < e.results.length; i++) t += e.results[i][0].transcript;
+          voiceSubtitles.textContent = t;
+        };
+        recognition.onerror = () => { stopVoice(); stopVoiceMode(); };
+        recognition.onend = () => {
+          if (isRecording && voiceSubtitles.textContent && voiceSubtitles.textContent !== (translations[currentLang]?.listening || 'Listening...')) {
+            const text = voiceSubtitles.textContent.trim();
+            stopVoice();
+            sendMessage(text);
+            setTimeout(() => { if (voiceModeActive) startVoice(); }, 500);
+          } else { stopVoice(); stopVoiceMode(); }
+        };
+        recognition.start();
+      }
+
+      function stopVoice() {
+        if (recognition) { recognition.stop(); recognition = null; }
+        isRecording = false;
+        micBtn.classList.remove('recording');
+      }
+
+      window.stopVoiceMode = function() {
+        voiceModeActive = false;
+        voiceOverlay.classList.remove('active');
+        stopVoice();
+        speechSynthesis.cancel();
+        voiceSubtitles.textContent = '';
+      };
+
+      // ========== CÓDIGO ==========
+      function processCodeBlocks(text) {
+        const regex = /```(\w*)\n([\s\S]*?)```/g; let result = text, match;
+        while ((match = regex.exec(text)) !== null) {
+          const code = match[2]; const isHTML = match[1] === 'html' || code.includes('<!DOCTYPE html>') || code.includes('<html');
+          const blockId = 'code-' + Math.random().toString(36).substr(2,8);
+          const escaped = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+          const toolbar = '<div class="code-toolbar"><button class="code-btn" onclick="copyCode(\'' + blockId + '\')"><i class="ti ti-copy"></i> Copiar</button><button class="code-btn" onclick="downloadCode(\'' + blockId + '\',\'archivo' + (isHTML?'.html':'.txt') + '\')"><i class="ti ti-download"></i> Descargar</button>' + (isHTML ? '<button class="code-btn run" onclick="runCode(\'' + blockId + '\')"><i class="ti ti-player-play"></i> Ejecutar</button>' : '') + '</div>';
+          result = result.replace(match[0], '<div class="code-container" id="' + blockId + '"><pre><code>' + escaped + '</code></pre>' + toolbar + '</div>');
+        }
+        return result;
+      }
+      window.copyCode = (id) => { navigator.clipboard.writeText(document.getElementById(id).querySelector('code').textContent); };
+      window.downloadCode = (id, filename) => { const blob = new Blob([document.getElementById(id).querySelector('code').textContent], {type:'text/plain'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click(); URL.revokeObjectURL(a.href); };
+      window.runCode = (id) => { document.getElementById('run-frame').srcdoc = document.getElementById(id).querySelector('code').textContent; document.getElementById('run-modal').classList.add('open'); };
+      window.closeRunModal = () => { document.getElementById('run-modal').classList.remove('open'); document.getElementById('run-frame').srcdoc = ''; };
+
+      // ========== FEEDBACK ==========
+      window.openFeedback = () => document.getElementById('feedback-modal').classList.add('open');
+      window.closeFeedback = () => document.getElementById('feedback-modal').classList.remove('open');
+      window.enviarFeedback = () => {
+        const mensaje = document.getElementById('feedback-text').value.trim();
+        if (!mensaje) return;
+        window.open('mailto:supportaos5@gmail.com?subject=Feedback AOS-0.2&body=' + encodeURIComponent(mensaje));
+        closeFeedback();
+      };
+
+      // ========== IMAGEN ==========
+      const imageInput = document.getElementById('imageInput');
+      imageInput.addEventListener('change', async function() {
+        const file = this.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          const url = e.target.result; showMessages(); addImageMessage(url);
+          if (!mobilenetModel) { addMessage('Modelo cargando...', 'assistant'); return; }
+          const img = new Image(); img.src = url;
+          img.onload = async () => {
+            try {
+              const predictions = await mobilenetModel.classify(img);
+              if (!predictions.length) { addMessage('No reconocí nada 🧐', 'assistant'); return; }
+              const top = predictions[0]; const className = top.className.toLowerCase(); const confianza = Math.round(top.probability * 100);
+              let explicacion = 'Objeto: ' + className;
+              addMessage(explicacion + ' (' + confianza + '% certeza)', 'assistant');
+            } catch { addMessage('Error al analizar 😥', 'assistant'); }
+          };
+        };
+        reader.readAsDataURL(file); this.value = '';
+      });
+
+      // ========== EVENTOS ==========
+      chatInput.addEventListener('input', () => {
+        sendBtn.disabled = chatInput.value.trim() === '' || isTyping;
+        chatInput.style.height = 'auto'; chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+      });
+      chatInput.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (!sendBtn.disabled) sendMessage(); } });
+      sendBtn.addEventListener('click', () => sendMessage());
+      sidebarBackdrop.addEventListener('click', toggleSidebar);
+
+      // ========== EXPORTACIONES GLOBALES ==========
+      window.sendMessage = sendMessage;
+      window.toggleSidebar = toggleSidebar;
+      window.toggleVoice = window.toggleVoice;
+      window.stopVoiceMode = window.stopVoiceMode;
+      window.closeOnboarding = closeOnboarding;
+      window.logout = logout;
+      window.openFeedback = openFeedback;
+      window.closeFeedback = closeFeedback;
+      window.enviarFeedback = enviarFeedback;
+      window.copyCode = window.copyCode;
+      window.downloadCode = window.downloadCode;
+      window.runCode = window.runCode;
+      window.closeRunModal = closeRunModal;
+    })();
   </script>
 </body>
 </html>
