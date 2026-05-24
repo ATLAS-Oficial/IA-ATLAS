@@ -26,6 +26,7 @@
       --text-ghost: #42424a;
       --accent: #38bdf8;
       --accent-bg: rgba(56, 189, 248, 0.08);
+      --success: #4ade80;
       --shadow: 0 20px 40px -15px rgba(0,0,0,0.8);
       --sidebar-width: 280px;
       --radius-md: 12px;
@@ -116,7 +117,6 @@
     .sidebar-header { padding: 24px 20px; display: flex; align-items: center; justify-content: space-between; font-weight: 600; font-size: 15px; }
     .chat-list { flex: 1; overflow-y: auto; padding: 0 12px; font-size: 14px; color: var(--text-muted); }
     
-    /* Ajustes en la barra lateral */
     .sidebar-settings {
       padding: 12px 20px;
       border-top: 1px solid var(--border);
@@ -135,7 +135,6 @@
     .sidebar-settings .toggle-switch { width: 40px; height: 22px; }
     .sidebar-settings .slider:before { height: 16px; width: 16px; left: 3px; bottom: 3px; }
     .sidebar-settings input:checked + .slider:before { transform: translateX(18px); }
-
     .sidebar-footer { padding: 12px 20px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-ghost); font-family: monospace; }
     
     #main-container { flex: 1; display: flex; flex-direction: column; width: 100%; height: 100%; }
@@ -174,6 +173,26 @@
     .code-btn.run { background: var(--accent-bg); color: var(--accent); border-color: var(--accent); }
     .wiki-image { max-width: 100%; border-radius: 12px; margin-top: 8px; border: 1px solid var(--border); }
 
+    .product-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin: 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: var(--transition);
+    }
+    .product-card:hover { border-color: var(--border-focus); }
+    .product-card img { width: 64px; height: 64px; object-fit: contain; border-radius: 8px; background: var(--bg-main); }
+    .product-card .info { flex: 1; }
+    .product-card .info .title { font-size: 13px; font-weight: 500; color: var(--text-main); margin-bottom: 4px; }
+    .product-card .info .source { font-size: 11px; color: var(--text-muted); }
+    .product-card .price { font-size: 16px; font-weight: 600; color: var(--accent); white-space: nowrap; }
+    .product-card .best-price { border: 1px solid var(--accent); background: var(--accent-bg); }
+    .product-card .best-price .price { color: var(--success); }
+
     .input-area { padding: 16px 24px 32px; background: linear-gradient(to top, var(--bg-main) 60%, transparent); }
     .input-wrapper {
       max-width: 720px; margin: 0 auto; background: rgba(20, 20, 23, 0.8); border: 1px solid var(--border);
@@ -186,7 +205,6 @@
     .send-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--text-main); color: var(--bg-main); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
     .send-btn:disabled { background: var(--border); color: var(--text-ghost); cursor: not-allowed; }
 
-    /* Onboarding (aún se usa) */
     #onboarding-modal {
       display: none; position: fixed; inset: 0; background: rgba(5, 5, 6, 0.85);
       backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
@@ -240,7 +258,6 @@
 </head>
 <body>
 
-  <!-- Autenticación -->
   <div id="auth-screen">
     <h1>AOS-0.2</h1>
     <div class="lang-selector">
@@ -264,7 +281,6 @@
     </div>
   </div>
 
-  <!-- Onboarding -->
   <div id="onboarding-modal">
     <div class="modal-card">
       <div class="onboarding-badge"><i class="ti ti-shield-check"></i> Local Node Active</div>
@@ -275,7 +291,6 @@
     </div>
   </div>
 
-  <!-- App principal -->
   <div id="app">
     <div id="sidebar-backdrop" onclick="toggleSidebar()"></div>
     <div id="sidebar">
@@ -284,8 +299,6 @@
         <button class="icon-btn" onclick="toggleSidebar()"><i class="ti ti-x"></i></button>
       </div>
       <div class="chat-list" id="chatHistoryList"></div>
-      
-      <!-- Ajustes integrados en la barra lateral -->
       <div class="sidebar-settings">
         <div class="setting-row">
           <label>Tema claro</label>
@@ -306,7 +319,6 @@
           <span style="font-size:11px; color:var(--accent);">supportaos5@gmail.com</span>
         </div>
       </div>
-      
       <div class="sidebar-footer" id="accountBadge">ID: ---- ---- ---- ----</div>
     </div>
 
@@ -316,14 +328,12 @@
         <div style="font-size: 11px; font-weight: 600; color: var(--text-ghost); letter-spacing: 0.05em;" id="top-indicator">SECURE LOCAL NODE</div>
         <button class="icon-btn" onclick="logout()"><i class="ti ti-logout"></i></button>
       </div>
-
       <div class="chat-view" id="chatView">
         <div class="welcome-screen" id="welcomeScreen">
           <h2 id="chat-welcome">Canal Activo</h2>
         </div>
         <div id="messages"></div>
       </div>
-
       <div class="input-area">
         <div class="input-wrapper">
           <textarea id="chatInput" placeholder="..." rows="1"></textarea>
@@ -341,7 +351,6 @@
     </div>
   </div>
 
-  <!-- Voice overlay -->
   <div id="voice-overlay">
     <div class="light-mesh-container" id="meshContainer">
       <div class="blur-light light-blue"></div>
@@ -358,10 +367,8 @@
     </div>
   </div>
 
-  <!-- Run modal -->
   <div id="run-modal"><div id="run-modal-content"><div id="run-modal-header"><span>Ejecutando código</span><button class="icon-btn" onclick="closeRunModal()"><i class="ti ti-x"></i></button></div><iframe id="run-frame" sandbox="allow-scripts"></iframe></div></div>
 
-  <!-- Feedback modal -->
   <div id="feedback-modal">
     <div style="background:var(--bg-surface); border-radius:16px; padding:24px; width:100%; max-width:400px; border:1px solid var(--border); color:var(--text-main);">
       <h3 style="margin-bottom:0.5rem;">✉️ Enviar sugerencia</h3>
@@ -376,7 +383,6 @@
 
   <script>
     (function() {
-      // Estado
       let currentAccount = '';
       let currentLang = 'es';
       let mobilenetModel = null;
@@ -387,8 +393,8 @@
       let voiceModeActive = false;
       let lightMode = false;
       let forceSpeak = false;
+      let meliToken = '';
 
-      // UI Elements
       const authScreen = document.getElementById('auth-screen');
       const app = document.getElementById('app');
       const messagesEl = document.getElementById('messages');
@@ -402,12 +408,9 @@
       const voiceSubtitles = document.getElementById('voice-subtitles');
       const sidebar = document.getElementById('sidebar');
       const sidebarBackdrop = document.getElementById('sidebar-backdrop');
-      
-      // Elementos de ajustes en el sidebar
       const lightModeToggleSide = document.getElementById('lightModeToggleSide');
       const ttsAutoToggleSide = document.getElementById('ttsAutoToggleSide');
 
-      // Traducciones
       const translations = {
         en: {
           existing: "Access with existing account", login: "Enter", or: "or", new: "Don't have an account?",
@@ -416,7 +419,11 @@
           mD1: "This environment operates under complete cryptographic isolation...",
           mD2: "AOS-0.2 is an independent project under constant, continuous development...",
           vListen: "AOS Listening", vListenPrompt: "Speak now safely...", vSpeak: "AOS Responding", vSpeakPrompt: "Processing neural response...",
-          listening: "Listening...", errorSpeech: "Speech recognition not supported. Try Chrome or Edge."
+          listening: "Listening...", errorSpeech: "Speech recognition not supported. Try Chrome or Edge.",
+          shoppingPrefix: "I found these products:",
+          cheapest: "Cheapest",
+          budget: "budget",
+          notFound: "No products found."
         },
         es: {
           existing: "Acceder con cuenta existente", login: "Entrar", or: "ó", new: "¿No tienes una cuenta?",
@@ -425,7 +432,11 @@
           mD1: "Este entorno opera bajo un aislamiento criptográfico completo...",
           mD2: "AOS-0.2 es un proyecto independiente en constante desarrollo continuo...",
           vListen: "AOS Escuchando", vListenPrompt: "Habla ahora de forma segura...", vSpeak: "AOS Respondiendo", vSpeakPrompt: "Procesando respuesta...",
-          listening: "Escuchando...", errorSpeech: "Reconocimiento de voz no soportado. Probá con Chrome o Edge."
+          listening: "Escuchando...", errorSpeech: "Reconocimiento de voz no soportado. Probá con Chrome o Edge.",
+          shoppingPrefix: "Encontré estos productos:",
+          cheapest: "Más barato",
+          budget: "presupuesto",
+          notFound: "No encontré productos."
         },
         es_AR: {
           existing: "Entrá con tu cuenta existente", login: "Entrar", or: "ó", new: "¿No tenés una cuenta?",
@@ -434,11 +445,14 @@
           mD1: "Este entorno corre bajo un aislamiento completo, che...",
           mD2: "AOS-0.2 es un proyecto independiente que está en constante desarrollo...",
           vListen: "AOS Escuchando", vListenPrompt: "Hablá ahora, tranquilo...", vSpeak: "AOS Respondiendo", vSpeakPrompt: "Armando la respuesta...",
-          listening: "Escuchando...", errorSpeech: "El reconocimiento de voz no anda en este navegador. Probá con Chrome o Edge."
+          listening: "Escuchando...", errorSpeech: "El reconocimiento de voz no anda en este navegador. Probá con Chrome o Edge.",
+          shoppingPrefix: "Conseguí estos productos:",
+          cheapest: "Más barato",
+          budget: "presupuesto",
+          notFound: "No encontré nada."
         }
       };
 
-      // ========== AUTENTICACIÓN ==========
       window.selectLanguage = (btn, lang) => {
         document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
@@ -500,7 +514,8 @@
         if (localStorage.getItem(`aos_first_${currentAccount}`) === 'true') {
           document.getElementById('onboarding-modal').classList.add('active');
         }
-        // Sincronizar los toggles del sidebar con los valores actuales
+        const savedToken = localStorage.getItem('aos_meli_token');
+        if (savedToken) meliToken = savedToken;
         lightModeToggleSide.checked = lightMode;
         ttsAutoToggleSide.checked = ttsAutoEnabled;
         if (!mobilenetModel) {
@@ -529,14 +544,12 @@
       window.toggleSidebar = () => {
         sidebar.classList.toggle('open');
         sidebarBackdrop.classList.toggle('show');
-        // Actualizar checkboxes cada vez que se abre
         if (sidebar.classList.contains('open')) {
           lightModeToggleSide.checked = lightMode;
           ttsAutoToggleSide.checked = ttsAutoEnabled;
         }
       };
 
-      // ========== AJUSTES DESDE LA BARRA LATERAL ==========
       window.toggleLightModeSide = () => {
         lightMode = lightModeToggleSide.checked;
         document.body.classList.toggle('light-mode', lightMode);
@@ -545,7 +558,172 @@
         ttsAutoEnabled = ttsAutoToggleSide.checked;
       };
 
-      // ========== LÓGICA DE CHAT ==========
+      // ========== COMPRAS ==========
+      function detectarPresupuesto(texto) {
+        const regex = /(?:por\s*(?:menos\s*de|hasta|máximo|max|presupuesto\s*(?:de|máximo)?)|con\s*(?:presupuesto|plata|guita)|\$|ARS|pesos?)\s*(\d[\d.,]*)/i;
+        const match = texto.match(regex);
+        if (match) {
+          let valor = match[1].replace(/\./g, '').replace(',', '.');
+          return parseFloat(valor);
+        }
+        return null;
+      }
+
+      function esConsultaDeCompra(texto) {
+        const t = texto.toLowerCase();
+        return /comprar|compara|precio|precios|barato|baratos|económico|económico|presupuesto|mercado libre|mercadolibre|oferta|cuánto sale|cuánto vale|buscar producto|buscame|conseguime/.test(t);
+      }
+
+      function extraerProducto(texto) {
+        let t = texto
+          .replace(/comprar|compara|precio|barato|económico|presupuesto|mercado libre|mercadolibre|buscame|conseguime|buscá|busca|búscame/gi, '')
+          .replace(/(por|con|hasta|máximo|max|presupuesto)\s*(\$|ARS|pesos?)?\s*[\d.,]+/gi, '')
+          .trim();
+        return t || texto.trim();
+      }
+
+      async function buscarMercadoLibre(producto, presupuesto) {
+        if (!meliToken) return [];
+        try {
+          const url = `https://api.mercadolibre.com/sites/MLA/search?q=${encodeURIComponent(producto)}&limit=5`;
+          const resp = await fetch(url, {
+            headers: { 'Authorization': `Bearer ${meliToken}` }
+          });
+          if (!resp.ok) return [];
+          const data = await resp.json();
+          if (!data.results) return [];
+          return data.results.map(item => ({
+            titulo: item.title,
+            precio: item.price,
+            moneda: item.currency_id || 'ARS',
+            url: item.permalink,
+            imagen: item.thumbnail,
+            fuente: 'Mercado Libre',
+            icono: 'ti ti-shopping-cart'
+          }));
+        } catch (e) { return []; }
+      }
+
+      async function buscarPreciosClaros(producto, presupuesto) {
+        try {
+          const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://www.preciosclaros.gob.ar/#!/buscar-productos?q=' + encodeURIComponent(producto))}`;
+          const resp = await fetch(proxyUrl);
+          if (!resp.ok) return [];
+          const html = await resp.text();
+          const productos = [];
+          const regex = /<div[^>]*class="[^"]*producto[^"]*"[^>]*>([\s\S]*?)<\/div>/gi;
+          let match;
+          while ((match = regex.exec(html)) !== null) {
+            const bloque = match[1];
+            const tituloMatch = bloque.match(/<h[3-5][^>]*>([^<]+)<\/h[3-5]>/i);
+            const precioMatch = bloque.match(/\$[\d.,]+/);
+            if (tituloMatch && precioMatch) {
+              productos.push({
+                titulo: tituloMatch[1].trim(),
+                precio: parseFloat(precioMatch[0].replace('$', '').replace(/\./g, '').replace(',', '.')),
+                moneda: 'ARS',
+                url: 'https://www.preciosclaros.gob.ar/#!/buscar-productos?q=' + encodeURIComponent(producto),
+                imagen: '',
+                fuente: 'Precios Claros',
+                icono: 'ti ti-building-store'
+              });
+            }
+          }
+          return productos;
+        } catch (e) { return []; }
+      }
+
+      async function buscarRatoneando(producto, presupuesto) {
+        try {
+          const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://ratoneando.ar/search?q=' + encodeURIComponent(producto))}`;
+          const resp = await fetch(proxyUrl);
+          if (!resp.ok) return [];
+          const html = await resp.text();
+          const productos = [];
+          const regex = /<div[^>]*class="[^"]*product[^"]*"[^>]*>([\s\S]*?)<\/div>/gi;
+          let match;
+          while ((match = regex.exec(html)) !== null) {
+            const bloque = match[1];
+            const tituloMatch = bloque.match(/<h[3-5][^>]*>([^<]+)<\/h[3-5]>/i);
+            const precioMatch = bloque.match(/\$[\d.,]+/);
+            if (tituloMatch && precioMatch) {
+              productos.push({
+                titulo: tituloMatch[1].trim(),
+                precio: parseFloat(precioMatch[0].replace('$', '').replace(/\./g, '').replace(',', '.')),
+                moneda: 'ARS',
+                url: `https://ratoneando.ar/search?q=${encodeURIComponent(producto)}`,
+                imagen: '',
+                fuente: 'Ratoneando',
+                icono: 'ti ti-mouse'
+              });
+            }
+          }
+          return productos;
+        } catch (e) { return []; }
+      }
+
+      async function buscarProductos(producto, presupuesto) {
+        const resultados = [];
+        if (meliToken) {
+          const ml = await buscarMercadoLibre(producto, presupuesto);
+          resultados.push(...ml);
+        }
+        const pc = await buscarPreciosClaros(producto, presupuesto);
+        resultados.push(...pc);
+        const rt = await buscarRatoneando(producto, presupuesto);
+        resultados.push(...rt);
+        let filtrados = presupuesto ? resultados.filter(p => p.precio <= presupuesto) : resultados;
+        filtrados.sort((a, b) => a.precio - b.precio);
+        return filtrados.slice(0, 6);
+      }
+
+      function formatearProductosHTML(productos, presupuesto, lang) {
+        if (productos.length === 0) return translations[lang]?.notFound;
+        let html = `<div>${translations[lang]?.shoppingPrefix}</div>`;
+        productos.forEach((p, i) => {
+          const esMasBarato = i === 0 && productos.length > 1;
+          const imgTag = p.imagen ? `<img src="${p.imagen}" alt="">` : `<div style="width:64px;height:64px;background:var(--bg-main);border-radius:8px;display:flex;align-items:center;justify-content:center;"><i class="${p.icono}" style="font-size:24px;color:var(--text-muted);"></i></div>`;
+          html += `
+            <div class="product-card ${esMasBarato ? 'best-price' : ''}">
+              ${imgTag}
+              <div class="info">
+                <div class="title">${p.titulo}</div>
+                <div class="source"><i class="${p.icono}"></i> ${p.fuente}</div>
+              </div>
+              <div class="price">$${p.precio.toLocaleString('es-AR')}</div>
+            </div>`;
+          if (esMasBarato) html += `<div style="font-size:11px;color:var(--success);margin-top:-4px;margin-bottom:8px;">← ${translations[lang]?.cheapest}</div>`;
+        });
+        return html;
+      }
+
+      // ========== WIKIPEDIA (NUEVAS INTRODUCCIONES) ==========
+      const wikiIntros = {
+        en: ["Here's what I found: ", "Based on what's known: ", "From my knowledge: ", "Let me share this: "],
+        es: ["Acá va lo que sé: ", "Esto es lo que encontré: ", "Te comparto esta información: ", "Mirá lo que descubrí: "],
+        es_AR: ["Che, mirá esto: ", "Acá tengo este dato: ", "Fijate lo que me saltó: ", "Te paso lo que averigüé: "]
+      };
+
+      async function buscarEnWikipedia(consulta) {
+        const url = 'https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=' + encodeURIComponent(consulta) + '&format=json&origin=*';
+        try {
+          const resp = await fetch(url); const data = await resp.json();
+          if (!data.query.search.length) return null;
+          const titulo = data.query.search[0].title;
+          const [extractResp, imageResp] = await Promise.all([
+            fetch(`https://es.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&titles=${encodeURIComponent(titulo)}&format=json&origin=*`).then(r=>r.json()),
+            fetch(`https://es.wikipedia.org/w/api.php?action=query&prop=pageimages&pithumbsize=400&titles=${encodeURIComponent(titulo)}&format=json&origin=*`).then(r=>r.json())
+          ]);
+          const pageId = Object.keys(extractResp.query.pages)[0];
+          if (extractResp.query.pages[pageId].missing) return null;
+          const extract = extractResp.query.pages[pageId].extract;
+          const imagePage = imageResp.query.pages[pageId];
+          let imageUrl = '';
+          if (imagePage && imagePage.thumbnail) imageUrl = imagePage.thumbnail.source;
+          return { extract, title: titulo, imageUrl };
+        } catch(e) { return null; }
+      }
+
       const emociones = {
         feliz: { en: ["happy","glad"], es: ["feliz","contento"], es_AR: ["feliz","contento","joya"] },
         triste: { en: ["sad","unhappy"], es: ["triste","deprimido"], es_AR: ["triste","bajón"] },
@@ -558,12 +736,12 @@
       };
       const respEmocion = {
         feliz: { en: ["That's great! 😊"], es: ["¡Qué bueno! 😊"], es_AR: ["¡Qué bien, che! 😊"] },
-        triste: { en: ["I'm sorry... Want to talk?"], es: ["Lamento eso. ¿Querés hablar?"], es_AR: ["Uh, qué bajón. ¿Querés hablar?"] },
-        enojado: { en: ["I understand. Want to vent?"], es: ["Entiendo tu bronca."], es_AR: ["Te entiendo. ¿Querés putear?"] },
+        triste: { en: ["I'm sorry..."], es: ["Lamento eso."], es_AR: ["Uh, qué bajón."] },
+        enojado: { en: ["I understand."], es: ["Entiendo."], es_AR: ["Te entiendo."] },
         miedo: { en: ["Fear is normal."], es: ["El miedo es normal."], es_AR: ["El cagaso es normal."] },
         sorpresa: { en: ["What a surprise!"], es: ["¡Qué sorpresa!"], es_AR: ["¡Qué sorpresa, che!"] },
         cansado: { en: ["Rest up!"], es: ["¡Descansá!"], es_AR: ["Tiráte a descansar."] },
-        aburrido: { en: ["Want to play something?"], es: ["¿Querés un juego?"], es_AR: ["¿Querés un chiste?"] },
+        aburrido: { en: ["Want to play?"], es: ["¿Querés un juego?"], es_AR: ["¿Querés un chiste?"] },
         enamorado: { en: ["Love is beautiful!"], es: ["¡El amor es hermoso!"], es_AR: ["¡Qué lindo, che!"] }
       };
 
@@ -602,9 +780,7 @@
         const t = texto.toLowerCase().trim();
         for (const [emocion, claves] of Object.entries(emociones)) {
           const palabras = claves[currentLang] || claves.es;
-          if (palabras.some(p => t.includes(p))) {
-            return random(respEmocion[emocion][currentLang] || respEmocion[emocion].es);
-          }
+          if (palabras.some(p => t.includes(p))) return random(respEmocion[emocion][currentLang] || respEmocion[emocion].es);
         }
         return null;
       }
@@ -629,45 +805,25 @@
         return null;
       }
 
-      async function buscarEnWikipedia(consulta) {
-        const url = 'https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=' + encodeURIComponent(consulta) + '&format=json&origin=*';
-        try {
-          const resp = await fetch(url); const data = await resp.json();
-          if (!data.query.search.length) return null;
-          const titulo = data.query.search[0].title;
-          const [extractResp, imageResp] = await Promise.all([
-            fetch(`https://es.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&titles=${encodeURIComponent(titulo)}&format=json&origin=*`).then(r=>r.json()),
-            fetch(`https://es.wikipedia.org/w/api.php?action=query&prop=pageimages&pithumbsize=400&titles=${encodeURIComponent(titulo)}&format=json&origin=*`).then(r=>r.json())
-          ]);
-          const pageId = Object.keys(extractResp.query.pages)[0];
-          if (extractResp.query.pages[pageId].missing) return null;
-          const extract = extractResp.query.pages[pageId].extract;
-          const imagePage = imageResp.query.pages[pageId];
-          let imageUrl = '';
-          if (imagePage && imagePage.thumbnail) imageUrl = imagePage.thumbnail.source;
-          return { extract, title: titulo, imageUrl };
-        } catch(e) { return null; }
-      }
-
       const explicaciones = {
         programacion: {
-          en: "Programming is the process of creating instructions for computers. It involves logic, algorithms, and data structures.",
-          es: "La programación es el proceso de crear instrucciones para computadoras. Involucra lógica, algoritmos y estructuras de datos.",
-          es_AR: "Programar es darle órdenes a la compu. Se usa lógica, algoritmos y estructuras de datos."
+          en: "Programming is the process of creating instructions for computers...",
+          es: "La programación es el proceso de crear instrucciones para computadoras...",
+          es_AR: "Programar es darle órdenes a la compu..."
         },
         fisica: {
-          en: "Physics studies matter, energy, and the fundamental forces of nature.",
-          es: "La física estudia la materia, la energía y las fuerzas fundamentales de la naturaleza.",
-          es_AR: "La física estudia la materia, la energía y las fuerzas del universo."
+          en: "Physics studies matter, energy, and the fundamental forces...",
+          es: "La física estudia la materia, la energía y las fuerzas...",
+          es_AR: "La física estudia la materia, la energía y las fuerzas..."
         },
         termodinamica: {
-          en: "Thermodynamics deals with heat, work, and energy transfer.",
-          es: "La termodinámica trata sobre calor, trabajo y transferencia de energía.",
-          es_AR: "La termodinámica es la rama que estudia el calor, el laburo y la energía."
+          en: "Thermodynamics deals with heat, work, and energy transfer...",
+          es: "La termodinámica trata sobre calor, trabajo y transferencia...",
+          es_AR: "La termodinámica es la rama que estudia el calor..."
         },
         matematicas: {
-          en: "Mathematics is the science of numbers, quantities, and shapes.",
-          es: "Las matemáticas son la ciencia de los números, cantidades y formas.",
+          en: "Mathematics is the science of numbers, quantities, and shapes...",
+          es: "Las matemáticas son la ciencia de los números...",
           es_AR: "Matemática: números, formas y mucho razonamiento."
         }
       };
@@ -688,29 +844,45 @@
       };
 
       async function obtenerRespuestaFinal(input) {
+        // Compras
+        if (esConsultaDeCompra(input)) {
+          const producto = extraerProducto(input);
+          const presupuesto = detectarPresupuesto(input);
+          const productos = await buscarProductos(producto, presupuesto);
+          return { 
+            text: formatearProductosHTML(productos, presupuesto, currentLang), 
+            instant: true, 
+            image: null 
+          };
+        }
+        // Código
         const code = obtenerDeConocimiento(input);
         if (code) return { text: code, instant: true, image: null };
+        // Saludos / emociones
         const rapida = obtenerRespuestaRapida(input);
         if (rapida) return { text: rapida, instant: false, image: null };
-        const explicacion = obtenerExplicacionAdicional(input);
-        if (input.trim().length > 5) {
+        // Wikipedia con timeout reducido y nuevas introducciones
+        if (input.trim().length > 3) {
           try {
             const wiki = await Promise.race([
               buscarEnWikipedia(input),
-              new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000))
+              new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000))
             ]);
             if (wiki) {
-              let texto = (currentLang === 'en' ? 'According to Wikipedia, ' : (currentLang === 'es_AR' ? 'Che, según Wikipedia, ' : 'Según Wikipedia, ')) +
-                         wiki.extract.split('. ').slice(0,2).join('. ') + '.';
+              const oraciones = wiki.extract.split('. ').slice(0, 3).join('. ') + '.';
+              const intros = wikiIntros[currentLang] || wikiIntros.es;
+              const intro = random(intros);
+              let texto = intro + oraciones.charAt(0).toLowerCase() + oraciones.slice(1);
+              texto += '\n\n🔗 Fuente: ' + 'https://es.wikipedia.org/wiki/' + encodeURIComponent(wiki.title);
+              const explicacion = obtenerExplicacionAdicional(input);
               if (explicacion) texto += '\n\n' + explicacion;
-              return { text: texto + '\n\n🔗 https://es.wikipedia.org/wiki/' + encodeURIComponent(wiki.title), instant: false, image: wiki.imageUrl };
+              return { text: texto, instant: false, image: wiki.imageUrl };
             }
           } catch(e) {}
         }
         return { text: random(fallbacks[currentLang] || fallbacks.es), instant: false, image: null };
       }
 
-      // ========== INTERFAZ ==========
       function showMessages() { welcomeScreen.style.display = 'none'; messagesEl.style.display = 'flex'; }
       
       function addUserMessage(text) {
@@ -841,7 +1013,6 @@
       window.runCode = (id) => { document.getElementById('run-frame').srcdoc = document.getElementById(id).querySelector('code').textContent; document.getElementById('run-modal').classList.add('open'); };
       window.closeRunModal = () => { document.getElementById('run-modal').classList.remove('open'); document.getElementById('run-frame').srcdoc = ''; };
 
-      // ========== VOZ ==========
       window.toggleVoice = function() {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SpeechRecognition) { alert(translations[currentLang]?.errorSpeech); return; }
@@ -895,7 +1066,6 @@
         forceSpeak = false;
       };
 
-      // ========== FEEDBACK ==========
       window.openFeedback = () => document.getElementById('feedback-modal').classList.add('open');
       window.closeFeedback = () => document.getElementById('feedback-modal').classList.remove('open');
       window.enviarFeedback = () => {
@@ -905,7 +1075,6 @@
         closeFeedback();
       };
 
-      // ========== IMAGEN ==========
       const imageInput = document.getElementById('imageInput');
       imageInput.addEventListener('change', async function() {
         const file = this.files[0]; if (!file) return;
@@ -929,7 +1098,6 @@
         reader.readAsDataURL(file); this.value = '';
       });
 
-      // Eventos
       chatInput.addEventListener('input', () => {
         sendBtn.disabled = chatInput.value.trim() === '' || isTyping;
         chatInput.style.height = 'auto'; chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
@@ -938,7 +1106,6 @@
       sendBtn.addEventListener('click', () => sendMessage());
       sidebarBackdrop.addEventListener('click', toggleSidebar);
 
-      // Exportaciones globales
       window.sendMessage = sendMessage;
       window.toggleSidebar = toggleSidebar;
       window.toggleVoice = window.toggleVoice;
@@ -952,7 +1119,6 @@
       window.downloadCode = window.downloadCode;
       window.runCode = window.runCode;
       window.closeRunModal = closeRunModal;
-      // Ajustes desde sidebar
       window.toggleLightModeSide = toggleLightModeSide;
       window.toggleAutoTTSSide = toggleAutoTTSSide;
     })();
