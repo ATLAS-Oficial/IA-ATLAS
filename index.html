@@ -1,1167 +1,332 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>AOS-0.3 | Neural Liquid Core</title>
-  
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons@latest/iconfont/tabler-icons.min.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente Virtual</title>
+    <style>
+        /* ==========================================================================
+           1. ESTILOS BASE (NEGRO ABSOLUTO Y MINIMALISMO)
+           ========================================================================== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
 
-  <style>
-    :root {
-      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-      --bg-base: #0a0b10;
-      --bg-surface: rgba(20, 20, 30, 0.45);
-      --bg-surface-strong: rgba(20, 20, 30, 0.65);
-      --border: rgba(255, 255, 255, 0.08);
-      --border-active: rgba(255, 255, 255, 0.15);
-      --text-main: #edf0f5;
-      --text-muted: #8b90a0;
-      --text-ghost: #4a4f5e;
-      --accent: #6cc8f7;
-      --accent-glow: rgba(108, 200, 247, 0.25);
-      --success: #4ade80;
-      --radius-sm: 12px;
-      --radius-md: 18px;
-      --radius-lg: 26px;
-      --radius-xl: 32px;
-      --transition: all 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
-      --sidebar-width: 280px;
-    }
+        body, html {
+            background-color: #000000;
+            color: #ffffff;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
 
-    body.light-mode {
-      --bg-base: #f2f3f7;
-      --bg-surface: rgba(255, 255, 255, 0.7);
-      --bg-surface-strong: rgba(255, 255, 255, 0.85);
-      --border: rgba(0, 0, 0, 0.08);
-      --border-active: rgba(0, 0, 0, 0.18);
-      --text-main: #1a1a2e;
-      --text-muted: #5a5a70;
-      --text-ghost: #9a9ab0;
-      --accent: #1a73e8;
-      --accent-glow: rgba(26, 115, 232, 0.2);
-    }
+        .chat-fullscreen {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+        }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: var(--font-sans);
-      background: var(--bg-base);
-      color: var(--text-main);
-      min-height: 100dvh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-      -webkit-tap-highlight-color: transparent;
-      -webkit-font-smoothing: antialiased;
-    }
+        /* ==========================================================================
+           2. ENCABEZADO
+           ========================================================================== */
+        .chat-header {
+            background-color: #000000;
+            padding: 24px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #111111;
+        }
 
-    /* Fondo dinámico */
-    #bg-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-    .bg-orb {
-      position: fixed; border-radius: 50%; filter: blur(120px); opacity: 0.35;
-      pointer-events: none; z-index: 0;
-      transition: all 2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .bg-orb.orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, #38bdf8, #0284c7); top: -10%; left: -8%; }
-    .bg-orb.orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, #7dd3fc, #0ea5e9); bottom: -12%; right: -5%; }
-    .bg-orb.orb-3 { width: 300px; height: 300px; background: radial-gradient(circle, #bae6fd, #38bdf8); top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.2; }
-    body.light-mode .bg-orb { opacity: 0.15 !important; }
+        .chat-title {
+            font-size: 16px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
 
-    .particle {
-      position: fixed; width: 2px; height: 2px; background: rgba(186, 230, 253, 0.7);
-      border-radius: 50%; pointer-events: none; z-index: 0;
-      animation: floatParticle var(--dur, 8s) infinite ease-in-out;
-      animation-delay: var(--delay, 0s);
-    }
-    @keyframes floatParticle {
-      0% { transform: translate(0, 0) scale(1); opacity: 0; }
-      20% { opacity: 0.8; }
-      50% { transform: translate(var(--dx, 40px), var(--dy, -60px)) scale(1.8); opacity: 0.5; }
-      80% { opacity: 0.2; }
-      100% { transform: translate(var(--dx2, -20px), var(--dy2, -100px)) scale(0.5); opacity: 0; }
-    }
+        .chat-status {
+            color: #888888;
+            font-size: 13px;
+        }
 
-    /* Pantalla de inicio */
-    #auth-screen {
-      position: relative; z-index: 10;
-      max-width: 440px; width: 100%; padding: 40px 28px;
-      text-align: center; animation: fadeSlideIn 0.6s ease;
-      display: flex; flex-direction: column; align-items: center;
-    }
-    @keyframes fadeSlideIn { from { opacity:0; transform:translateY(30px) } to { opacity:1; transform:translateY(0) } }
+        /* ==========================================================================
+           3. PANEL DE CONVERSACIÓN
+           ========================================================================== */
+        .chat-body {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
 
-    #auth-screen .logo-icon {
-      width: 56px; height: 56px; border-radius: 18px;
-      background: var(--bg-surface); border: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 16px; font-size: 24px; color: var(--accent);
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-    }
-    #auth-screen h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 6px; }
-    #auth-screen .subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 28px; }
+        .chat-body::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-body::-webkit-scrollbar-thumb {
+            background-color: #222222;
+        }
 
-    .lang-cards {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; margin-bottom: 28px;
-    }
-    .lang-card {
-      background: var(--bg-surface); border: 1px solid var(--border);
-      border-radius: var(--radius-md); padding: 14px 8px; cursor: pointer;
-      transition: var(--transition); text-align: center;
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    }
-    .lang-card:hover { border-color: var(--border-active); transform: translateY(-2px); }
-    .lang-card.selected { border-color: var(--accent); background: rgba(56, 189, 248, 0.1); box-shadow: 0 0 24px var(--accent-glow); }
-    .lang-card .lang-flag { font-size: 22px; margin-bottom: 4px; }
-    .lang-card .lang-name { font-size: 12px; font-weight: 500; color: var(--text-muted); }
-    .lang-card.selected .lang-name { color: var(--accent); }
+        .log-row {
+            display: flex;
+            flex-direction: column;
+            max-width: 80%;
+            animation: fadeIn 0.1s ease-out;
+        }
 
-    #auth-forms-container { display: none; width: 100%; animation: fadeSlideIn 0.4s ease; }
-    .glass-panel {
-      background: var(--bg-surface); border: 1px solid var(--border);
-      border-radius: var(--radius-lg); padding: 24px; margin-bottom: 14px;
-      text-align: left; backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-    }
-    .glass-panel label {
-      display: block; font-size: 11px; font-weight: 600; color: var(--text-muted);
-      margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.06em;
-    }
-    .glass-input {
-      width: 100%; padding: 14px 16px; background: rgba(0,0,0,0.3);
-      border: 1px solid var(--border); border-radius: var(--radius-sm);
-      color: var(--text-main); font-family: 'SF Mono', monospace; font-size: 15px;
-      outline: none; transition: var(--transition); text-align: center; letter-spacing: 2px;
-    }
-    .glass-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+        .log-row.bot {
+            align-self: flex-start;
+        }
 
-    .btn {
-      width: 100%; padding: 14px; border: none; border-radius: var(--radius-sm);
-      font-size: 14px; font-weight: 600; cursor: pointer; transition: var(--transition);
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, #38bdf8, #0284c7);
-      color: #fff; box-shadow: 0 4px 16px rgba(56, 189, 248, 0.3);
-    }
-    .btn-primary:hover { box-shadow: 0 6px 24px rgba(56, 189, 248, 0.45); transform: translateY(-1px); }
-    .btn-secondary {
-      background: transparent; color: var(--text-muted); border: 1px solid var(--border);
-    }
-    .btn-secondary:hover { border-color: var(--border-active); color: var(--text-main); }
-    .separator-text { text-align: center; margin: 14px 0; font-size: 11px; color: var(--text-ghost); text-transform: uppercase; }
+        .log-row.user {
+            align-self: flex-end;
+            text-align: right;
+        }
 
-    .id-display {
-      background: rgba(0,0,0,0.4); border: 1px solid var(--border);
-      padding: 16px; border-radius: var(--radius-sm); font-family: 'SF Mono', monospace;
-      font-size: 17px; letter-spacing: 3px; color: var(--accent); text-align: center;
-      margin-bottom: 12px; display: none; word-break: break-all;
-    }
+        .sender-tag {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
 
-    /* App principal */
-    #app { display: none; width: 100vw; height: 100dvh; position: relative; z-index: 10; }
-    #sidebar {
-      width: var(--sidebar-width); background: var(--bg-surface-strong); border-right: 1px solid var(--border);
-      display: flex; flex-direction: column; position: fixed; top: 0; bottom: 0; left: 0; z-index: 200;
-      transform: translateX(-100%); transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
-      backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-    }
-    #sidebar.open { transform: translateX(0); }
-    #sidebar-backdrop {
-      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-      backdrop-filter: blur(4px); z-index: 199;
-    }
-    #sidebar-backdrop.show { display: block; }
-    .sidebar-header { padding: 24px 20px; display: flex; align-items: center; justify-content: space-between; font-weight: 600; font-size: 15px; }
-    .sidebar-actions { padding: 8px 16px; display: flex; flex-direction: column; gap: 6px; }
-    .sidebar-action-btn {
-      width: 100%; padding: 8px 12px; background: transparent; border: 1px solid var(--border);
-      border-radius: var(--radius-sm); color: var(--text-muted); font-size: 12px;
-      cursor: pointer; display: flex; align-items: center; gap: 6px; transition: var(--transition);
-      font-family: var(--font-sans);
-    }
-    .sidebar-action-btn:hover { background: rgba(255,255,255,0.04); color: var(--text-main); }
-    .chat-list { flex: 1; overflow-y: auto; padding: 8px 16px; }
-    .chat-list-item {
-      padding: 8px 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px;
-      color: var(--text-muted); margin-bottom: 2px; transition: var(--transition);
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .chat-list-item:hover { background: rgba(255,255,255,0.03); color: var(--text-main); }
-    .chat-list-item.active { background: var(--accent-glow); color: var(--accent); }
-    .chat-list-item .conv-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .chat-list-item .conv-date { font-size: 10px; color: var(--text-ghost); margin-left: 8px; }
-    .sidebar-footer { padding: 14px 20px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text-muted); }
-    .sidebar-footer .setting-row {
-      display: flex; align-items: center; justify-content: space-between; padding: 8px 0;
-    }
-    .sidebar-footer label { font-size: 12px; color: var(--text-main); }
-    .toggle-switch { position: relative; display: inline-block; width: 40px; height: 22px; }
-    .toggle-switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.15); border-radius: 22px; transition: .3s; }
-    .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: .3s; }
-    input:checked + .slider { background: var(--accent); }
-    input:checked + .slider:before { transform: translateX(18px); }
+        .bot .sender-tag { color: #666666; }
+        .user .sender-tag { color: #3b82f6; }
 
-    #main-container { flex: 1; display: flex; flex-direction: column; width: 100%; height: 100%; }
-    .top-bar {
-      height: 60px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between;
-      background: transparent; z-index: 50;
-    }
-    .icon-btn {
-      background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-muted);
-      width: 38px; height: 38px; border-radius: var(--radius-sm); display: flex; align-items: center;
-      justify-content: center; cursor: pointer; transition: var(--transition);
-      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-    }
-    .icon-btn:hover { background: rgba(255,255,255,0.08); color: var(--text-main); border-color: var(--border-active); }
+        .message-text {
+            font-size: 16px;
+            line-height: 1.5;
+            white-space: pre-line;
+        }
 
-    .chat-view { flex: 1; overflow-y: auto; display: flex; flex-direction: column; padding: 16px 16px 0; }
-    .welcome-screen { max-width: 560px; width: 100%; margin: auto; text-align: center; }
-    .welcome-screen h2 { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 6px; }
-    .welcome-screen p { font-size: 13px; color: var(--text-muted); }
-    #messages { display: none; flex-direction: column; gap: 8px; max-width: 768px; width: 100%; margin: 0 auto; }
-    .msg-row { display: flex; animation: messagePop 0.35s ease both; }
-    .msg-row.user { justify-content: flex-end; }
-    .msg-row.assistant { justify-content: flex-start; }
-    .msg-content { max-width: 82%; word-break: break-word; overflow-wrap: anywhere; display: flex; gap: 10px; align-items: flex-start; }
-    .assistant-avatar {
-      width: 30px; height: 30px; min-width: 30px; border-radius: 10px;
-      background: var(--bg-surface); border: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--accent);
-    }
-    .bubble {
-      padding: 10px 16px; border-radius: 18px; font-size: 13.5px; line-height: 1.6;
-      color: var(--text-main); word-break: break-word; overflow-wrap: anywhere; white-space: pre-wrap;
-    }
-    .msg-row.user .bubble {
-      background: var(--bg-surface-strong); border: 1px solid var(--border);
-      border-radius: 18px 18px 6px 18px; backdrop-filter: blur(16px);
-    }
-    .msg-row.assistant .bubble { background: transparent; padding: 4px 0; border-radius: 0; border: none; }
-    .bubble-footer { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
-    .audio-btn {
-      background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-muted);
-      cursor: pointer; padding: 4px 8px; border-radius: 8px; font-size: 12px; transition: var(--transition);
-    }
-    .audio-btn:hover { color: var(--text-main); border-color: var(--border-active); }
+        .bot .message-text {
+            color: #ffffff;
+            border-left: 2px solid #222222;
+            padding-left: 16px;
+        }
 
-    .typing-dots { display: flex; gap: 4px; align-items: center; padding: 6px 0; }
-    .typing-dots span { width: 5px; height: 5px; border-radius: 50%; background: var(--text-ghost); animation: bounce 1.2s infinite; }
-    .typing-dots span:nth-child(2){animation-delay:0.2s} .typing-dots span:nth-child(3){animation-delay:0.4s}
-    @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
+        .user .message-text {
+            color: #e0e0e0;
+            border-right: 2px solid #3b82f6;
+            padding-right: 16px;
+        }
 
-    .code-block {
-      background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: var(--radius-sm);
-      padding: 14px; margin: 8px 0; overflow-x: auto; font-family: 'SF Mono', monospace; font-size: 12px;
-    }
-    .code-toolbar { display: flex; gap: 6px; justify-content: flex-end; margin-top: 8px; }
-    .code-btn {
-      padding: 4px 10px; border-radius: 8px; border: 1px solid var(--border);
-      background: var(--bg-surface); color: var(--text-muted); cursor: pointer; font-size: 11px;
-    }
-    .code-btn.run { background: rgba(56, 189, 248, 0.15); color: var(--accent); border-color: var(--accent); }
-    .wiki-image { max-width: 100%; border-radius: var(--radius-sm); margin-top: 8px; border: 1px solid var(--border); }
-    .math-steps { font-family: 'SF Mono', monospace; font-size: 12px; color: var(--accent); margin: 8px 0; }
-    .product-card {
-      background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
-      padding: 12px; margin: 6px 0; display: flex; align-items: center; gap: 10px;
-    }
-    .product-card img { width: 52px; height: 52px; object-fit: contain; border-radius: 8px; background: rgba(0,0,0,0.3); }
-    .product-card .info { flex: 1; }
-    .product-card .info .title { font-size: 12px; font-weight: 500; color: var(--text-main); }
-    .product-card .info .source { font-size: 10px; color: var(--text-muted); }
-    .product-card .price { font-size: 15px; font-weight: 600; color: var(--accent); white-space: nowrap; }
-    .product-card.best-price { border-color: var(--accent); background: rgba(56, 189, 248, 0.06); }
+        .timestamp {
+            font-size: 11px;
+            color: #444444;
+            margin-top: 6px;
+        }
 
-    /* Input area - CORREGIDA */
-    .input-area { padding: 12px 16px 24px; z-index: 50; display: flex; justify-content: center; }
-    .input-wrapper {
-      width: 100%; max-width: 768px; margin: 0 auto;
-      background: var(--bg-surface-strong); border: 1px solid var(--border);
-      border-radius: var(--radius-xl); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
-      padding: 8px 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.5);
-      display: flex; flex-direction: column;
-    }
-    .input-wrapper textarea {
-      width: 100%; background: none; border: none; outline: none; resize: none;
-      font-family: var(--font-sans); font-size: 14px; color: var(--text-main);
-      padding: 8px 4px; min-height: 38px; max-height: 120px;
-    }
-    .input-wrapper textarea::placeholder { color: var(--text-ghost); }
-    .input-toolbar { display: flex; align-items: center; justify-content: space-between; padding-top: 4px; gap: 8px; }
-    .input-tools { display: flex; gap: 4px; align-items: center; }
-    .send-btn {
-      width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: #05060d;
-      border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
-      transition: var(--transition); box-shadow: 0 4px 14px rgba(56, 189, 248, 0.35);
-    }
-    .send-btn:disabled { background: rgba(255,255,255,0.08); color: var(--text-ghost); box-shadow: none; cursor: not-allowed; }
+        /* ==========================================================================
+           4. ÁREA DE ENTRADA DE TEXTO
+           ========================================================================== */
+        .chat-footer {
+            background-color: #000000;
+            padding: 40px;
+            border-top: 1px solid #111111;
+        }
 
-    /* Voice overlay */
-    #voice-overlay {
-      display: none; position: fixed; inset: 0; background: rgba(3, 3, 8, 0.92);
-      backdrop-filter: blur(20px); z-index: 500; flex-direction: column;
-      align-items: center; justify-content: space-between; padding: 48px 24px;
-    }
-    #voice-overlay.active { display: flex; animation: fadeSlideIn 0.35s ease; }
-    .voice-center { text-align: center; margin: auto; }
-    .voice-status-text { font-size: 13px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
-    .voice-main-text { font-size: 22px; font-weight: 600; color: var(--text-main); }
-    .voice-subtitles { font-size: 16px; color: var(--text-muted); margin-top: 16px; min-height: 24px; }
-    .voice-close-btn {
-      width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1); color: #ef4444; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; font-size: 24px; transition: var(--transition);
-    }
-    .voice-close-btn:hover { background: #ef4444; color: #fff; }
+        .input-line {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            gap: 20px;
+        }
 
-    /* Modals */
-    #onboarding-modal, #run-modal, #feedback-modal {
-      display: none; position: fixed; inset: 0; background: rgba(3,3,8,0.85);
-      backdrop-filter: blur(16px); z-index: 1000; align-items: center; justify-content: center; padding: 24px;
-    }
-    #onboarding-modal.active, #run-modal.open, #feedback-modal.open { display: flex; }
-    .modal-glass {
-      background: var(--bg-surface-strong); border: 1px solid var(--border);
-      max-width: 480px; width: 100%; padding: 28px; border-radius: var(--radius-lg);
-      backdrop-filter: blur(28px); box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-    }
-    .modal-glass h3 { font-size: 22px; font-weight: 600; margin-bottom: 14px; }
-    .modal-glass p { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 18px; }
-    #run-modal-content { background: var(--bg-surface-strong); border-radius: var(--radius-lg); width: 100%; max-width: 900px; height: 80dvh; display: flex; flex-direction: column; overflow: hidden; }
-    #run-modal-header { padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
-    #run-frame { flex: 1; width: 100%; border: none; }
+        .input-line input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 16px;
+            outline: none;
+        }
 
-    @keyframes messagePop { from { opacity:0; transform:translateY(16px) } to { opacity:1; transform:translateY(0) } }
-    .disclaimer { text-align: center; font-size: 10px; color: var(--text-ghost); margin-top: 6px; opacity: 0.7; }
-  </style>
+        .input-line input::placeholder {
+            color: #444444;
+        }
+
+        .terminal-btn {
+            background-color: transparent;
+            border: 1px solid #333333;
+            color: #ffffff;
+            padding: 12px 28px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .terminal-btn:hover {
+            background-color: #ffffff;
+            color: #000000;
+            border-color: #ffffff;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
 </head>
-<body class="">
+<body>
 
-  <div class="bg-orb orb-1" id="orb1"></div>
-  <div class="bg-orb orb-2" id="orb2"></div>
-  <div class="bg-orb orb-3" id="orb3"></div>
-  <canvas id="bg-canvas"></canvas>
-
-  <!-- Pantalla de inicio -->
-  <div id="auth-screen">
-    <div class="logo-icon"><i class="ti ti-brain"></i></div>
-    <h1>AOS-0.3</h1>
-    <p class="subtitle">Neural Liquid Core</p>
-    <div class="lang-cards">
-      <div class="lang-card" onclick="selectLanguage(this, 'en')">
-        <div class="lang-flag">🇺🇸</div><div class="lang-name">English</div>
-      </div>
-      <div class="lang-card" onclick="selectLanguage(this, 'es')">
-        <div class="lang-flag">🌎</div><div class="lang-name">Español</div>
-      </div>
-      <div class="lang-card" onclick="selectLanguage(this, 'es_AR')">
-        <div class="lang-flag">🇦🇷</div><div class="lang-name">Argentino</div>
-      </div>
-    </div>
-    <div id="auth-forms-container">
-      <div class="glass-panel">
-        <label id="lbl-existing">Acceder con cuenta existente</label>
-        <input type="text" id="loginCodeInput" class="glass-input" placeholder="---- ---- ---- ----" maxlength="19" oninput="formatInput(this)">
-        <button class="btn btn-primary" style="margin-top:12px;" onclick="login()" id="btn-login">Entrar</button>
-      </div>
-      <div class="separator-text" id="lbl-or">ó</div>
-      <div class="glass-panel" style="text-align:center;">
-        <label style="text-align:left;" id="lbl-new">¿No tenés una cuenta?</label>
-        <div id="generatedCodeDisplay" class="id-display"></div>
-        <button id="genBtn" class="btn btn-secondary" onclick="generateAccount()">Generar ID Privado</button>
-        <button id="confirmGenBtn" class="btn btn-primary" style="display:none;margin-top:10px;" onclick="confirmNewAccount()">Ya guardé mi código, entrar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Onboarding -->
-  <div id="onboarding-modal">
-    <div class="modal-glass">
-      <h3 id="modal-title">Bienvenido al ecosistema</h3>
-      <p id="modal-desc1">Este entorno opera bajo un aislamiento criptográfico completo.</p>
-      <p id="modal-desc2">AOS-0.3 es un proyecto independiente en constante desarrollo.</p>
-      <button class="btn btn-primary" onclick="closeOnboarding()">Entendido</button>
-    </div>
-  </div>
-
-  <!-- App principal -->
-  <div id="app">
-    <div id="sidebar-backdrop" onclick="toggleSidebar()"></div>
-    <div id="sidebar">
-      <div class="sidebar-header">
-        <span>Conversaciones</span>
-        <button class="icon-btn" onclick="toggleSidebar()"><i class="ti ti-x"></i></button>
-      </div>
-      <div class="sidebar-actions">
-        <button class="sidebar-action-btn" onclick="nuevaConversacion()"><i class="ti ti-plus"></i> Nueva conversación</button>
-        <button class="sidebar-action-btn" onclick="openFeedback()"><i class="ti ti-message-report"></i> Enviar sugerencia</button>
-      </div>
-      <div class="chat-list" id="chatHistoryList"></div>
-      <div class="sidebar-footer">
-        <div class="setting-row">
-          <label>Tema claro</label>
-          <label class="toggle-switch"><input type="checkbox" id="lightModeToggleSide" onchange="toggleLightMode()"><span class="slider"></span></label>
+    <div class="chat-fullscreen">
+        <div class="chat-header">
+            <div class="chat-title">Asistente Virtual</div>
+            <div class="chat-status" id="sessionStatus">Sesión activa</div>
         </div>
-        <div class="setting-row">
-          <label>Sonido en voz</label>
-          <label class="toggle-switch"><input type="checkbox" id="ttsAutoToggleSide" checked onchange="toggleAutoTTS()"><span class="slider"></span></label>
-        </div>
-        <div class="setting-row">
-          <span style="font-size:11px;color:var(--accent);">supportaos5@gmail.com</span>
-        </div>
-        <div style="font-size:10px;color:var(--text-ghost);margin-top:8px;" id="accountBadge">ID: ---- ---- ---- ----</div>
-      </div>
-    </div>
 
-    <div id="main-container">
-      <div class="top-bar">
-        <button class="icon-btn" onclick="toggleSidebar()"><i class="ti ti-menu-2"></i></button>
-        <div style="font-size:13px;font-weight:500;color:var(--text-muted);">AOS-0.3</div>
-        <button class="icon-btn" onclick="logout()"><i class="ti ti-logout"></i></button>
-      </div>
-      <div class="chat-view" id="chatView">
-        <div class="welcome-screen" id="welcomeScreen">
-          <h2 id="chat-welcome">¿En qué puedo ayudarte?</h2>
-          <p>Escribí tu mensaje para comenzar</p>
-        </div>
-        <div id="messages"></div>
-      </div>
-      <div class="input-area">
-        <div class="input-wrapper">
-          <textarea id="chatInput" placeholder="Enviar mensaje..." rows="1"></textarea>
-          <div class="input-toolbar">
-            <div class="input-tools">
-              <input type="file" id="imageInput" accept="image/*" style="display:none" />
-              <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" />
-              <button class="icon-btn" onclick="document.getElementById('imageInput').click()"><i class="ti ti-photo"></i></button>
-              <button class="icon-btn" onclick="document.getElementById('cameraInput').click()"><i class="ti ti-camera"></i></button>
-              <button class="icon-btn" id="mic-btn" onclick="toggleVoice()"><i class="ti ti-microphone"></i></button>
+        <div class="chat-body" id="chatBody">
+            <div class="log-row bot">
+                <span class="sender-tag">Asistente</span>
+                <div class="message-text">Hola. ¿En qué te puedo ayudar hoy?</div>
+                <span class="timestamp" id="initTime">00:00</span>
             </div>
-            <button class="send-btn" id="sendBtn" disabled><i class="ti ti-arrow-up"></i></button>
-          </div>
         </div>
-        <p class="disclaimer">La IA puede cometer errores. Verificá la información importante.</p>
-      </div>
+
+        <div class="chat-footer">
+            <form class="input-line" id="chatForm">
+                <input type="text" id="userInput" placeholder="Escribí tu mensaje acá..." autocomplete="off" required autofocus>
+                <button type="submit" class="terminal-btn">ENVIAR</button>
+            </form>
+        </div>
     </div>
-  </div>
 
-  <!-- Voice overlay -->
-  <div id="voice-overlay">
-    <div class="voice-center">
-      <div class="voice-status-text" id="voiceStatus">---</div>
-      <div class="voice-main-text" id="voicePrompt">---</div>
-      <div class="voice-subtitles" id="voice-subtitles"></div>
-    </div>
-    <button class="voice-close-btn" onclick="stopVoiceMode()"><i class="ti ti-phone-off"></i></button>
-  </div>
+    <script>
+        const chatForm = document.getElementById('chatForm');
+        const userInput = document.getElementById('userInput');
+        const chatBody = document.getElementById('chatBody');
 
-  <!-- Run modal -->
-  <div id="run-modal"><div id="run-modal-content"><div id="run-modal-header"><span>Ejecutando código</span><button class="icon-btn" onclick="closeRunModal()"><i class="ti ti-x"></i></button></div><iframe id="run-frame" sandbox="allow-scripts"></iframe></div></div>
-
-  <!-- Feedback modal -->
-  <div id="feedback-modal">
-    <div class="modal-glass" style="max-width:400px;">
-      <h3>✉️ Enviar sugerencia</h3>
-      <p>Tus comentarios llegan a supportaos5@gmail.com</p>
-      <textarea id="feedback-text" rows="5" placeholder="Escribe tu sugerencia..." style="width:100%;padding:12px;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:12px;color:var(--text-main);font-family:inherit;resize:vertical;margin-bottom:12px;"></textarea>
-      <div style="display:flex;gap:8px;justify-content:flex-end;">
-        <button class="btn btn-secondary" style="width:auto;" onclick="closeFeedback()">Cancelar</button>
-        <button class="btn btn-primary" style="width:auto;" onclick="enviarFeedback()">Enviar</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    (function() {
-      // ========== ESTADO ==========
-      let currentAccount = '', currentLang = 'es', mobilenetModel = null, isTyping = false;
-      let recognition = null, isRecording = false, ttsAutoEnabled = true, voiceModeActive = false;
-      let forceSpeak = false, meliToken = '';
-      let conversations = [];
-      let currentConversationId = null;
-
-      const authScreen = document.getElementById('auth-screen');
-      const app = document.getElementById('app');
-      const messagesEl = document.getElementById('messages');
-      const welcomeScreen = document.getElementById('welcomeScreen');
-      const chatInput = document.getElementById('chatInput');
-      const sendBtn = document.getElementById('sendBtn');
-      const micBtn = document.getElementById('mic-btn');
-      const voiceOverlay = document.getElementById('voice-overlay');
-      const voiceStatus = document.getElementById('voiceStatus');
-      const voicePrompt = document.getElementById('voicePrompt');
-      const voiceSubtitles = document.getElementById('voice-subtitles');
-      const sidebar = document.getElementById('sidebar');
-      const sidebarBackdrop = document.getElementById('sidebar-backdrop');
-      const orb1 = document.getElementById('orb1'), orb2 = document.getElementById('orb2'), orb3 = document.getElementById('orb3');
-      const chatHistoryList = document.getElementById('chatHistoryList');
-
-      // Partículas
-      for (let i = 0; i < 25; i++) {
-        const p = document.createElement('div');
-        p.className = 'particle';
-        p.style.setProperty('--dx', (Math.random()*80-40)+'px');
-        p.style.setProperty('--dy', -(Math.random()*80+20)+'px');
-        p.style.setProperty('--dx2', (Math.random()*40-20)+'px');
-        p.style.setProperty('--dy2', -(Math.random()*120+40)+'px');
-        p.style.setProperty('--dur', (6+Math.random()*10)+'s');
-        p.style.setProperty('--delay', Math.random()*8+'s');
-        p.style.left = Math.random()*100+'%';
-        p.style.top = Math.random()*100+'%';
-        document.body.appendChild(p);
-      }
-
-      function setOrbState(state) {
-        if (state === 'speaking') {
-          orb1.style.transform = 'scale(1.3) translate(30px, -20px)'; orb1.style.opacity = '0.5';
-          orb2.style.transform = 'scale(1.2) translate(-20px, 30px)'; orb2.style.opacity = '0.45';
-          orb3.style.opacity = '0.3';
-        } else if (state === 'thinking') {
-          orb1.style.transform = 'scale(0.9) translate(-20px, 10px)'; orb1.style.opacity = '0.25';
-          orb2.style.transform = 'scale(1.5) translate(10px, -30px)'; orb2.style.opacity = '0.55';
-          orb3.style.opacity = '0.4';
-        } else {
-          orb1.style.transform = 'scale(1)'; orb1.style.opacity = '0.35';
-          orb2.style.transform = 'scale(1)'; orb2.style.opacity = '0.35';
-          orb3.style.opacity = '0.2';
-        }
-      }
-
-      // Traducciones
-      const translations = {
-        en: {
-          existing: "Access with existing account", login: "Enter", or: "or", new: "Don't have an account?",
-          indicator: "SECURE LIQUID NODE", welcome: "How can I help you?", placeholder: "Send message...",
-          mTitle: "Welcome to the Ecosystem", mD1: "Complete cryptographic isolation...", mD2: "Constant development...",
-          vListen: "AOS Listening", vListenPrompt: "Speak now...", vSpeak: "AOS Responding", vSpeakPrompt: "Processing...",
-          listening: "Listening...", errorSpeech: "Speech recognition not supported.", shoppingPrefix: "Products:", cheapest: "Cheapest", notFound: "No products found."
-        },
-        es: {
-          existing: "Acceder con cuenta existente", login: "Entrar", or: "ó", new: "¿No tienes una cuenta?",
-          indicator: "NODO LÍQUIDO SEGURO", welcome: "¿En qué puedo ayudarte?", placeholder: "Enviar mensaje...",
-          mTitle: "Bienvenido al Ecosistema", mD1: "Aislamiento criptográfico completo...", mD2: "Desarrollo continuo...",
-          vListen: "AOS Escuchando", vListenPrompt: "Habla ahora...", vSpeak: "AOS Respondiendo", vSpeakPrompt: "Procesando...",
-          listening: "Escuchando...", errorSpeech: "Reconocimiento de voz no soportado.", shoppingPrefix: "Productos:", cheapest: "Más barato", notFound: "No encontré productos."
-        },
-        es_AR: {
-          existing: "Entrá con tu cuenta", login: "Entrar", or: "ó", new: "¿No tenés cuenta?",
-          indicator: "NODO LÍQUIDO SEGURO", welcome: "¿En qué te puedo ayudar?", placeholder: "Mandá un mensaje...",
-          mTitle: "Bienvenido al Ecosistema", mD1: "Aislamiento completo, che...", mD2: "Desarrollo constante...",
-          vListen: "AOS Escuchando", vListenPrompt: "Hablá tranquilo...", vSpeak: "AOS Respondiendo", vSpeakPrompt: "Armando respuesta...",
-          listening: "Escuchando...", errorSpeech: "Reconocimiento de voz no soportado.", shoppingPrefix: "Conseguí esto:", cheapest: "Más barato", notFound: "No encontré nada."
-        }
-      };
-
-      // ========== MEMORIA DE CONVERSACIONES ==========
-      function guardarConversaciones() {
-        localStorage.setItem(`aos_conv_${currentAccount}`, JSON.stringify(conversations));
-      }
-      function cargarConversaciones() {
-        const data = localStorage.getItem(`aos_conv_${currentAccount}`);
-        if (data) { try { conversations = JSON.parse(data); } catch(e) { conversations = []; } } else conversations = [];
-      }
-      function crearNuevaConversacion() {
-        const nueva = {
-          id: Date.now().toString(36) + Math.random().toString(36).substr(2,5),
-          titulo: 'Nueva conversación',
-          mensajes: [],
-          fecha: new Date().toISOString()
+        // Respuestas locales fijas
+        const RESPUESTAS_LOCALES = {
+            "hola": [
+                "Hola. Decime en qué te puedo ayudar.",
+                "Hola. Quedo a tu disposición para lo que necesités.",
+                "Hola. ¿Cómo va?"
+            ],
+            "como estas": [
+                "Todo bien por acá. ¿Y vos?",
+                "Muy bien. ¿En qué te puedo colaborar?",
+                "Todo en orden. ¿Vos cómo estás?"
+            ],
+            "bien": [
+                "Me alegra escuchar eso. ¿Cómo te llamás?",
+                "Qué bueno. Decime tu nombre para continuar.",
+                "Excelente. ¿Cuál es tu nombre?"
+            ],
+            "benja": [
+                "Perfecto, Benja. Si necesitás asistencia con algo, avisame.",
+                "Hola, Benja. Decime en qué te puedo dar una mano.",
+                "Entendido, Benja. Quedo a tu disposición para lo que haga falta."
+            ],
+            "chau": [
+                "Chau. Nos vemos.",
+                "Hasta luego. Que andes bien.",
+                "Chau. Cuidate."
+            ]
         };
-        conversations.unshift(nueva);
-        guardarConversaciones();
-        return nueva;
-      }
-      function actualizarConversacion(mensajes) {
-        const conv = conversations.find(c => c.id === currentConversationId);
-        if (conv) {
-          conv.mensajes = mensajes;
-          if (conv.mensajes.length > 0 && conv.titulo === 'Nueva conversación') {
-            const primerUsuario = conv.mensajes.find(m => m.role === 'user');
-            if (primerUsuario) conv.titulo = primerUsuario.text.substring(0, 50);
-          }
-          conv.fecha = new Date().toISOString();
-          guardarConversaciones();
-          renderizarLista();
-        }
-      }
-      function cargarConversacion(id) {
-        const conv = conversations.find(c => c.id === id);
-        if (!conv) return;
-        currentConversationId = id;
-        messagesEl.innerHTML = '';
-        if (conv.mensajes.length === 0) {
-          messagesEl.style.display = 'none'; welcomeScreen.style.display = 'flex';
-        } else {
-          welcomeScreen.style.display = 'none'; messagesEl.style.display = 'flex';
-          conv.mensajes.forEach(m => {
-            if (m.role === 'user') addUserMessage(m.text);
-            else if (m.role === 'assistant') {
-              const { bubble, footer } = addAssistantSkeleton();
-              if (m.html) bubble.innerHTML = m.html; else bubble.textContent = m.text;
-              if (m.image) { const img = document.createElement('img'); img.src = m.image; img.className = 'wiki-image'; footer.appendChild(img); }
-              addAudioBtn(footer, m.text);
-            }
-          });
-        }
-        renderizarLista();
-        if (window.innerWidth < 769) toggleSidebar();
-      }
-      function renderizarLista() {
-        chatHistoryList.innerHTML = '';
-        conversations.forEach(conv => {
-          const div = document.createElement('div');
-          div.className = 'chat-list-item' + (conv.id === currentConversationId ? ' active' : '');
-          div.innerHTML = `<span class="conv-title">${conv.titulo}</span><span class="conv-date">${new Date(conv.fecha).toLocaleDateString()}</span>`;
-          div.onclick = () => cargarConversacion(conv.id);
-          chatHistoryList.appendChild(div);
-        });
-      }
-      function obtenerMensajesActuales() {
-        const mensajes = [];
-        messagesEl.querySelectorAll('.msg-row').forEach(row => {
-          if (row.classList.contains('user')) {
-            const b = row.querySelector('.bubble'); if (b) mensajes.push({ role:'user', text:b.textContent });
-          } else if (row.classList.contains('assistant')) {
-            const b = row.querySelector('.assistant-text');
-            if (b) {
-              const footer = row.querySelector('.bubble-footer');
-              let image = null; if (footer) { const img = footer.querySelector('.wiki-image'); if (img) image = img.src; }
-              mensajes.push({ role:'assistant', text:b.textContent, html:b.innerHTML, image });
-            }
-          }
-        });
-        return mensajes;
-      }
-      window.nuevaConversacion = function() {
-        if (currentConversationId) {
-          const mensajes = obtenerMensajesActuales();
-          if (mensajes.length) actualizarConversacion(mensajes);
-        }
-        const nueva = crearNuevaConversacion();
-        currentConversationId = nueva.id;
-        messagesEl.innerHTML = ''; messagesEl.style.display = 'none'; welcomeScreen.style.display = 'flex';
-        chatInput.value = ''; sendBtn.disabled = true;
-        renderizarLista();
-        if (window.innerWidth < 769) toggleSidebar();
-      };
 
-      // ========== AUTENTICACIÓN ==========
-      window.selectLanguage = (btn, lang) => {
-        document.querySelectorAll('.lang-card').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        currentLang = lang;
-        const t = translations[lang];
-        document.getElementById('lbl-existing').innerText = t.existing;
-        document.getElementById('btn-login').innerText = t.login;
-        document.getElementById('lbl-or').innerText = t.or;
-        document.getElementById('lbl-new').innerText = t.new;
-        document.getElementById('chat-welcome').innerText = t.welcome;
-        chatInput.placeholder = t.placeholder;
-        document.getElementById('auth-forms-container').style.display = 'block';
-      };
-      window.formatInput = el => {
-        let v = el.value.replace(/\s+/g, '').replace(/[^0-9]/g, '');
-        let parts = [];
-        for (let i=0; i<v.length && i<16; i+=4) parts.push(v.substring(i, i+4));
-        el.value = parts.join(' ');
-      };
-      window.generateAccount = () => {
-        let code = '';
-        for (let i = 0; i < 16; i++) code += Math.floor(Math.random() * 10);
-        const display = document.getElementById('generatedCodeDisplay');
-        display.style.display = 'block';
-        display.innerText = code.match(/.{1,4}/g).join(' ');
-        document.getElementById('genBtn').style.display = 'none';
-        document.getElementById('confirmGenBtn').style.display = 'block';
-        currentAccount = code;
-      };
-      window.confirmNewAccount = () => { if(currentAccount) { localStorage.setItem(`aos_mem_${currentAccount}`, JSON.stringify([])); localStorage.setItem(`aos_first_${currentAccount}`, 'true'); launchApp(currentAccount); } };
-      window.login = () => {
-        let input = document.getElementById('loginCodeInput').value.replace(/\s+/g, '');
-        if(input.length === 16) {
-          if (!localStorage.getItem(`aos_mem_${input}`)) { localStorage.setItem(`aos_mem_${input}`, JSON.stringify([])); localStorage.setItem(`aos_first_${input}`, 'true'); }
-          launchApp(input);
+        function getTimestamp() {
+            const now = new Date();
+            return now.toTimeString().split(' ')[0].slice(0, 5);
         }
-      };
-      function launchApp(accountId) {
-        currentAccount = accountId;
-        authScreen.style.display = 'none'; app.style.display = 'flex';
-        document.getElementById('accountBadge').innerText = `ID: ${accountId.match(/.{1,4}/g).join(' ')}`;
-        if (localStorage.getItem(`aos_first_${currentAccount}`) === 'true') document.getElementById('onboarding-modal').classList.add('active');
-        const savedToken = localStorage.getItem('aos_meli_token'); if (savedToken) meliToken = savedToken;
-        if (!mobilenetModel) mobilenet.load().then(model => { mobilenetModel = model; }).catch(e => {});
-        cargarConversaciones();
-        if (conversations.length === 0) {
-          const nueva = crearNuevaConversacion();
-          currentConversationId = nueva.id;
-          welcomeScreen.style.display = 'flex'; messagesEl.style.display = 'none';
-        } else {
-          const ultima = conversations[0];
-          currentConversationId = ultima.id;
-          cargarConversacion(ultima.id);
-        }
-        renderizarLista();
-      }
-      window.closeOnboarding = () => { document.getElementById('onboarding-modal').classList.remove('active'); localStorage.removeItem(`aos_first_${currentAccount}`); };
-      window.logout = () => {
-        if (currentConversationId) {
-          const mensajes = obtenerMensajesActuales();
-          if (mensajes.length) actualizarConversacion(mensajes);
-        }
-        currentAccount = ''; app.style.display = 'none'; authScreen.style.display = 'flex';
-        document.getElementById('genBtn').style.display = 'block'; document.getElementById('confirmGenBtn').style.display = 'none';
-        document.getElementById('generatedCodeDisplay').style.display = 'none'; document.getElementById('loginCodeInput').value = '';
-        messagesEl.innerHTML = ''; messagesEl.style.display = 'none'; welcomeScreen.style.display = 'flex';
-      };
-      window.toggleSidebar = () => { sidebar.classList.toggle('open'); sidebarBackdrop.classList.toggle('show'); };
-      window.toggleLightMode = () => {
-        document.body.classList.toggle('light-mode');
-      };
-      window.toggleAutoTTS = () => { ttsAutoEnabled = document.getElementById('ttsAutoToggleSide').checked; };
 
-      // ========== COMPRAS ==========
-      function detectarPresupuesto(texto) { const m = texto.match(/(?:por\s*(?:menos\s*de|hasta|máximo|max|presupuesto\s*(?:de|máximo)?)|con\s*(?:presupuesto|plata|guita)|\$|ARS|pesos?)\s*(\d[\d.,]*)/i); return m ? parseFloat(m[1].replace(/\./g,'').replace(',','.')) : null; }
-      function esConsultaDeCompra(texto) { return /comprar|compara|precio|precios|barato|baratos|económico|presupuesto|mercado libre|mercadolibre|oferta|cuánto sale|cuánto vale|buscar producto|buscame|conseguime/i.test(texto); }
-      function extraerProducto(texto) { return texto.replace(/comprar|compara|precio|barato|económico|presupuesto|mercado libre|mercadolibre|buscame|conseguime|buscá|busca/gi,'').replace(/(por|con|hasta|máximo|max|presupuesto)\s*(\$|ARS|pesos?)?\s*[\d.,]+/gi,'').trim() || texto.trim(); }
-      async function buscarMercadoLibre(producto) {
-        if (!meliToken) return [];
-        try {
-          const r = await fetch(`https://api.mercadolibre.com/sites/MLA/search?q=${encodeURIComponent(producto)}&limit=5`, { headers: { 'Authorization': `Bearer ${meliToken}` } });
-          if (!r.ok) return [];
-          const d = await r.json();
-          return (d.results||[]).map(i => ({ titulo: i.title, precio: i.price, url: i.permalink, imagen: i.thumbnail, fuente: 'Mercado Libre' }));
-        } catch(e) { return []; }
-      }
-      async function buscarProductos(producto, presupuesto) {
-        const resultados = [];
-        if (meliToken) resultados.push(...await buscarMercadoLibre(producto));
-        let filtrados = presupuesto ? resultados.filter(p => p.precio <= presupuesto) : resultados;
-        filtrados.sort((a,b) => a.precio - b.precio);
-        return filtrados.slice(0,6);
-      }
-      function formatearProductosHTML(productos, lang) {
-        if (!productos.length) return translations[lang]?.notFound;
-        let h = `<div>${translations[lang]?.shoppingPrefix}</div>`;
-        productos.forEach((p,i) => {
-          const best = i===0 && productos.length>1;
-          h += `<div class="product-card ${best?'best-price':''}">${p.imagen?`<img src="${p.imagen}">`:''}<div class="info"><div class="title">${p.titulo}</div><div class="source">${p.fuente}</div></div><div class="price">$${p.precio.toLocaleString('es-AR')}</div></div>`;
-          if (best) h += `<div style="font-size:10px;color:var(--success);margin-top:-4px;margin-bottom:6px;">← ${translations[lang]?.cheapest}</div>`;
-        });
-        return h;
-      }
+        document.getElementById('initTime').innerText = getTimestamp();
 
-      // ========== WIKIPEDIA ==========
-      const wikiIntros = {
-        en: ["Here's what I found: ","Based on what's known: ","Let me share this: "],
-        es: ["Acá va lo que sé: ","Esto es lo que encontré: ","Te comparto: "],
-        es_AR: ["Che, mirá esto: ","Acá tengo este dato: ","Te paso lo que averigüé: "]
-      };
-      async function buscarEnWikipedia(consulta) {
-        try {
-          const r = await fetch(`https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(consulta)}&format=json&origin=*`);
-          const d = await r.json();
-          if (!d.query.search.length) return null;
-          const titulo = d.query.search[0].title;
-          const [eR, iR] = await Promise.all([
-            fetch(`https://es.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&titles=${encodeURIComponent(titulo)}&format=json&origin=*`).then(r=>r.json()),
-            fetch(`https://es.wikipedia.org/w/api.php?action=query&prop=pageimages&pithumbsize=400&titles=${encodeURIComponent(titulo)}&format=json&origin=*`).then(r=>r.json())
-          ]);
-          const pid = Object.keys(eR.query.pages)[0];
-          if (eR.query.pages[pid].missing) return null;
-          let img = ''; const ip = iR.query.pages[pid]; if (ip && ip.thumbnail) img = ip.thumbnail.source;
-          return { extract: eR.query.pages[pid].extract, title: titulo, imageUrl: img };
-        } catch(e) { return null; }
-      }
+        function appendMessage(sender, text, role) {
+            const logRow = document.createElement('div');
+            logRow.className = `log-row ${role}`;
 
-      // ========== EMOCIONES Y RESPUESTAS ==========
-      const emociones = {
-        feliz: { en:["happy","glad"], es:["feliz","contento"], es_AR:["feliz","joya"] },
-        triste: { en:["sad"], es:["triste"], es_AR:["triste","bajón"] },
-        enojado: { en:["angry"], es:["enojado"], es_AR:["enojado","bronca"] },
-        sorpresa: { en:["surprised"], es:["sorprendido"], es_AR:["sorprendido"] },
-        cansado: { en:["tired"], es:["cansado"], es_AR:["cansado"] }
-      };
-      const respEmocion = {
-        feliz: { en:["That's great! 😊"], es:["¡Qué bueno! 😊"], es_AR:["¡Qué bien, che! 😊"] },
-        triste: { en:["I'm sorry..."], es:["Lamento eso."], es_AR:["Uh, qué bajón."] },
-        enojado: { en:["I understand."], es:["Entiendo."], es_AR:["Te entiendo."] },
-        sorpresa: { en:["What a surprise!"], es:["¡Qué sorpresa!"], es_AR:["¡Qué sorpresa, che!"] },
-        cansado: { en:["Rest up!"], es:["¡Descansá!"], es_AR:["Tiráte a descansar."] }
-      };
-      const respuestas = {
-        en:[{c:["hello","hi","hey"],r:["Hello! 👋"]},{c:["how are you"],r:["I'm great! 😄"]},{c:["name"],r:["I'm AOS-0.3. 🇦🇷"]},{c:["thanks"],r:["You're welcome!"]},{c:["bye"],r:["See you! 👋"]}],
-        es:[{c:["hola","buenas"],r:["¡Hola! 👋"]},{c:["cómo estás"],r:["¡Muy bien! 😄"]},{c:["nombre"],r:["Soy AOS-0.3. 🇦🇷"]},{c:["gracias"],r:["¡De nada!"]},{c:["chau"],r:["¡Chau! 👋"]}],
-        es_AR:[{c:["hola","buenas"],r:["¡Hola, che! 👋"]},{c:["cómo estás"],r:["¡Joyita! 😄"]},{c:["nombre"],r:["Soy AOS-0.3. 🇦🇷"]},{c:["gracias"],r:["¡De nada, che!"]},{c:["chau"],r:["¡Chau! 👋"]}]
-      };
-      const codeKnowledge = { calculadora: ['```html\n<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Calc</title><style>*{margin:0;padding:0}body{background:#1a1a2e;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif}.c{background:#16213e;border-radius:20px;padding:20px;width:300px}.d{background:#0f3460;border-radius:12px;padding:20px;text-align:right;margin-bottom:15px;color:#fff;font-size:2rem}.b{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}button{padding:18px;border:none;border-radius:12px;font-size:1rem;cursor:pointer;background:#1a1a2e;color:#fff}.o{background:#e94560}.e{background:#0f3460;grid-column:span 2}</style></head><body><div class="c"><div class="d" id="r">0</div><div class="b"><button onclick="a(\'7\')">7</button><button onclick="a(\'8\')">8</button><button onclick="a(\'9\')">9</button><button class="o" onclick="a(\'/\')">÷</button><button onclick="a(\'4\')">4</button><button onclick="a(\'5\')">5</button><button onclick="a(\'6\')">6</button><button class="o" onclick="a(\'*\')">×</button><button onclick="a(\'1\')">1</button><button onclick="a(\'2\')">2</button><button onclick="a(\'3\')">3</button><button class="o" onclick="a(\'-\')">−</button><button onclick="a(\'0\')">0</button><button onclick="a(\'.\')">.</button><button class="e" onclick="calc()">=</button><button class="o" onclick="a(\'+\')">+</button></div></div><script>let e=\'\';function a(v){e+=v;document.getElementById(\'r\').textContent=e}function calc(){try{let r=Function(\'"use strict";return(\'+e+\')\')();document.getElementById(\'r\').textContent=parseFloat(r.toFixed(10));e=String(r)}catch(x){document.getElementById(\'r\').textContent=\'Error\'}}<\/script></body></html>\n```'] };
-      const keywordMap = { calculadora:'calculadora',tareas:'calculadora',notas:'calculadora' };
-      function random(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
-      function detectarEmocion(texto) {
-        const t = texto.toLowerCase().trim();
-        for (const [emocion, claves] of Object.entries(emociones)) {
-          if ((claves[currentLang]||claves.es).some(p => t.includes(p))) return random(respEmocion[emocion][currentLang]||respEmocion[emocion].es);
-        }
-        return null;
-      }
-      function obtenerRespuestaRapida(texto) {
-        const t = texto.toLowerCase().trim();
-        const em = detectarEmocion(texto); if (em) return em;
-        for (const entrada of (respuestas[currentLang]||respuestas.es)) { if (entrada.c.some(c => t.includes(c))) return random(entrada.r); }
-        return null;
-      }
-      function obtenerDeConocimiento(input) {
-        const t = input.toLowerCase().trim();
-        for (const [kw, cat] of Object.entries(keywordMap)) { if (t.includes(kw)) return random(codeKnowledge[cat]||codeKnowledge.calculadora); }
-        if (t.includes('programa')||t.includes('código')||t.includes('html')) return random(codeKnowledge.calculadora);
-        return null;
-      }
-      const fallbacks = {
-        en:["I'm not sure 🤔","Could you rephrase?"],
-        es:["No entendí bien 🤔","¿Lo reformulás?"],
-        es_AR:["No te cazé 🤔","¿Me lo tirás de nuevo?"]
-      };
+            logRow.innerHTML = `
+                <span class="sender-tag">${sender}</span>
+                <div class="message-text">${text}</div>
+                <span class="timestamp">${getTimestamp()}</span>
+            `;
 
-      // ========== MOTOR MATEMÁTICO ==========
-      class MathReasoningBot {
-        constructor() {
-          this.ops = {
-            '+': { fn: (a,b) => a + b, prec: 1, assoc: 'left' },
-            '-': { fn: (a,b) => a - b, prec: 1, assoc: 'left' },
-            '*': { fn: (a,b) => a * b, prec: 2, assoc: 'left' },
-            '/': { fn: (a,b) => a / b, prec: 2, assoc: 'left' },
-            '^': { fn: (a,b) => Math.pow(a, b), prec: 3, assoc: 'right' }
-          };
-          this.var = 'x';
+            chatBody.appendChild(logRow);
+            chatBody.scrollTop = chatBody.scrollHeight;
         }
-        reason(problem) {
-          problem = problem.trim();
-          if (problem.includes('=')) return this.solveEquation(problem);
-          return this.evaluateArithmetic(problem);
-        }
-        tokenize(expr) {
-          const tokens = []; let i = 0;
-          while (i < expr.length) {
-            const c = expr[i];
-            if (c === ' ') { i++; continue; }
-            if (/\d|\./.test(c)) { let num = ''; while (i < expr.length && (/\d|\./.test(expr[i]))) { num += expr[i]; i++; } tokens.push({ type: 'NUM', value: num.includes('.') ? parseFloat(num) : parseInt(num) }); continue; }
-            if (/[a-zA-Z]/.test(c)) { let v = ''; while (i < expr.length && /[a-zA-Z]/.test(expr[i])) { v += expr[i]; i++; } tokens.push({ type: 'VAR', value: v }); continue; }
-            if ('+-*/^()='.includes(c)) { tokens.push({ type: 'OP', value: c }); i++; continue; }
-            throw new Error(`Carácter inesperado: ${c}`);
-          }
-          return tokens;
-        }
-        parseAST(tokens) {
-          const output = [], operators = [];
-          for (const tok of tokens) {
-            if (tok.type === 'NUM' || tok.type === 'VAR') { output.push(tok.type === 'NUM' ? { type: 'num', value: tok.value } : { type: 'var', name: tok.value }); }
-            else if (tok.value === '(') { operators.push(tok.value); }
-            else if (tok.value === ')') { while (operators.length && operators[operators.length-1] !== '(') this.popOp(output, operators); operators.pop(); }
-            else if (this.ops[tok.value]) {
-              while (operators.length && operators[operators.length-1] in this.ops) {
-                const top = operators[operators.length-1], curr = this.ops[tok.value], topOp = this.ops[top];
-                if ((curr.assoc === 'left' && curr.prec <= topOp.prec) || (curr.assoc === 'right' && curr.prec < topOp.prec)) { this.popOp(output, operators); } else break;
-              }
-              operators.push(tok.value);
-            }
-          }
-          while (operators.length) this.popOp(output, operators);
-          return output[0];
-        }
-        popOp(output, operators) { const op = operators.pop(), right = output.pop(), left = output.pop(); output.push({ type: 'op', op, left, right }); }
-        astToStr(node) {
-          if (node.type === 'num') { const v = node.value; return (Number.isInteger(v) ? v.toString() : parseFloat(v.toFixed(10)).toString()); }
-          else if (node.type === 'var') return node.name;
-          else if (node.type === 'op') { const left = this.astToStr(node.left), right = this.astToStr(node.right); if ('+-'.includes(node.op)) return `(${left} ${node.op} ${right})`; return `${left} ${node.op} ${right}`; }
-          return '';
-        }
-        evaluateArithmetic(expr) {
-          const tokens = this.tokenize(expr); let ast = this.parseAST(tokens); const steps = []; let current = ast;
-          while (true) { if (current.type === 'num') break; const { node: newnode, changed } = this.reduceStep(current); if (!changed) break; steps.push(this.astToStr(newnode)); current = newnode; }
-          let out = `Problema: ${expr}\n`; if (steps.length) { out += 'Pasos:\n'; steps.forEach(s => out += `  = ${s}\n`); } out += `Resultado: ${this.astToStr(current)}`; return out;
-        }
-        reduceStep(node) {
-          if (node.type === 'op') {
-            const left = node.left, right = node.right;
-            const { node: nl, changed: cl } = this.reduceStep(left);
-            const { node: nr, changed: cr } = this.reduceStep(right);
-            if (cl || cr) return { node: { type: 'op', op: node.op, left: nl, right: nr }, changed: true };
-            if (left.type === 'num' && right.type === 'num') { const fn = this.ops[node.op].fn; let result = fn(left.value, right.value); if (node.op === '/' && right.value === 0) throw new Error('División por cero'); return { node: { type: 'num', value: result }, changed: true }; }
-          }
-          return { node, changed: false };
-        }
-        solveEquation(problem) {
-          const [leftStr, rightStr] = problem.split('=').map(s => s.trim());
-          const leftAST = this.parseAST(this.tokenize(leftStr)), rightAST = this.parseAST(this.tokenize(rightStr));
-          const leftCoeffs = this.astToPoly(leftAST), rightCoeffs = this.astToPoly(rightAST);
-          const coeffs = {};
-          for (const [p, c] of Object.entries(leftCoeffs)) coeffs[p] = (coeffs[p]||0) + c;
-          for (const [p, c] of Object.entries(rightCoeffs)) coeffs[p] = (coeffs[p]||0) - c;
-          const steps = [];
-          steps.push(`Ecuación original: ${this.astToStr(leftAST)} = ${this.astToStr(rightAST)}`);
-          steps.push('Todos los términos al lado izquierdo:');
-          steps.push(`  ${this.polyToStr(coeffs)} = 0`);
-          const constant = coeffs[0] || 0, varCoeff = coeffs[1] || 0;
-          if (varCoeff === 0) { steps.push(constant === 0 ? 'Todos los reales son solución (identidad).' : 'No hay solución (contradicción).'); return steps.join('\n'); }
-          steps.push(`Aislar la variable: ${varCoeff}${this.var} = ${-constant}`);
-          let solution = -constant / varCoeff;
-          if (Number.isInteger(solution)) solution = parseInt(solution);
-          steps.push(`Dividir ambos lados por ${varCoeff}: ${this.var} = ${solution}`);
-          return steps.join('\n');
-        }
-        astToPoly(node) {
-          if (node.type === 'num') return { 0: node.value };
-          if (node.type === 'var') return { 1: 1 };
-          if (node.type === 'op') {
-            const left = this.astToPoly(node.left), right = this.astToPoly(node.right);
-            const result = {}, allPowers = new Set([...Object.keys(left), ...Object.keys(right)]);
-            if (node.op === '+') { for (const p of allPowers) result[p] = (left[p]||0) + (right[p]||0); }
-            else if (node.op === '-') { for (const p of allPowers) result[p] = (left[p]||0) - (right[p]||0); }
-            else if (node.op === '*') { for (const [p1, c1] of Object.entries(left)) { for (const [p2, c2] of Object.entries(right)) { const p = parseInt(p1) + parseInt(p2); result[p] = (result[p]||0) + c1 * c2; } } }
-            else if (node.op === '/') { if (Object.keys(right).length === 1 && right[0] !== undefined) { const divisor = right[0]; for (const [p, c] of Object.entries(left)) result[p] = c / divisor; } else throw new Error('Ecuaciones no lineales no soportadas'); }
-            return result;
-          }
-          return {};
-        }
-        polyToStr(coeffs) {
-          const terms = [], powers = Object.keys(coeffs).map(Number).sort((a,b) => b - a);
-          for (const p of powers) {
-            const c = coeffs[p]; if (c === 0) continue;
-            let term = '';
-            if (p === 0) term = String(c);
-            else { if (c === 1) term = ''; else if (c === -1) term = '-'; else term = String(c); term += p === 1 ? this.var : `${this.var}^${p}`; }
-            if (terms.length === 0 && term.startsWith('+')) term = term.slice(1);
-            terms.push(term);
-          }
-          return terms.length ? terms.join(' + ').replace(/\+ -/g, '- ') : '0';
-        }
-      }
-      const mathBot = new MathReasoningBot();
 
-      function esProblemaMatematico(texto) {
-        const t = texto.replace(/\s+/g, '');
-        if (/^[\d\+\-\*\/\^\(\)\.]+$/.test(t) && /[\+\-\*\/\^]/.test(t)) return true;
-        if (/[\dx][\+\-\*\/\^]?[\dx]*=[\dx\+\-\*\/\^]*/.test(t) && t.includes('=')) return true;
-        if (/resolver|resuelve|calcula|ecuacion|ecuación|aritmetica|matematica|math|solve|calculate/i.test(texto)) return true;
-        return false;
-      }
-
-      // ========== RESPUESTA FINAL ==========
-      async function obtenerRespuestaFinal(input) {
-        if (esConsultaDeCompra(input)) {
-          const prod = extraerProducto(input); const pres = detectarPresupuesto(input);
-          setOrbState('thinking');
-          const productos = await buscarProductos(prod, pres);
-          setOrbState('idle');
-          return { text: formatearProductosHTML(productos, currentLang), instant: true, image: null };
-        }
-        const code = obtenerDeConocimiento(input); if (code) return { text: code, instant: true, image: null };
-        const rapida = obtenerRespuestaRapida(input); if (rapida) return { text: rapida, instant: false, image: null };
-        if (esProblemaMatematico(input)) {
-          try {
-            const mathResult = mathBot.reason(input);
-            return { text: mathResult, instant: false, image: null };
-          } catch(e) {}
-        }
-        if (input.trim().length > 3) {
-          try {
-            setOrbState('thinking');
-            const wiki = await Promise.race([buscarEnWikipedia(input), new Promise((_,r) => setTimeout(() => r(new Error('timeout')), 2000))]);
-            setOrbState('idle');
-            if (wiki && wiki.extract) {
-              const oraciones = wiki.extract.split('. ').slice(0,3).join('. ')+'.';
-              const intro = random(wikiIntros[currentLang]||wikiIntros.es);
-              let texto = intro + oraciones.charAt(0).toLowerCase() + oraciones.slice(1);
-              texto += '\n\n🔗 Fuente: https://es.wikipedia.org/wiki/'+encodeURIComponent(wiki.title);
-              return { text: texto, instant: false, image: wiki.imageUrl };
-            }
-          } catch(e) { setOrbState('idle'); }
-        }
-        return { text: random(fallbacks[currentLang]||fallbacks.es), instant: false, image: null };
-      }
-
-      // ========== UI ==========
-      function showMessages() { welcomeScreen.style.display = 'none'; messagesEl.style.display = 'flex'; }
-      function addUserMessage(text) {
-        const row = document.createElement('div'); row.className = 'msg-row user';
-        row.innerHTML = '<div class="msg-content"><div class="bubble">'+text+'</div></div>';
-        messagesEl.appendChild(row); document.querySelector('.chat-view').scrollTop = document.querySelector('.chat-view').scrollHeight;
-      }
-      function addAssistantSkeleton() {
-        const row = document.createElement('div'); row.className = 'msg-row assistant';
-        row.innerHTML = '<div class="msg-content"><div class="assistant-avatar"><i class="ti ti-brain"></i></div><div><div class="bubble assistant-text"></div><div class="bubble-footer"></div></div></div>';
-        messagesEl.appendChild(row); document.querySelector('.chat-view').scrollTop = document.querySelector('.chat-view').scrollHeight;
-        return { bubble: row.querySelector('.assistant-text'), footer: row.querySelector('.bubble-footer') };
-      }
-      function addAudioBtn(footer, text) {
-        const btn = document.createElement('button'); btn.className = 'audio-btn';
-        btn.innerHTML = '<i class="ti ti-volume"></i>'; btn.onclick = () => speakText(text); footer.appendChild(btn);
-      }
-      function addTyping() {
-        const row = document.createElement('div'); row.className = 'msg-row assistant'; row.id = 'typing-row';
-        row.innerHTML = '<div class="msg-content"><div class="assistant-avatar"><i class="ti ti-brain"></i></div><div><div class="bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div></div></div>';
-        messagesEl.appendChild(row);
-      }
-      function typeWords(text, bubble, cb) {
-        const words = text.split(' '); let i = 0; bubble.textContent = '';
-        const iv = setInterval(() => {
-          if (i < words.length) { bubble.textContent += (i?' ':'')+words[i]; i++; document.querySelector('.chat-view').scrollTop = document.querySelector('.chat-view').scrollHeight; }
-          else { clearInterval(iv); if (cb) cb(); }
-        }, 35);
-      }
-      function speakText(text) {
-        if (!window.speechSynthesis) return;
-        const clean = text.replace(/```[\s\S]*?```/g,'').replace(/[^\w\sáéíóúñÁÉÍÓÚÑ.,;:!?¿¡@()\-+]/g,'').trim();
-        if (!clean) return;
-        speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(clean);
-        u.lang = currentLang==='en'?'en-US':(currentLang==='es_AR'?'es-AR':'es-ES');
-        u.volume=1; u.rate=1.08; speechSynthesis.speak(u);
-        if (voiceModeActive) voiceSubtitles.textContent = clean;
-        setOrbState('speaking'); u.onend = () => setOrbState('idle');
-      }
-
-      async function sendMessage(msgText) {
-        const text = msgText || chatInput.value.trim();
-        if (!text || isTyping) return;
-        showMessages(); addUserMessage(text);
-        chatInput.value = ''; chatInput.style.height = 'auto'; sendBtn.disabled = true; isTyping = true;
-        addTyping();
-        try {
-          const respuesta = await obtenerRespuestaFinal(text);
-          document.getElementById('typing-row')?.remove();
-          const { bubble, footer } = addAssistantSkeleton();
-          const finalizar = () => {
-            if (respuesta.image) { const img = document.createElement('img'); img.src = respuesta.image; img.className = 'wiki-image'; footer.appendChild(img); }
-            addAudioBtn(footer, respuesta.text);
-            if (forceSpeak) { speakText(respuesta.text); forceSpeak = false; }
-            actualizarConversacion(obtenerMensajesActuales());
-          };
-          if (respuesta.instant) { bubble.innerHTML = processCodeBlocks(respuesta.text); finalizar(); }
-          else { typeWords(respuesta.text, bubble, finalizar); }
-        } catch(e) {
-          document.getElementById('typing-row')?.remove();
-          const { bubble, footer } = addAssistantSkeleton();
-          bubble.textContent = 'Error. Intenta de nuevo.'; addAudioBtn(footer, 'Error.');
-          actualizarConversacion(obtenerMensajesActuales());
-        }
-        isTyping = false; sendBtn.disabled = (chatInput.value.trim()==='');
-      }
-
-      function processCodeBlocks(text) {
-        const regex = /```(\w*)\n([\s\S]*?)```/g; let result = text, match;
-        while ((match = regex.exec(text)) !== null) {
-          const code = match[2]; const isHTML = match[1]==='html'||code.includes('<!DOCTYPE html>')||code.includes('<html');
-          const id = 'c'+Math.random().toString(36).substr(2,8);
-          const escaped = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-          const toolbar = `<div class="code-toolbar"><button class="code-btn" onclick="copyCode('${id}')"><i class="ti ti-copy"></i> Copiar</button><button class="code-btn" onclick="downloadCode('${id}','archivo${isHTML?'.html':'.txt'}')"><i class="ti ti-download"></i> Descargar</button>${isHTML?`<button class="code-btn run" onclick="runCode('${id}')"><i class="ti ti-player-play"></i> Ejecutar</button>`:''}</div>`;
-          result = result.replace(match[0], `<div class="code-block" id="${id}"><pre><code>${escaped}</code></pre>${toolbar}</div>`);
-        }
-        return result;
-      }
-      window.copyCode = (id) => { navigator.clipboard.writeText(document.getElementById(id).querySelector('code').textContent); };
-      window.downloadCode = (id, fn) => { const b = new Blob([document.getElementById(id).querySelector('code').textContent],{type:'text/plain'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = fn; a.click(); URL.revokeObjectURL(a.href); };
-      window.runCode = (id) => { document.getElementById('run-frame').srcdoc = document.getElementById(id).querySelector('code').textContent; document.getElementById('run-modal').classList.add('open'); };
-      window.closeRunModal = () => { document.getElementById('run-modal').classList.remove('open'); document.getElementById('run-frame').srcdoc = ''; };
-
-      // ========== VOZ ==========
-      window.toggleVoice = function() {
-        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SR) { alert(translations[currentLang]?.errorSpeech); return; }
-        if (isRecording) { stopVoice(); stopVoiceMode(); }
-        else { voiceModeActive = true; voiceOverlay.classList.add('active'); startVoice(); }
-      };
-      function startVoice() {
-        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SR) return;
-        recognition = new SR();
-        recognition.lang = currentLang==='en'?'en-US':(currentLang==='es_AR'?'es-AR':'es-ES');
-        recognition.interimResults = true; recognition.continuous = true;
-        recognition.onstart = () => {
-          isRecording = true; micBtn.classList.add('recording');
-          voiceStatus.innerText = translations[currentLang]?.vListen||'Listening';
-          voicePrompt.innerText = translations[currentLang]?.vListenPrompt||'Speak';
-          voiceSubtitles.textContent = translations[currentLang]?.listening||'Listening...';
-          setOrbState('thinking');
-        };
-        recognition.onresult = e => { let t=''; for (let i=e.resultIndex;i<e.results.length;i++) t+=e.results[i][0].transcript; voiceSubtitles.textContent=t; };
-        recognition.onerror = () => { stopVoice(); stopVoiceMode(); };
-        recognition.onend = () => {
-          if (isRecording && voiceSubtitles.textContent && voiceSubtitles.textContent!==(translations[currentLang]?.listening||'Listening...')) {
-            const text = voiceSubtitles.textContent.trim(); stopVoice();
-            forceSpeak = ttsAutoEnabled; sendMessage(text);
-            setTimeout(() => { if (voiceModeActive) startVoice(); }, 500);
-          } else { stopVoice(); stopVoiceMode(); }
-        };
-        recognition.start();
-      }
-      function stopVoice() { if (recognition) { recognition.stop(); recognition = null; } isRecording = false; micBtn.classList.remove('recording'); setOrbState('idle'); }
-      window.stopVoiceMode = function() {
-        voiceModeActive = false; voiceOverlay.classList.remove('active'); stopVoice();
-        speechSynthesis.cancel(); voiceSubtitles.textContent = ''; forceSpeak = false; setOrbState('idle');
-      };
-
-      // ========== FEEDBACK ==========
-      window.openFeedback = () => document.getElementById('feedback-modal').classList.add('open');
-      window.closeFeedback = () => document.getElementById('feedback-modal').classList.remove('open');
-      window.enviarFeedback = () => {
-        const m = document.getElementById('feedback-text').value.trim(); if (!m) return;
-        window.open('mailto:supportaos5@gmail.com?subject=Feedback AOS-0.3&body='+encodeURIComponent(m)); closeFeedback();
-      };
-
-      // ========== IMÁGENES ==========
-      async function procesarImagen(file) {
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-          const url = e.target.result; showMessages(); addUserMessage('<img src="'+url+'" style="max-width:200px;border-radius:12px;">');
-          if (!mobilenetModel) { const {bubble}=addAssistantSkeleton(); bubble.textContent='Modelo cargando...'; return; }
-          const img = new Image(); img.src = url;
-          img.onload = async () => {
+        /* TU FUNCIÓN DE BÚSQUEDA EN WIKIPEDIA
+          (Corregida y adaptada para integrarse al flujo del chat)
+        */
+        async function buscarEnWikipedia(consulta) {
             try {
-              const predictions = await mobilenetModel.classify(img);
-              const {bubble,footer}=addAssistantSkeleton();
-              if (!predictions.length) { bubble.textContent='No reconocí nada 🧐'; return; }
-              const top=predictions[0]; const text='Objeto: '+top.className.toLowerCase()+' ('+Math.round(top.probability*100)+'% certeza)';
-              bubble.textContent=text; addAudioBtn(footer, text);
-              actualizarConversacion(obtenerMensajesActuales());
-            } catch { const {bubble}=addAssistantSkeleton(); bubble.textContent='Error al analizar 😥'; }
-          };
-        };
-        reader.readAsDataURL(file);
-      }
-      document.getElementById('imageInput').addEventListener('change', function() { if (this.files[0]) procesarImagen(this.files[0]); this.value=''; });
-      document.getElementById('cameraInput').addEventListener('change', function() { if (this.files[0]) procesarImagen(this.files[0]); this.value=''; });
+                const r = await fetch(`https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(consulta)}&format=json&origin=*`);
+                const d = await r.json();
+                if (!d.query.search.length) return null;
+                
+                const titulo = d.query.search[0].title;
+                const [eR, iR] = await Promise.all([
+                    fetch(`https://es.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&titles=${encodeURIComponent(titulo)}&format=json&origin=*`).then(r=>r.json()),
+                    fetch(`https://es.wikipedia.org/w/api.php?action=query&prop=pageimages&pithumbsize=400&titles=${encodeURIComponent(titulo)}&format=json&origin=*`).then(r=>r.json())
+                ]);
+                
+                const pid = Object.keys(eR.query.pages)[0];
+                if (eR.query.pages[pid].missing) return null;
+                
+                let img = ''; 
+                const ip = iR.query.pages[pid]; 
+                if (ip && ip.thumbnail) img = ip.thumbnail.source;
+                
+                return { extract: eR.query.pages[pid].extract, title: titulo, imageUrl: img };
+            } catch(e) { 
+                return null; 
+            }
+        }
 
-      // ========== EVENTOS ==========
-      chatInput.addEventListener('input', () => {
-        sendBtn.disabled = chatInput.value.trim()===''||isTyping;
-        chatInput.style.height = 'auto'; chatInput.style.height = Math.min(chatInput.scrollHeight,120)+'px';
-      });
-      chatInput.addEventListener('keydown', e => { if (e.key==='Enter'&&!e.shiftKey) { e.preventDefault(); if (!sendBtn.disabled) sendMessage(); } });
-      sendBtn.addEventListener('click', () => sendMessage());
-      sidebarBackdrop.addEventListener('click', toggleSidebar);
+        /*
+          MANEJADOR DEL FORMULARIO
+        */
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-      window.sendMessage = sendMessage;
-      window.toggleSidebar = toggleSidebar;
-      window.toggleVoice = window.toggleVoice;
-      window.stopVoiceMode = window.stopVoiceMode;
-      window.closeOnboarding = closeOnboarding;
-      window.logout = logout;
-      window.openFeedback = openFeedback;
-      window.closeFeedback = closeFeedback;
-      window.enviarFeedback = enviarFeedback;
-      window.toggleLightMode = toggleLightMode;
-      window.toggleAutoTTS = toggleAutoTTS;
-      window.nuevaConversacion = window.nuevaConversacion;
-    })();
-  </script>
+            const message = userInput.value;
+            if (!message.trim()) return;
+
+            // 1. Pintamos el mensaje del operador en pantalla
+            appendMessage('Vos', message, 'user');
+            userInput.value = '';
+
+            const cleanMessage = message.toLowerCase().trim();
+
+            // CASO A: Si coincide con las respuestas fijas configuradas localmente
+            if (RESPUESTAS_LOCALES[cleanMessage]) {
+                const opciones = RESPUESTAS_LOCALES[cleanMessage];
+                const index = Math.floor(Math.random() * opciones.length);
+                
+                setTimeout(() => {
+                    appendMessage('Asistente', opciones[index], 'bot');
+                }, 400);
+            } 
+            // CASO B: Si no coincide con nada, disparamos tu buscador de Wikipedia
+            else {
+                // Ejecutamos tu función asincrónica esperando el objeto de datos
+                const info = await buscarEnWikipedia(message);
+
+                if (info) {
+                    // Armamos la respuesta seria usando el título y el extracto que programaste
+                    let respuestaHTML = `<strong>${info.title}</strong>\n\n${info.extract}`;
+                    
+                    // Si Wikipedia nos devolvió una imagen válida, la inyectamos abajo del texto con estilos limpios
+                    if (info.imageUrl) {
+                        respuestaHTML += `<img src="${info.imageUrl}" style="max-width: 100%; height: auto; margin-top: 15px; border-radius: 4px; display: block;">`;
+                    }
+                    
+                    appendMessage('Asistente', respuestaHTML, 'bot');
+                } else {
+                    // Si tu función atrapó un error o no encontró el artículo, responde esto:
+                    appendMessage('Asistente', "No encontré información relevante sobre ese tema.", 'bot');
+                }
+            }
+        });
+    </script>
 </body>
 </html>
