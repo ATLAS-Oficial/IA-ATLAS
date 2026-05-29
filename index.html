@@ -23,8 +23,79 @@
             overflow: hidden;
         }
 
-        .chat-fullscreen {
+        /* ==========================================================================
+           NUEVO: ESTILOS DE LA PANTALLA DE REGISTRO ANÓNIMO
+           ========================================================================== */
+        .auth-fullscreen {
             display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            background-color: #000000;
+            padding: 20px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .auth-box {
+            max-width: 440px;
+            width: 100%;
+            border: 1px solid #111111;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            text-align: left;
+        }
+
+        .auth-title {
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #111111;
+            padding-bottom: 12px;
+        }
+
+        .auth-desc {
+            font-size: 14px;
+            color: #888888;
+            line-height: 1.6;
+        }
+
+        .id-display-container {
+            display: none; /* Empieza oculto hasta apretar el botón */
+            flex-direction: column;
+            gap: 8px;
+            margin: 10px 0;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .id-label {
+            font-size: 11px;
+            color: #666666;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .id-number {
+            font-size: 24px;
+            font-family: monospace;
+            color: #3b82f6;
+            letter-spacing: 3px;
+            background-color: #050505;
+            border: 1px dashed #222222;
+            padding: 14px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* ==========================================================================
+           CAMBIADO: EL CHAT AHORA EMPIEZA OCULTO (display: none)
+           ========================================================================== */
+        .chat-fullscreen {
+            display: none; 
             flex-direction: column;
             height: 100vh;
             width: 100vw;
@@ -177,32 +248,77 @@
 </head>
 <body>
 
-    <div class="chat-fullscreen">
+    <div class="auth-fullscreen" id="authScreen">
+        <div class="auth-box">
+            <h2 class="auth-title">Red Segura Anónima</h2>
+            <p class="auth-desc">
+                Para proteger tu privacidad, este entorno no recopila nombres, correos ni datos personales. Generá una identificación numérica aleatoria para ingresar al sistema.
+            </p>
+            
+            <div class="id-display-container" id="idDisplayContainer">
+                <span class="id-label">Tu ID de sesión asignado:</span>
+                <div class="id-number" id="idNumber">------</div>
+            </div>
+
+            <button type="button" class="terminal-btn" id="authBtn">Generar ID Anónimo</button>
+        </div>
+    </div>
+
+    <div class="chat-fullscreen" id="chatScreen">
         <div class="chat-header">
             <div class="chat-title">Asistente Virtual</div>
-            <div class="chat-status" id="sessionStatus">Sesión activa</div>
+            <div class="chat-status" id="sessionStatus">Esperando credencial...</div>
         </div>
 
         <div class="chat-body" id="chatBody">
             <div class="log-row bot">
                 <span class="sender-tag">Asistente</span>
-                <div class="message-text">Hola. ¿En qué te puedo ayudar hoy?</div>
+                <div class="message-text">Hola. Conexión segura establecida. ¿En qué te puedo ayudar hoy?</div>
                 <span class="timestamp" id="initTime">00:00</span>
             </div>
         </div>
 
         <div class="chat-footer">
             <form class="input-line" id="chatForm">
-                <input type="text" id="userInput" placeholder="Escribí tu mensaje acá..." autocomplete="off" required autofocus>
+                <input type="text" id="userInput" placeholder="Escribí tu mensaje acá..." autocomplete="off" required>
                 <button type="submit" class="terminal-btn">ENVIAR</button>
             </form>
         </div>
     </div>
 
     <script>
+        // NUEVOS ELEMENTOS CAPTURADOS PARA LA PANTALLA DE REGISTRO
+        const authScreen = document.getElementById('authScreen');
+        const chatScreen = document.getElementById('chatScreen');
+        const authBtn = document.getElementById('authBtn');
+        const idDisplayContainer = document.getElementById('idDisplayContainer');
+        const idNumber = document.getElementById('idNumber');
+        const sessionStatus = document.getElementById('sessionStatus');
+
         const chatForm = document.getElementById('chatForm');
         const userInput = document.getElementById('userInput');
         const chatBody = document.getElementById('chatBody');
+
+        // Variable para guardar el ID generado
+        let usuarioID = null;
+
+        // NUEVO: Lógica interactiva del botón de registro
+        authBtn.addEventListener('click', () => {
+            // Paso 1: Si no hay ID, lo genera y lo muestra en pantalla
+            if (!usuarioID) {
+                usuarioID = Math.floor(100000 + Math.random() * 900000);
+                idNumber.innerText = "#" + usuarioID;
+                idDisplayContainer.style.display = 'flex';
+                authBtn.innerText = "Ingresar al Chat";
+            } 
+            // Paso 2: Si el ID ya existe y vuelve a apretar, entra al chat
+            else {
+                authScreen.style.display = 'none'; // Esconde el registro
+                chatScreen.style.display = 'flex';   // Muestra el chat
+                sessionStatus.innerText = "ID: #" + usuarioID + " | En línea";
+                userInput.focus(); // Hace foco automático en la entrada de texto
+            }
+        });
 
         // Respuestas locales fijas
         const RESPUESTAS_LOCALES = {
@@ -254,9 +370,7 @@
             chatBody.scrollTop = chatBody.scrollHeight;
         }
 
-        /* TU FUNCIÓN DE BÚSQUEDA EN WIKIPEDIA
-          (Corregida y adaptada para integrarse al flujo del chat)
-        */
+        /* TU FUNCIÓN DE BÚSQUEDA EN WIKIPEDIA */
         async function buscarEnWikipedia(consulta) {
             try {
                 const r = await fetch(`https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(consulta)}&format=json&origin=*`);
@@ -282,22 +396,18 @@
             }
         }
 
-        /*
-          MANEJADOR DEL FORMULARIO
-        */
+        /* MANEJADOR DEL FORMULARIO */
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const message = userInput.value;
             if (!message.trim()) return;
 
-            // 1. Pintamos el mensaje del operador en pantalla
             appendMessage('Vos', message, 'user');
             userInput.value = '';
 
             const cleanMessage = message.toLowerCase().trim();
 
-            // CASO A: Si coincide con las respuestas fijas configuradas localmente
             if (RESPUESTAS_LOCALES[cleanMessage]) {
                 const opciones = RESPUESTAS_LOCALES[cleanMessage];
                 const index = Math.floor(Math.random() * opciones.length);
@@ -306,23 +416,18 @@
                     appendMessage('Asistente', opciones[index], 'bot');
                 }, 400);
             } 
-            // CASO B: Si no coincide con nada, disparamos tu buscador de Wikipedia
             else {
-                // Ejecutamos tu función asincrónica esperando el objeto de datos
                 const info = await buscarEnWikipedia(message);
 
                 if (info) {
-                    // Armamos la respuesta seria usando el título y el extracto que programaste
                     let respuestaHTML = `<strong>${info.title}</strong>\n\n${info.extract}`;
                     
-                    // Si Wikipedia nos devolvió una imagen válida, la inyectamos abajo del texto con estilos limpios
                     if (info.imageUrl) {
                         respuestaHTML += `<img src="${info.imageUrl}" style="max-width: 100%; height: auto; margin-top: 15px; border-radius: 4px; display: block;">`;
                     }
                     
                     appendMessage('Asistente', respuestaHTML, 'bot');
                 } else {
-                    // Si tu función atrapó un error o no encontró el artículo, responde esto:
                     appendMessage('Asistente', "No encontré información relevante sobre ese tema.", 'bot');
                 }
             }
