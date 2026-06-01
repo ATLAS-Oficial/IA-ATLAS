@@ -1,1323 +1,304 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SF · Sin Fronteras — Red Profesional</title>
-
-<style>
-
-/* ═══════════════════════════════════════
-   SF — SIN FRONTERAS · ESTILO 2008 PRO
-   Tema claro profesional + modo oscuro
-   ═════════════════════════════════════ */
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-/* Variables de tema CLARO (por defecto) */
-:root {
-  --bg-body: #e9edf2;
-  --bg-texture: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(255,255,255,0.25) 3px, rgba(255,255,255,0.25) 6px), linear-gradient(180deg, #f2f5f8 0%, #dce3ea 100%);
-  --surface: #ffffff;
-  --surface-border: #b0bec5;
-  --surface-border-top: #d9e1e8;
-  --shadow: 0 2px 5px rgba(0,0,0,0.1);
-  --text: #2c3e50;
-  --text-secondary: #607d8b;
-  --header-bg: linear-gradient(180deg, #3a4149 0%, #1c2127 100%);
-  --header-border: #0a0e12;
-  --header-text: #ffffff;
-  --header-accent: #d4af37; /* dorado suave para el logo */
-  --accent: #546e7a; /* gris azulado medio */
-  --accent-hover: #455a64;
-  --btn-primary-bg: linear-gradient(180deg, #6c7a89 0%, #3e4a53 100%);
-  --btn-primary-border: #232b31;
-  --btn-primary-border-top: #99a8b3;
-  --btn-primary-text: #ffffff;
-  --btn-secondary-bg: linear-gradient(180deg, #8d9aa5 0%, #54626e 100%);
-  --btn-secondary-border: #35404a;
-  --widget-title-bg: linear-gradient(180deg, #546e7a 0%, #2c3e50 100%);
-  --widget-title-text: #ffffff;
-  --post-box-title-bg: linear-gradient(180deg, #7f8c8d 0%, #444e54 100%);
-  --post-box-title-text: #ffffff;
-  --input-bg: #f8fafc;
-  --input-border: #bccbd4;
-  --input-focus-border: #546e7a;
-  --comment-bubble-bg: #f4f7f9;
-  --comment-bubble-border: #d5e1e8;
-  --welcome-bg: linear-gradient(180deg, #eef5ec 0%, #d4e5d0 100%);
-  --welcome-border: #9cbf9a;
-  --welcome-text: #2d4a2c;
-  --like-color: #c0392b; /* rojo oscuro para “me gusta” */
-  --lightbox-bg: rgba(0,0,0,0.9);
-  --lightbox-img-border: #fff;
-}
-
-/* Tema OSCURO */
-body.dark {
-  --bg-body: #12171c;
-  --bg-texture: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(255,255,255,0.03) 3px, rgba(255,255,255,0.03) 6px), linear-gradient(180deg, #1a1f26 0%, #0e1217 100%);
-  --surface: #1c2128;
-  --surface-border: #2a333d;
-  --surface-border-top: #3c4652;
-  --shadow: 0 2px 5px rgba(0,0,0,0.4);
-  --text: #cbd5e0;
-  --text-secondary: #8899a6;
-  --header-bg: linear-gradient(180deg, #1c2128 0%, #0a0e12 100%);
-  --header-border: #030508;
-  --header-text: #e0e6ec;
-  --header-accent: #d4af37;
-  --accent: #546e7a;
-  --accent-hover: #667d8c;
-  --btn-primary-bg: linear-gradient(180deg, #4b5561 0%, #242a31 100%);
-  --btn-primary-border: #14181d;
-  --btn-primary-border-top: #7a8793;
-  --btn-primary-text: #e0e6ec;
-  --btn-secondary-bg: linear-gradient(180deg, #5f6b77 0%, #333b44 100%);
-  --btn-secondary-border: #1c2228;
-  --widget-title-bg: linear-gradient(180deg, #3a4149 0%, #1c2127 100%);
-  --widget-title-text: #cbd5e0;
-  --post-box-title-bg: linear-gradient(180deg, #4a535b 0%, #262d34 100%);
-  --post-box-title-text: #e0e6ec;
-  --input-bg: #262d34;
-  --input-border: #3c4652;
-  --input-focus-border: #667d8c;
-  --comment-bubble-bg: #262d34;
-  --comment-bubble-border: #3c4652;
-  --welcome-bg: linear-gradient(180deg, #28322b 0%, #18211b 100%);
-  --welcome-border: #3d4f40;
-  --welcome-text: #c0d6c4;
-  --like-color: #e06c5c;
-  --lightbox-bg: rgba(0,0,0,0.95);
-  --lightbox-img-border: #3c4652;
-}
-
-body {
-  font-family: 'Trebuchet MS', Verdana, sans-serif;
-  font-size: 13px;
-  background: var(--bg-body);
-  background-image: var(--bg-texture);
-  min-height: 100vh;
-  color: var(--text);
-  transition: background 0.3s, color 0.3s;
-}
-
-/* ── HEADER CORPORATIVO ── */
-#header {
-  background: var(--header-bg);
-  border-bottom: 3px solid var(--header-border);
-  padding: 0;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.3);
-}
-
-#header-inner {
-  max-width: 980px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 20px;
-}
-
-#logo {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 28px;
-  font-weight: bold;
-  color: var(--header-text);
-  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-  letter-spacing: -0.5px;
-  text-decoration: none;
-}
-
-#logo span {
-  color: var(--header-accent);
-}
-
-#logo small {
-  font-size: 10px;
-  font-family: 'Trebuchet MS', Verdana, sans-serif;
-  color: #adbac8;
-  font-weight: normal;
-  display: block;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-top: -4px;
-}
-
-#header-nav {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-#user-info {
-  color: #cbd5e0;
-  font-size: 12px;
-  margin-right: 10px;
-  font-style: italic;
-}
-
-/* Botones de navegación estilo 2008 profesional */
-.nav-btn {
-  background: var(--btn-secondary-bg);
-  border: 1px solid var(--btn-secondary-border);
-  border-top: 1px solid var(--btn-primary-border-top);
-  color: var(--btn-primary-text);
-  font-family: 'Trebuchet MS', Verdana, sans-serif;
-  font-size: 12px;
-  font-weight: bold;
-  padding: 5px 14px;
-  cursor: pointer;
-  border-radius: 3px;
-  text-shadow: 0 -1px 1px rgba(0,0,0,0.4);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.15);
-  transition: all 0.1s ease;
-}
-.nav-btn:hover {
-  filter: brightness(1.1);
-}
-.nav-btn:active {
-  filter: brightness(0.9);
-}
-
-.nav-btn.blue {
-  background: var(--btn-primary-bg);
-  border-color: var(--btn-primary-border);
-  border-top: 1px solid var(--btn-primary-border-top);
-}
-
-/* ── LAYOUT PRINCIPAL ── */
-#page {
-  max-width: 980px;
-  margin: 18px auto;
-  display: flex;
-  gap: 16px;
-  padding: 0 16px;
-}
-
-/* ── SIDEBAR IZQUIERDO ── */
-#sidebar {
-  width: 210px;
-  flex-shrink: 0;
-}
-
-.widget {
-  background: var(--surface);
-  border: 1px solid var(--surface-border);
-  border-top: 1px solid var(--surface-border-top);
-  border-radius: 6px;
-  margin-bottom: 12px;
-  overflow: hidden;
-  box-shadow: var(--shadow);
-}
-
-.widget-title {
-  background: var(--widget-title-bg);
-  color: var(--widget-title-text);
-  font-weight: bold;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  padding: 7px 10px;
-  text-shadow: 0 -1px 1px rgba(0,0,0,0.3);
-  border-bottom: 1px solid #1a252f;
-}
-
-.widget-body {
-  padding: 10px;
-  color: var(--text);
-}
-
-/* Perfil en sidebar */
-#my-avatar-box {
-  text-align: center;
-  padding: 16px 10px 12px;
-}
-
-#my-avatar-initial {
-  width: 82px;
-  height: 82px;
-  border-radius: 50%;
-  border: 3px solid var(--surface-border-top);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2), 0 0 0 1px var(--accent);
-  background: var(--widget-title-bg);
-  color: var(--widget-title-text);
-  font-size: 34px;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 10px;
-  font-family: Georgia, serif;
-}
-
-#my-name {
-  font-weight: bold;
-  font-size: 14px;
-  color: var(--text);
-}
-
-#my-email {
-  font-size: 11px;
-  color: var(--text-secondary);
-  margin-top: 2px;
-}
-
-.sidebar-link {
-  display: block;
-  padding: 6px 10px;
-  color: var(--accent);
-  text-decoration: none;
-  border-radius: 3px;
-  font-size: 12px;
-  cursor: pointer;
-  margin-bottom: 2px;
-  transition: background 0.15s;
-}
-.sidebar-link:hover {
-  background: var(--comment-bubble-bg);
-  color: var(--text);
-}
-.sidebar-link::before {
-  content: '› ';
-  font-weight: bold;
-  font-size: 14px;
-}
-
-.sidebar-stats {
-  font-size: 11px;
-  color: var(--text-secondary);
-  line-height: 1.9;
-}
-.sidebar-stats b {
-  color: var(--text);
-  font-weight: bold;
-}
-
-/* Widget de apariencia (toggle tema) */
-#theme-toggle-btn {
-  width: 100%;
-  margin-top: 4px;
-  background: var(--btn-secondary-bg);
-  border: 1px solid var(--btn-secondary-border);
-  border-top: 1px solid var(--btn-primary-border-top);
-  color: var(--btn-primary-text);
-  font-weight: bold;
-  font-size: 11px;
-  padding: 5px 8px;
-  border-radius: 3px;
-  cursor: pointer;
-  text-shadow: 0 -1px 1px rgba(0,0,0,0.3);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-  transition: background 0.15s;
-}
-#theme-toggle-btn:hover {
-  filter: brightness(1.08);
-}
-
-/* ── CONTENIDO PRINCIPAL ── */
-#main {
-  flex: 1;
-  min-width: 0;
-}
-
-/* ── CAJA DE PUBLICAR ── */
-#post-box {
-  background: var(--surface);
-  border: 1px solid var(--surface-border);
-  border-top: 1px solid var(--surface-border-top);
-  border-radius: 6px;
-  margin-bottom: 16px;
-  overflow: hidden;
-  box-shadow: var(--shadow);
-}
-
-#post-box-title {
-  background: var(--post-box-title-bg);
-  color: var(--post-box-title-text);
-  font-weight: bold;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 7px 12px;
-  text-shadow: 0 -1px 1px rgba(0,0,0,0.3);
-  border-bottom: 1px solid #2c353d;
-}
-
-#post-form {
-  padding: 14px;
-}
-
-#post-text {
-  width: 100%;
-  height: 80px;
-  border: 1px solid var(--input-border);
-  border-radius: 4px;
-  padding: 10px;
-  font-family: 'Trebuchet MS', Verdana, sans-serif;
-  font-size: 13px;
-  resize: vertical;
-  outline: none;
-  color: var(--text);
-  background: var(--input-bg);
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
-  transition: border-color 0.2s, background 0.2s;
-}
-#post-text:focus {
-  border-color: var(--input-focus-border);
-  background: var(--surface);
-}
-
-.post-form-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 10px;
-}
-
-.post-form-row label {
-  font-size: 12px;
-  color: var(--text);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 10px;
-  border: 1px dashed var(--input-border);
-  border-radius: 4px;
-  background: var(--input-bg);
-  transition: background 0.15s;
-}
-.post-form-row label:hover {
-  background: var(--comment-bubble-bg);
-}
-
-#photo-input { display: none; }
-
-#photo-preview {
-  max-height: 60px;
-  max-width: 85px;
-  border-radius: 4px;
-  border: 1px solid var(--input-border);
-  display: none;
-}
-
-.publish-btn {
-  margin-left: auto;
-  background: var(--btn-primary-bg);
-  border: 1px solid var(--btn-primary-border);
-  border-top: 1px solid var(--btn-primary-border-top);
-  color: var(--btn-primary-text);
-  font-family: 'Trebuchet MS', Verdana, sans-serif;
-  font-size: 12px;
-  font-weight: bold;
-  padding: 7px 22px;
-  cursor: pointer;
-  border-radius: 4px;
-  text-shadow: 0 -1px 1px rgba(0,0,0,0.4);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15);
-  transition: all 0.1s ease;
-}
-.publish-btn:hover {
-  filter: brightness(1.08);
-}
-.publish-btn:active {
-  filter: brightness(0.92);
-}
-
-/* ── FEED ── */
-#feed {
-  margin-top: 0;
-}
-
-.post {
-  background: var(--surface);
-  border: 1px solid var(--surface-border);
-  border-top: 1px solid var(--surface-border-top);
-  border-radius: 6px;
-  padding: 14px;
-  margin-bottom: 12px;
-  box-shadow: var(--shadow);
-  animation: slideDown 0.25s ease;
-}
-
-.post + .post {
-  margin-top: 12px;
-}
-
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.post-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-.post-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 2px solid var(--surface-border-top);
-  box-shadow: 0 1px 4px rgba(0,0,0,0.15), 0 0 0 1px var(--accent);
-  background: var(--widget-title-bg);
-  color: var(--widget-title-text);
-  font-weight: bold;
-  font-size: 18px;
-  font-family: Georgia, serif;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.post-meta { flex: 1; }
-
-.post-user {
-  font-weight: bold;
-  color: var(--text);
-  font-size: 13px;
-  cursor: pointer;
-}
-.post-user:hover { text-decoration: underline; }
-
-.post-time {
-  font-size: 11px;
-  color: var(--text-secondary);
-  margin-top: 1px;
-}
-
-.post-body {
-  line-height: 1.7;
-  color: var(--text);
-  margin-bottom: 6px;
-}
-
-.post-img {
-  display: block;
-  max-width: 100%;
-  max-height: 360px;
-  object-fit: cover;
-  border-radius: 4px;
-  margin: 10px 0;
-  border: 1px solid var(--input-border);
-  cursor: pointer;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-  transition: opacity 0.15s;
-}
-.post-img:hover { opacity: 0.93; }
-
-.post-actions {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-top: 12px;
-  padding-top: 10px;
-  border-top: 1px solid var(--surface-border-top);
-  font-size: 12px;
-}
-
-.post-action {
-  color: var(--accent);
-  cursor: pointer;
-  padding: 2px 5px;
-  border-radius: 3px;
-  transition: background 0.15s;
-}
-.post-action:hover {
-  background: var(--comment-bubble-bg);
-  color: var(--text);
-}
-.post-action.liked {
-  color: var(--like-color);
-  font-weight: bold;
-}
-
-.like-count {
-  color: var(--like-color);
-  font-weight: bold;
-}
-.comment-count {
-  color: var(--text-secondary);
-}
-
-.comments-section {
-  margin-top: 12px;
-  padding-top: 10px;
-  border-top: 1px solid var(--surface-border-top);
-  display: none;
-}
-.comments-section.open { display: block; }
-
-.comment {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 7px;
-  font-size: 12px;
-}
-.comment-av {
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  background: var(--widget-title-bg);
-  border: 1px solid var(--surface-border-top);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-  color: var(--widget-title-text);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: bold;
-  flex-shrink: 0;
-}
-.comment-bubble {
-  background: var(--comment-bubble-bg);
-  border: 1px solid var(--comment-bubble-border);
-  border-radius: 0 8px 8px 8px;
-  padding: 5px 9px;
-  flex: 1;
-}
-.comment-name {
-  font-weight: bold;
-  color: var(--text);
-}
-
-.comment-form {
-  display: flex;
-  gap: 8px;
-  margin-top: 8px;
-}
-.comment-input {
-  flex: 1;
-  border: 1px solid var(--input-border);
-  border-radius: 3px;
-  padding: 6px 10px;
-  font-family: 'Trebuchet MS', Verdana, sans-serif;
-  font-size: 12px;
-  outline: none;
-  background: var(--input-bg);
-  color: var(--text);
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
-}
-.comment-input:focus { border-color: var(--input-focus-border); }
-.comment-send {
-  background: var(--btn-secondary-bg);
-  border: 1px solid var(--btn-secondary-border);
-  border-top: 1px solid var(--btn-primary-border-top);
-  color: var(--btn-primary-text);
-  font-size: 11px;
-  font-weight: bold;
-  padding: 5px 12px;
-  cursor: pointer;
-  border-radius: 3px;
-  text-shadow: 0 -1px 1px rgba(0,0,0,0.3);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-  transition: all 0.1s;
-}
-.comment-send:hover {
-  filter: brightness(1.1);
-}
-
-/* ── PANTALLAS DE ACCESO ── */
-#access-screen {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  padding: 20px;
-  background: var(--bg-body);
-  background-image: var(--bg-texture);
-}
-
-.access-box {
-  background: var(--surface);
-  border: 1px solid var(--surface-border);
-  border-top: 1px solid var(--surface-border-top);
-  border-radius: 8px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-  width: 100%;
-  max-width: 440px;
-  overflow: hidden;
-}
-
-.access-header {
-  background: var(--header-bg);
-  padding: 24px 20px;
-  text-align: center;
-}
-
-.access-logo {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 36px;
-  font-weight: bold;
-  color: var(--header-text);
-  text-shadow: 0 2px 5px rgba(0,0,0,0.4);
-}
-.access-logo span { color: var(--header-accent); }
-
-.access-tagline {
-  font-size: 11px;
-  color: #adbac8;
-  margin-top: 6px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-}
-
-.access-tabs {
-  display: flex;
-  border-bottom: 2px solid var(--surface-border);
-}
-.access-tab {
-  flex: 1;
-  padding: 10px;
-  text-align: center;
-  font-size: 12px;
-  font-weight: bold;
-  cursor: pointer;
-  background: var(--input-bg);
-  color: var(--text-secondary);
-  border: none;
-  transition: background 0.15s;
-}
-.access-tab.active {
-  background: var(--surface);
-  color: var(--text);
-  border-bottom: 2px solid transparent;
-}
-.access-tab:hover { background: var(--comment-bubble-bg); }
-
-.access-body { padding: 24px 20px; }
-
-.form-group { margin-bottom: 14px; }
-.form-group label {
-  display: block;
-  font-size: 12px;
-  font-weight: bold;
-  color: var(--text);
-  margin-bottom: 5px;
-}
-.form-group input {
-  width: 100%;
-  padding: 9px 12px;
-  border: 1px solid var(--input-border);
-  border-radius: 4px;
-  font-family: 'Trebuchet MS', Verdana, sans-serif;
-  font-size: 13px;
-  outline: none;
-  background: var(--input-bg);
-  color: var(--text);
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.06);
-  transition: border-color 0.2s, background 0.2s;
-}
-.form-group input:focus {
-  border-color: var(--input-focus-border);
-  background: var(--surface);
-}
-
-.form-error {
-  color: #c0392b;
-  font-size: 11px;
-  margin-top: 4px;
-  display: none;
-  font-weight: bold;
-}
-.form-error.show { display: block; }
-
-.access-btn {
-  width: 100%;
-  padding: 11px;
-  background: var(--btn-primary-bg);
-  border: 1px solid var(--btn-primary-border);
-  border-top: 1px solid var(--btn-primary-border-top);
-  color: var(--btn-primary-text);
-  font-family: 'Trebuchet MS', Verdana, sans-serif;
-  font-size: 13px;
-  font-weight: bold;
-  cursor: pointer;
-  border-radius: 4px;
-  text-shadow: 0 -1px 1px rgba(0,0,0,0.3);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15);
-  margin-top: 8px;
-  letter-spacing: 0.4px;
-  transition: all 0.1s ease;
-}
-.access-btn:hover { filter: brightness(1.08); }
-.access-btn:active { filter: brightness(0.92); }
-
-.access-footer {
-  text-align: center;
-  font-size: 11px;
-  color: var(--text-secondary);
-  margin-top: 16px;
-  padding-top: 14px;
-  border-top: 1px solid var(--surface-border-top);
-}
-
-/* Footer del sitio */
-#site-footer {
-  text-align: center;
-  font-size: 11px;
-  color: var(--text-secondary);
-  padding: 22px;
-  margin-top: 24px;
-  border-top: 1px solid var(--surface-border);
-}
-#site-footer a { color: var(--accent); text-decoration: none; }
-#site-footer a:hover { text-decoration: underline; }
-
-/* ── MENSAJE DE BIENVENIDA ── */
-.welcome-bar {
-  background: var(--welcome-bg);
-  border: 1px solid var(--welcome-border);
-  border-radius: 4px;
-  padding: 9px 14px;
-  margin-bottom: 14px;
-  font-size: 12px;
-  color: var(--welcome-text);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: var(--shadow);
-}
-
-/* Vacio */
-.empty-feed {
-  text-align: center;
-  padding: 50px 20px;
-  color: var(--text-secondary);
-  font-size: 13px;
-  background: var(--surface);
-  border: 1px solid var(--surface-border);
-  border-radius: 6px;
-  box-shadow: var(--shadow);
-}
-.empty-feed big {
-  display: block;
-  font-size: 36px;
-  margin-bottom: 12px;
-}
-
-/* ── IMAGEN AMPLIADA ── */
-#lightbox {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: var(--lightbox-bg);
-  z-index: 9999;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-#lightbox.open { display: flex; }
-#lightbox img {
-  max-width: 90vw;
-  max-height: 90vh;
-  border: 3px solid var(--lightbox-img-border);
-  border-radius: 4px;
-  box-shadow: 0 0 50px rgba(0,0,0,0.6);
-}
-
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente Virtual</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body, html {
+            background-color: #000000;
+            color: #ffffff;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        .chat-fullscreen {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .chat-header {
+            background-color: #000000;
+            padding: 24px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #111111;
+        }
+
+        .chat-title {
+            font-size: 16px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .chat-status {
+            color: #888888;
+            font-size: 13px;
+        }
+
+        .chat-body {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .chat-body::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-body::-webkit-scrollbar-thumb {
+            background-color: #222222;
+        }
+
+        .log-row {
+            display: flex;
+            flex-direction: column;
+            max-width: 80%;
+            animation: fadeIn 0.1s ease-out;
+        }
+
+        .log-row.bot {
+            align-self: flex-start;
+        }
+
+        .log-row.user {
+            align-self: flex-end;
+            text-align: right;
+        }
+
+        .sender-tag {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .bot .sender-tag { color: #666666; }
+        .user .sender-tag { color: #3b82f6; }
+
+        .message-text {
+            font-size: 16px;
+            line-height: 1.5;
+            white-space: pre-line;
+        }
+
+        .bot .message-text {
+            color: #ffffff;
+            border-left: 2px solid #222222;
+            padding-left: 16px;
+        }
+
+        .user .message-text {
+            color: #e0e0e0;
+            border-right: 2px solid #3b82f6;
+            padding-right: 16px;
+        }
+
+        .timestamp {
+            font-size: 11px;
+            color: #444444;
+            margin-top: 6px;
+        }
+
+        .chat-footer {
+            background-color: #000000;
+            padding: 40px;
+            border-top: 1px solid #111111;
+        }
+
+        .input-line {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            gap: 20px;
+        }
+
+        .input-line input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .input-line input::placeholder {
+            color: #444444;
+        }
+
+        .terminal-btn {
+            background-color: transparent;
+            border: 1px solid #333333;
+            color: #ffffff;
+            padding: 12px 28px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .terminal-btn:hover {
+            background-color: #ffffff;
+            color: #000000;
+            border-color: #ffffff;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
 </head>
 <body>
 
-<!-- ════════════════════════════
-     PANTALLA DE ACCESO
-════════════════════════════ -->
-<div id="access-screen">
-  <div class="access-box">
-    <div class="access-header">
-      <div class="access-logo">S<span>F</span></div>
-      <div class="access-tagline">Sin Fronteras · Red Profesional Global</div>
+    <div class="chat-fullscreen">
+        <div class="chat-header">
+            <div class="chat-title">Asistente Virtual</div>
+            <div class="chat-status" id="sessionStatus">Sesión activa</div>
+        </div>
+
+        <div class="chat-body" id="chatBody">
+            <div class="log-row bot">
+                <span class="sender-tag">Asistente</span>
+                <div class="message-text">Hola. ¿En qué te puedo ayudar hoy?</div>
+                <span class="timestamp" id="initTime">00:00</span>
+            </div>
+        </div>
+
+        <div class="chat-footer">
+            <form class="input-line" id="chatForm">
+                <input type="text" id="userInput" placeholder="Escribí tu mensaje acá..." autocomplete="off" required autofocus>
+                <button type="submit" class="terminal-btn">ENVIAR</button>
+            </form>
+        </div>
     </div>
 
-    <div class="access-tabs">
-      <button class="access-tab active" id="tab-login" onclick="switchTab('login')">Iniciar sesión</button>
-      <button class="access-tab" id="tab-register" onclick="switchTab('register')">Registrarse</button>
-    </div>
+    <script>
+        const chatForm = document.getElementById('chatForm');
+        const userInput = document.getElementById('userInput');
+        const chatBody = document.getElementById('chatBody');
 
-    <div class="access-body" id="form-login">
-      <div class="form-group">
-        <label>Correo electrónico</label>
-        <input type="email" id="login-email" placeholder="tu@email.com">
-      </div>
-      <div class="form-group">
-        <label>Contraseña</label>
-        <input type="password" id="login-pass" placeholder="••••••••"
-          onkeydown="if(event.key==='Enter')doLogin()">
-        <div class="form-error" id="login-error">Credenciales incorrectas. Verificá tus datos.</div>
-      </div>
-      <button class="access-btn" onclick="doLogin()">Acceder a SF →</button>
-      <div class="access-footer">
-        ¿No tenés cuenta? <a onclick="switchTab('register')" style="cursor:pointer;color:var(--accent);font-weight:bold">Registrate gratis</a>
-      </div>
-    </div>
+        // Respuestas locales fijas
+        const RESPUESTAS_LOCALES = {
+            "hola": [
+                "Hola. Decime en qué te puedo ayudar.",
+                "Hola. Quedo a tu disposición para lo que necesités.",
+                "Hola. ¿Cómo va?"
+            ],
+            "como estas": [
+                "Todo bien por acá. ¿Y vos?",
+                "Muy bien. ¿En qué te puedo colaborar?",
+                "Todo en orden. ¿Vos cómo estás?"
+            ],
+            "bien": [
+                "Me alegra escuchar eso. ¿Cómo te llamás?",
+                "Qué bueno. Decime tu nombre para continuar.",
+                "Excelente. ¿Cuál es tu nombre?"
+            ],
+            "benja": [
+                "Perfecto, Benja. Si necesitás asistencia con algo, avisame.",
+                "Hola, Benja. Decime en qué te puedo dar una mano.",
+                "Entendido, Benja. Quedo a tu disposición para lo que haga falta."
+            ],
+            "chau": [
+                "Chau. Nos vemos.",
+                "Hasta luego. Que andes bien.",
+                "Chau. Cuidate."
+            ]
+        };
 
-    <div class="access-body" id="form-register" style="display:none">
-      <div class="form-group">
-        <label>Nombre completo</label>
-        <input type="text" id="reg-name" placeholder="Tu nombre real">
-      </div>
-      <div class="form-group">
-        <label>Correo electrónico</label>
-        <input type="email" id="reg-email" placeholder="tu@email.com">
-        <div class="form-error" id="reg-error-email">Este email ya está registrado.</div>
-      </div>
-      <div class="form-group">
-        <label>Contraseña (mínimo 6 caracteres)</label>
-        <input type="password" id="reg-pass" placeholder="••••••••"
-          onkeydown="if(event.key==='Enter')doRegister()">
-        <div class="form-error" id="reg-error-pass">La contraseña debe tener al menos 6 caracteres.</div>
-      </div>
-      <button class="access-btn" onclick="doRegister()">Crear cuenta gratuita</button>
-      <div class="access-footer">
-        Al registrarte aceptás los <a href="#" style="color:var(--accent);">Términos de uso</a> de SF.
-      </div>
-    </div>
-  </div>
-</div>
+        function getTimestamp() {
+            const now = new Date();
+            return now.toTimeString().split(' ')[0].slice(0, 5);
+        }
 
-<!-- ════════════════════════════
-     INTERFAZ PRINCIPAL (oculta hasta login)
-════════════════════════════ -->
-<div id="app" style="display:none">
+        document.getElementById('initTime').innerText = getTimestamp();
 
-  <div id="header">
-    <div id="header-inner">
-      <a id="logo" href="#">S<span>F</span> <small>Sin Fronteras</small></a>
-      <div id="header-nav">
-        <span id="user-info"></span>
-        <button class="nav-btn blue" onclick="goHome()">Inicio</button>
-        <button class="nav-btn" onclick="doLogout()">Salir</button>
-      </div>
-    </div>
-  </div>
+        function appendMessage(sender, text, role) {
+            const logRow = document.createElement('div');
+            logRow.className = `log-row ${role}`;
 
-  <div id="page">
+            logRow.innerHTML = `
+                <span class="sender-tag">${sender}</span>
+                <div class="message-text">${text}</div>
+                <span class="timestamp">${getTimestamp()}</span>
+            `;
 
-    <div id="sidebar">
-      <div class="widget">
-        <div class="widget-title">Mi Perfil</div>
-        <div id="my-avatar-box">
-          <div id="my-avatar-initial"></div>
-          <div id="my-name"></div>
-          <div id="my-email"></div>
-        </div>
-      </div>
+            chatBody.appendChild(logRow);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
 
-      <div class="widget">
-        <div class="widget-title">Navegación</div>
-        <div class="widget-body" style="padding:8px 6px">
-          <a class="sidebar-link" onclick="goHome()">Inicio</a>
-          <a class="sidebar-link" onclick="goHome()">Mi perfil</a>
-          <a class="sidebar-link" onclick="goHome()">Amigos</a>
-          <a class="sidebar-link" onclick="goHome()">Fotos</a>
-          <a class="sidebar-link" onclick="goHome()">Mensajes</a>
-        </div>
-      </div>
+        // REEMPLAZA Wikipedia por la API de Claude
+        async function consultarClaude(consulta) {
+            try {
+                const res = await fetch("https://api.anthropic.com/v1/messages", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-api-key": "PEGA_TU_API_KEY_ACÁ",
+                        "anthropic-version": "2023-06-01",
+                        "anthropic-dangerous-direct-browser-access": "true"
+                    },
+                    body: JSON.stringify({
+                        model: "claude-sonnet-4-20250514",
+                        max_tokens: 1000,
+                        messages: [
+                            { role: "user", content: consulta }
+                        ]
+                    })
+                });
+                const data = await res.json();
+                return data.content?.[0]?.text || null;
+            } catch (e) {
+                return null;
+            }
+        }
 
-      <div class="widget">
-        <div class="widget-title">Actividad</div>
-        <div class="widget-body">
-          <div class="sidebar-stats">
-            Publicaciones: <b id="stat-posts">0</b><br>
-            Me gusta dados: <b id="stat-likes">0</b><br>
-            Comentarios: <b id="stat-comments">0</b><br>
-            Miembro desde: <b id="stat-since">—</b>
-          </div>
-        </div>
-      </div>
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-      <!-- Widget de Apariencia (tema oscuro) -->
-      <div class="widget">
-        <div class="widget-title">Apariencia</div>
-        <div class="widget-body">
-          <button id="theme-toggle-btn" onclick="toggleTheme()">
-            <span id="theme-icon">☾</span> Modo oscuro
-          </button>
-        </div>
-      </div>
-    </div>
+            const message = userInput.value;
+            if (!message.trim()) return;
 
-    <div id="main">
-      <div class="welcome-bar" id="welcome-bar" style="display:none">
-        <span>✔️</span>
-        <span id="welcome-msg">¡Bienvenido a SF!</span>
-      </div>
+            appendMessage('Vos', message, 'user');
+            userInput.value = '';
 
-      <div id="post-box">
-        <div id="post-box-title">¿Qué está pasando?</div>
-        <div id="post-form">
-          <textarea id="post-text" placeholder="Compartí una actualización con tu red..."></textarea>
-          <div class="post-form-row">
-            <label for="photo-input">📎 Adjuntar imagen
-              <input type="file" id="photo-input" accept="image/*" onchange="previewPhoto(this)">
-            </label>
-            <img id="photo-preview" alt="preview">
-            <button class="publish-btn" onclick="publishPost()">Publicar</button>
-          </div>
-        </div>
-      </div>
+            const cleanMessage = message.toLowerCase().trim();
 
-      <div id="feed"></div>
-    </div>
+            // CASO A: Respuestas fijas locales (igual que antes)
+            if (RESPUESTAS_LOCALES[cleanMessage]) {
+                const opciones = RESPUESTAS_LOCALES[cleanMessage];
+                const index = Math.floor(Math.random() * opciones.length);
+                
+                setTimeout(() => {
+                    appendMessage('Asistente', opciones[index], 'bot');
+                }, 400);
+            } 
+            // CASO B: Si no coincide, usa la API de Claude (antes era Wikipedia)
+            else {
+                const respuesta = await consultarClaude(message);
 
-  </div>
-
-  <div id="site-footer">
-    © 2025 <b>SF — Sin Fronteras</b> · <a href="#">Inicio</a> · <a href="#">Privacidad</a> · <a href="#">Términos</a> · <a href="#">Contacto</a>
-    <br>Conectando profesionales sin límites
-  </div>
-
-</div>
-
-<div id="lightbox" onclick="closeLightbox()">
-  <img id="lightbox-img" src="" alt="">
-</div>
-
-<script>
-
-let DB = {
-  users : JSON.parse(localStorage.getItem('sf_users')  || '[]'),
-  posts : JSON.parse(localStorage.getItem('sf_posts')  || '[]'),
-};
-let currentUser = JSON.parse(localStorage.getItem('sf_session') || 'null');
-
-function saveDB() {
-  localStorage.setItem('sf_users', JSON.stringify(DB.users));
-  localStorage.setItem('sf_posts', JSON.stringify(DB.posts));
-}
-function saveSession() {
-  localStorage.setItem('sf_session', JSON.stringify(currentUser));
-}
-
-// Tema oscuro
-function applyTheme(dark) {
-  if (dark) {
-    document.body.classList.add('dark');
-    document.getElementById('theme-icon').textContent = '☀';
-    document.getElementById('theme-toggle-btn').innerHTML = '<span id="theme-icon">☀</span> Modo claro';
-  } else {
-    document.body.classList.remove('dark');
-    document.getElementById('theme-icon').textContent = '☾';
-    document.getElementById('theme-toggle-btn').innerHTML = '<span id="theme-icon">☾</span> Modo oscuro';
-  }
-}
-
-function toggleTheme() {
-  const isDark = document.body.classList.contains('dark');
-  const newMode = !isDark;
-  localStorage.setItem('sf_dark_mode', newMode ? '1' : '0');
-  applyTheme(newMode);
-}
-
-// Cargar preferencia de tema al iniciar
-(function() {
-  const saved = localStorage.getItem('sf_dark_mode');
-  if (saved === '1') {
-    applyTheme(true);
-  } else {
-    applyTheme(false);
-  }
-})();
-
-function switchTab(tab) {
-  document.getElementById('form-login').style.display    = tab === 'login'    ? 'block' : 'none';
-  document.getElementById('form-register').style.display = tab === 'register' ? 'block' : 'none';
-  document.getElementById('tab-login').classList.toggle('active',    tab === 'login');
-  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
-}
-
-function doRegister() {
-  const name  = document.getElementById('reg-name').value.trim();
-  const email = document.getElementById('reg-email').value.trim().toLowerCase();
-  const pass  = document.getElementById('reg-pass').value;
-
-  document.getElementById('reg-error-email').classList.remove('show');
-  document.getElementById('reg-error-pass').classList.remove('show');
-
-  if (!name || !email) { alert('Completá nombre y correo.'); return; }
-  if (pass.length < 6) {
-    document.getElementById('reg-error-pass').classList.add('show');
-    return;
-  }
-  if (DB.users.find(u => u.email === email)) {
-    document.getElementById('reg-error-email').classList.add('show');
-    return;
-  }
-
-  const newUser = {
-    id      : Date.now(),
-    name    : name,
-    email   : email,
-    pass    : pass,
-    since   : new Date().toLocaleDateString('es-AR'),
-    isNew   : true
-  };
-  DB.users.push(newUser);
-  saveDB();
-
-  currentUser = newUser;
-  saveSession();
-  showApp(true);
-}
-
-function doLogin() {
-  const email = document.getElementById('login-email').value.trim().toLowerCase();
-  const pass  = document.getElementById('login-pass').value;
-  document.getElementById('login-error').classList.remove('show');
-
-  const user = DB.users.find(u => u.email === email && u.pass === pass);
-  if (!user) {
-    document.getElementById('login-error').classList.add('show');
-    return;
-  }
-
-  currentUser = user;
-  saveSession();
-  showApp(false);
-}
-
-function doLogout() {
-  currentUser = null;
-  localStorage.removeItem('sf_session');
-  document.getElementById('access-screen').style.display = 'flex';
-  document.getElementById('app').style.display = 'none';
-}
-
-function showApp(isNew) {
-  document.getElementById('access-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-
-  document.getElementById('my-avatar-initial').textContent = currentUser.name.charAt(0).toUpperCase();
-  document.getElementById('my-name').textContent  = currentUser.name;
-  document.getElementById('my-email').textContent = currentUser.email;
-  document.getElementById('user-info').textContent = currentUser.name.split(' ')[0];
-  document.getElementById('stat-since').textContent = currentUser.since || '—';
-
-  const wb = document.getElementById('welcome-bar');
-  const wm = document.getElementById('welcome-msg');
-  if (isNew) {
-    wb.style.display = 'flex';
-    wm.textContent   = `Bienvenido/a a SF, ${currentUser.name.split(' ')[0]}. Tu red profesional está lista.`;
-    setTimeout(() => wb.style.display = 'none', 6000);
-  }
-
-  renderFeed();
-  updateStats();
-}
-
-let pendingPhotoB64 = null;
-
-function previewPhoto(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    pendingPhotoB64 = e.target.result;
-    const prev = document.getElementById('photo-preview');
-    prev.src    = pendingPhotoB64;
-    prev.style.display = 'inline-block';
-  };
-  reader.readAsDataURL(file);
-}
-
-function publishPost() {
-  const texto = document.getElementById('post-text').value.trim();
-  if (!texto && !pendingPhotoB64) {
-    alert('Escribí un mensaje o adjuntá una imagen antes de publicar.');
-    return;
-  }
-
-  const post = {
-    id       : Date.now(),
-    userId   : currentUser.id,
-    userName : currentUser.name,
-    text     : texto,
-    photo    : pendingPhotoB64 || null,
-    time     : new Date().toLocaleString('es-AR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}),
-    likes    : [],
-    comments : []
-  };
-
-  DB.posts.unshift(post);
-  saveDB();
-
-  document.getElementById('post-text').value  = '';
-  document.getElementById('photo-input').value = '';
-  document.getElementById('photo-preview').style.display = 'none';
-  pendingPhotoB64 = null;
-
-  renderFeed();
-  updateStats();
-}
-
-function renderFeed() {
-  const feed = document.getElementById('feed');
-  let posts = [...DB.posts];
-
-  if (!posts.length) {
-    feed.innerHTML = `
-      <div class="empty-feed">
-        <big>📝</big>
-        El feed está vacío. Publicá tu primera actualización.
-      </div>`;
-    return;
-  }
-
-  feed.innerHTML = posts.map(post => buildPostHTML(post)).join('');
-}
-
-function buildPostHTML(post) {
-  const isLiked  = post.likes.includes(currentUser.id);
-  const initial  = post.userName.charAt(0).toUpperCase();
-  const comments = post.comments.map(c => `
-    <div class="comment">
-      <div class="comment-av">${c.userName.charAt(0).toUpperCase()}</div>
-      <div class="comment-bubble">
-        <span class="comment-name">${escHTML(c.userName)}</span>
-        &nbsp;${escHTML(c.text)}
-      </div>
-    </div>`).join('');
-
-  return `
-    <div class="post" id="post-${post.id}">
-      <div class="post-header">
-        <div class="post-avatar">${initial}</div>
-        <div class="post-meta">
-          <div class="post-user">${escHTML(post.userName)}</div>
-          <div class="post-time">${post.time}</div>
-        </div>
-      </div>
-      ${post.text  ? `<div class="post-body">${escHTML(post.text)}</div>` : ''}
-      ${post.photo ? `<img class="post-img" src="${post.photo}" onclick="openLightbox(this.src)" alt="imagen">` : ''}
-      <div class="post-actions">
-        <span class="post-action ${isLiked ? 'liked' : ''}" onclick="toggleLike(${post.id})">
-          ${isLiked ? '★' : '☆'} Me gusta
-        </span>
-        <span class="like-count">${post.likes.length > 0 ? post.likes.length : ''}</span>
-        <span class="post-action" onclick="toggleComments(${post.id})">
-          Comentar
-        </span>
-        <span class="comment-count">${post.comments.length > 0 ? post.comments.length : ''}</span>
-        ${post.userId === currentUser.id ? `<span class="post-action" style="color:#c0392b" onclick="deletePost(${post.id})">Eliminar</span>` : ''}
-      </div>
-      <div class="comments-section" id="comments-${post.id}">
-        <div id="comment-list-${post.id}">${comments}</div>
-        <div class="comment-form">
-          <input class="comment-input" id="comment-input-${post.id}"
-            placeholder="Escribí un comentario..."
-            onkeydown="if(event.key==='Enter')addComment(${post.id})">
-          <button class="comment-send" onclick="addComment(${post.id})">Enviar</button>
-        </div>
-      </div>
-    </div>`;
-}
-
-function toggleLike(postId) {
-  const post = DB.posts.find(p => p.id === postId);
-  if (!post) return;
-  const idx = post.likes.indexOf(currentUser.id);
-  if (idx === -1) {
-    post.likes.push(currentUser.id);
-  } else {
-    post.likes.splice(idx, 1);
-  }
-  saveDB();
-  renderFeed();
-  updateStats();
-}
-
-function toggleComments(postId) {
-  const section = document.getElementById('comments-' + postId);
-  if (!section) return;
-  section.classList.toggle('open');
-  if (section.classList.contains('open')) {
-    document.getElementById('comment-input-' + postId)?.focus();
-  }
-}
-
-function addComment(postId) {
-  const input = document.getElementById('comment-input-' + postId);
-  const text  = input?.value.trim();
-  if (!text) return;
-  const post = DB.posts.find(p => p.id === postId);
-  if (!post) return;
-  post.comments.push({
-    userName : currentUser.name,
-    text     : text,
-    time     : new Date().toLocaleTimeString('es-AR', {hour:'2-digit', minute:'2-digit'})
-  });
-  saveDB();
-  const list = document.getElementById('comment-list-' + postId);
-  if (list) {
-    list.innerHTML = post.comments.map(c => `
-      <div class="comment">
-        <div class="comment-av">${c.userName.charAt(0).toUpperCase()}</div>
-        <div class="comment-bubble">
-          <span class="comment-name">${escHTML(c.userName)}</span>
-          &nbsp;${escHTML(c.text)}
-        </div>
-      </div>`).join('');
-  }
-  input.value = '';
-  updateStats();
-}
-
-function deletePost(postId) {
-  if (!confirm('¿Eliminar esta publicación definitivamente?')) return;
-  DB.posts = DB.posts.filter(p => p.id !== postId);
-  saveDB();
-  renderFeed();
-  updateStats();
-}
-
-function updateStats() {
-  const myPosts    = DB.posts.filter(p => p.userId === currentUser.id).length;
-  const myLikes    = DB.posts.reduce((sum, p) => sum + (p.likes.includes(currentUser.id) ? 1 : 0), 0);
-  const myComments = DB.posts.reduce((sum, p) => sum + p.comments.filter(c => c.userName === currentUser.name).length, 0);
-  document.getElementById('stat-posts').textContent    = myPosts;
-  document.getElementById('stat-likes').textContent    = myLikes;
-  document.getElementById('stat-comments').textContent = myComments;
-}
-
-function openLightbox(src) {
-  document.getElementById('lightbox-img').src = src;
-  document.getElementById('lightbox').classList.add('open');
-}
-function closeLightbox() {
-  document.getElementById('lightbox').classList.remove('open');
-}
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeLightbox();
-});
-
-function goHome() {
-  renderFeed();
-  window.scrollTo(0, 0);
-}
-
-function escHTML(str) {
-  return (str||'')
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;')
-    .replace(/\n/g,'<br>');
-}
-
-if (currentUser) {
-  const still = DB.users.find(u => u.id === currentUser.id);
-  if (still) {
-    currentUser = still;
-    showApp(false);
-  } else {
-    localStorage.removeItem('sf_session');
-  }
-}
-
-</script>
+                if (respuesta) {
+                    appendMessage('Asistente', respuesta, 'bot');
+                } else {
+                    appendMessage('Asistente', "No pude procesar esa consulta.", 'bot');
+                }
+            }
+        });
+    </script>
 </body>
 </html>
