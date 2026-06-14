@@ -1,577 +1,751 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ATLAS</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        /* ================================================================
-           RESET Y BASE
-           ================================================================ */
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Chatbot • Liquid Glass Neutro</title>
+  <style>
+    /* ===== VARIABLES GLOBALES (TEMA OSCURO POR DEFECTO, PURO NEGRO) ===== */
+    :root {
+      --bg-deep: #0a0a0a;
+      --bg-elevated: #141414;
+      --text-primary: #f0f0f0;
+      --text-secondary: #b0b0b0;
+      --glass-bg-user: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 50%, rgba(0, 0, 0, 0.6) 100%);
+      --glass-bg-bot: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 50%, rgba(0, 0, 0, 0.7) 100%);
+      --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+      --glass-border-user: 1px solid rgba(255, 255, 255, 0.15);
+      --glass-border-bot: 1px solid rgba(255, 255, 255, 0.1);
+      --glass-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.06), inset 0 -1px 2px rgba(0, 0, 0, 0.6), 0 10px 30px -10px rgba(0, 0, 0, 0.8);
+      --hover-glow: rgba(255, 255, 255, 0.08);
+      --specular-color: rgba(255, 255, 255, 0.5);
+      --input-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(0, 0, 0, 0.4) 100%);
+      --input-focus-border: rgba(255, 255, 255, 0.5);
+      --placeholder-color: rgba(255, 255, 255, 0.3);
+      --sidebar-header-gradient: linear-gradient(135deg, #ffffffcc, #ffffff44);
+      --sidebar-item-bg: rgba(255, 255, 255, 0.03);
+      --sidebar-item-hover: rgba(255, 255, 255, 0.1);
+      --send-btn-bg: rgba(255, 255, 255, 0.1);
+      --send-btn-hover: rgba(255, 255, 255, 0.25);
+    }
 
-        :root {
-            --black: #000000;
-            --white: #ffffff;
-            --dim: #888888;
-            --dimmer: #444444;
-            --dimmest: #1a1a1a;
-            --border: #111111;
-            --accent: #3b82f6;
-            --serif: 'IM Fell English', Georgia, serif;
-            --mono: 'Courier Prime', 'Courier New', monospace;
-        }
+    /* ===== TEMA GRIS ===== */
+    [data-theme="gray"] {
+      --bg-deep: #808080;
+      --bg-elevated: #8c8c8c;
+      --text-primary: #222;
+      --text-secondary: #444;
+      --glass-bg-user: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 50%, rgba(0, 0, 0, 0.3) 100%);
+      --glass-bg-bot: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(0, 0, 0, 0.4) 100%);
+      --glass-border: 1px solid rgba(255, 255, 255, 0.2);
+      --glass-border-user: 1px solid rgba(255, 255, 255, 0.35);
+      --glass-border-bot: 1px solid rgba(255, 255, 255, 0.25);
+      --glass-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), inset 0 -1px 2px rgba(0, 0, 0, 0.4), 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      --hover-glow: rgba(255, 255, 255, 0.25);
+      --specular-color: rgba(255, 255, 255, 0.7);
+      --input-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(0, 0, 0, 0.3) 100%);
+      --input-focus-border: rgba(255, 255, 255, 0.8);
+      --placeholder-color: rgba(0, 0, 0, 0.3);
+      --sidebar-header-gradient: linear-gradient(135deg, #333, #666);
+      --sidebar-item-bg: rgba(255, 255, 255, 0.1);
+      --sidebar-item-hover: rgba(255, 255, 255, 0.2);
+      --send-btn-bg: rgba(255, 255, 255, 0.2);
+      --send-btn-hover: rgba(255, 255, 255, 0.4);
+    }
 
-        html, body {
-            background: var(--black);
-            color: var(--white);
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-            font-family: var(--mono);
-        }
+    /* ===== TEMA BLANCO ===== */
+    [data-theme="light"] {
+      --bg-deep: #ffffff;
+      --bg-elevated: #f5f5f5;
+      --text-primary: #111;
+      --text-secondary: #555;
+      --glass-bg-user: linear-gradient(135deg, rgba(0, 0, 0, 0.06) 0%, rgba(255, 255, 255, 0.8) 50%, rgba(200, 200, 200, 0.5) 100%);
+      --glass-bg-bot: linear-gradient(135deg, rgba(0, 0, 0, 0.04) 0%, rgba(255, 255, 255, 0.9) 50%, rgba(220, 220, 220, 0.5) 100%);
+      --glass-border: 1px solid rgba(0, 0, 0, 0.08);
+      --glass-border-user: 1px solid rgba(0, 0, 0, 0.12);
+      --glass-border-bot: 1px solid rgba(0, 0, 0, 0.1);
+      --glass-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.9), inset 0 -1px 2px rgba(0, 0, 0, 0.05), 0 8px 20px -10px rgba(0, 0, 0, 0.1);
+      --hover-glow: rgba(0, 0, 0, 0.05);
+      --specular-color: rgba(0, 0, 0, 0.15);
+      --input-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(240, 240, 240, 0.8) 100%);
+      --input-focus-border: rgba(0, 0, 0, 0.4);
+      --placeholder-color: rgba(0, 0, 0, 0.25);
+      --sidebar-header-gradient: linear-gradient(135deg, #222, #555);
+      --sidebar-item-bg: rgba(0, 0, 0, 0.03);
+      --sidebar-item-hover: rgba(0, 0, 0, 0.08);
+      --send-btn-bg: rgba(0, 0, 0, 0.06);
+      --send-btn-hover: rgba(0, 0, 0, 0.15);
+    }
 
-        /* ================================================================
-           PANTALLA DE BIENVENIDA
-           ================================================================ */
-        #welcomeScreen {
-            position: fixed;
-            inset: 0;
-            background: var(--black);
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            transition: opacity 0.8s ease, transform 0.8s ease;
-        }
+    /* ===== RESET Y BASE ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        #welcomeScreen.exit {
-            opacity: 0;
-            transform: translateY(-20px);
-            pointer-events: none;
-        }
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background-image: 
+        radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 60px 60px, 80px 80px;
+      transition: background 0.4s ease, color 0.4s ease;
+    }
 
-        /* Línea decorativa superior */
-        .w-topbar {
-            padding: 28px 48px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-            flex-shrink: 0;
-        }
+    /* ===== CONTENEDOR PRINCIPAL ===== */
+    .chat-app {
+      display: flex;
+      width: 100%;
+      max-width: 1200px;
+      height: 90vh;
+      max-height: 800px;
+      background: transparent;
+      border-radius: 32px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 25px 60px -20px rgba(0, 0, 0, 0.5);
+      transition: box-shadow 0.4s;
+    }
 
-        .w-wordmark {
-            font-family: var(--serif);
-            font-size: 22px;
-            letter-spacing: 6px;
-            text-transform: uppercase;
-            color: var(--white);
-        }
+    .bg-pattern {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.04) 0%, transparent 50%),
+        radial-gradient(circle at 70% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 40%);
+      pointer-events: none;
+      z-index: 0;
+      transition: opacity 0.4s;
+    }
 
-        .w-badge {
-            font-family: var(--mono);
-            font-size: 10px;
-            letter-spacing: 2px;
-            color: var(--dimmer);
-            text-transform: uppercase;
-            border: 1px solid var(--dimmest);
-            padding: 5px 10px;
-        }
+    [data-theme="light"] .bg-pattern {
+      background-image: 
+        radial-gradient(circle at 30% 50%, rgba(0, 0, 0, 0.02) 0%, transparent 50%),
+        radial-gradient(circle at 70% 20%, rgba(0, 0, 0, 0.01) 0%, transparent 40%);
+    }
 
-        /* Cuerpo scrolleable */
-        .w-body {
-            flex: 1;
-            overflow-y: auto;
-            padding: 64px 48px 40px;
-            scrollbar-width: thin;
-            scrollbar-color: #222 transparent;
-        }
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      width: 280px;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 40%, rgba(0, 0, 0, 0.25) 100%);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border-right: var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      z-index: 2;
+      position: relative;
+      border-radius: 28px 4px 28px 4px / 18px 28px 18px 28px;
+      transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), background 0.4s, box-shadow 0.4s;
+    }
 
-        .w-body::-webkit-scrollbar { width: 4px; }
-        .w-body::-webkit-scrollbar-thumb { background: #222; }
+    .sidebar-header {
+      font-size: 1.3rem;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      background: var(--sidebar-header-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-        /* Título principal */
-        .w-hero {
-            margin-bottom: 56px;
-            opacity: 0;
-            transform: translateY(16px);
-            animation: fadeUp 0.9s ease 0.1s forwards;
-        }
+    .sidebar-header::before {
+      content: "⚙️";
+      font-size: 1.6rem;
+      -webkit-text-fill-color: initial;
+      background: none;
+    }
 
-        .w-hero-label {
-            font-family: var(--mono);
-            font-size: 10px;
-            letter-spacing: 3px;
-            color: var(--dimmer);
-            text-transform: uppercase;
-            margin-bottom: 16px;
-        }
+    .theme-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
 
-        .w-hero-title {
-            font-family: var(--serif);
-            font-size: clamp(52px, 8vw, 96px);
-            font-weight: 400;
-            line-height: 0.95;
-            letter-spacing: -1px;
-            color: var(--white);
-        }
+    .theme-btn {
+      padding: 12px 16px;
+      border-radius: 18px 6px 18px 6px / 12px 20px 12px 20px;
+      background: var(--sidebar-item-bg);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      font-size: 0.95rem;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+    }
 
-        .w-hero-title em {
-            font-style: italic;
-            color: var(--dim);
-        }
+    .theme-btn:hover {
+      background: var(--sidebar-item-hover);
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: inset 0 0 20px var(--hover-glow), 0 8px 20px -10px rgba(0,0,0,0.5);
+      transform: translateY(-1px);
+    }
 
-        /* Bloques de texto */
-        .w-content {
-            max-width: 760px;
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-        }
+    .theme-btn.active {
+      background: var(--sidebar-item-hover);
+      border-color: var(--input-focus-border);
+      box-shadow: 0 0 15px var(--hover-glow);
+      font-weight: 600;
+    }
 
-        .w-paragraph {
-            font-family: var(--mono);
-            font-size: 14px;
-            line-height: 1.8;
-            color: #cccccc;
-            padding: 24px 0;
-            border-top: 1px solid var(--border);
-            opacity: 0;
-            transform: translateY(10px);
-        }
+    /* ===== ÁREA PRINCIPAL ===== */
+    .main-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: transparent;
+      position: relative;
+      z-index: 1;
+    }
 
-        .w-paragraph:last-of-type {
-            border-bottom: 1px solid var(--border);
-        }
+    .main-header {
+      padding: 18px 24px;
+      border-bottom: var(--glass-border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: rgba(11, 15, 25, 0.4);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 3;
+      transition: background 0.4s;
+    }
 
-        /* Animaciones escalonadas */
-        .w-paragraph:nth-child(1) { animation: fadeUp 0.7s ease 0.25s forwards; }
-        .w-paragraph:nth-child(2) { animation: fadeUp 0.7s ease 0.35s forwards; }
-        .w-paragraph:nth-child(3) { animation: fadeUp 0.7s ease 0.45s forwards; }
-        .w-paragraph:nth-child(4) { animation: fadeUp 0.7s ease 0.55s forwards; }
-        .w-paragraph:nth-child(5) { animation: fadeUp 0.7s ease 0.65s forwards; }
-        .w-paragraph:nth-child(6) { animation: fadeUp 0.7s ease 0.75s forwards; }
-        .w-paragraph:nth-child(7) { animation: fadeUp 0.7s ease 0.85s forwards; }
-        .w-paragraph:nth-child(8) { animation: fadeUp 0.7s ease 0.95s forwards; }
+    [data-theme="light"] .main-header {
+      background: rgba(255, 255, 255, 0.7);
+    }
+    [data-theme="gray"] .main-header {
+      background: rgba(255, 255, 255, 0.2);
+    }
 
-        /* Footer con CTA */
-        .w-footer {
-            padding: 32px 48px;
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
-            background: var(--black);
-        }
+    .main-header h2 {
+      font-size: 1.2rem;
+      background: linear-gradient(to right, #fff, #aaa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
 
-        .w-status {
-            font-size: 11px;
-            letter-spacing: 2px;
-            color: var(--dimmer);
-            text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    [data-theme="light"] .main-header h2 {
+      background: linear-gradient(to right, #222, #555);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    [data-theme="gray"] .main-header h2 {
+      background: linear-gradient(to right, #333, #666);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-        .w-status::before {
-            content: '';
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            background: #ffffff33;
-            border-radius: 50%;
-            animation: pulse 2s ease infinite;
-        }
+    .messages-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      background: transparent;
+      position: relative;
+    }
 
-        .w-enter-btn {
-            background: transparent;
-            border: 1px solid var(--white);
-            color: var(--white);
-            font-family: var(--mono);
-            font-size: 12px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            padding: 14px 36px;
-            cursor: pointer;
-            transition: background 0.2s, color 0.2s;
-            opacity: 0;
-            animation: fadeUp 0.7s ease 1.1s forwards;
-        }
+    .messages-container::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
 
-        .w-enter-btn:hover {
-            background: var(--white);
-            color: var(--black);
-        }
+    /* ===== BURBUJAS ===== */
+    .message {
+      display: flex;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
 
-        /* ================================================================
-           CHAT (EXACTAMENTE IGUAL AL ORIGINAL)
-           ================================================================ */
-        #chatApp {
-            position: fixed;
-            inset: 0;
-            display: none;
-            flex-direction: column;
-            height: 100vh;
-            width: 100vw;
-        }
+    .message.user {
+      justify-content: flex-end;
+    }
 
-        #chatApp.visible {
-            display: flex;
-        }
+    .message.bot {
+      justify-content: flex-start;
+    }
 
-        .chat-fullscreen {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            width: 100vw;
-        }
+    .bubble {
+      max-width: 75%;
+      padding: 14px 20px;
+      font-size: 0.95rem;
+      line-height: 1.45;
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border: var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      position: relative;
+      word-break: break-word;
+    }
 
-        .chat-header {
-            background-color: #000000;
-            padding: 24px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #111111;
-        }
+    .message.user .bubble {
+      background: var(--glass-bg-user);
+      border: var(--glass-border-user);
+      border-radius: 28px 28px 8px 28px / 24px 24px 18px 24px;
+    }
 
-        .chat-title {
-            font-size: 16px;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
+    .message.bot .bubble {
+      background: var(--glass-bg-bot);
+      border: var(--glass-border-bot);
+      border-radius: 28px 28px 28px 8px / 24px 24px 24px 18px;
+    }
 
-        .chat-status {
-            color: #888888;
-            font-size: 13px;
-        }
+    .bubble::before {
+      content: "";
+      position: absolute;
+      top: -1px;
+      left: 5%;
+      width: 40%;
+      height: 2px;
+      background: linear-gradient(to right, var(--specular-color), transparent);
+      border-radius: 100%;
+      opacity: 0.6;
+      transition: opacity 0.3s, width 0.3s;
+    }
 
-        .chat-body {
-            flex: 1;
-            padding: 40px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 28px;
-        }
+    .bubble:hover {
+      transform: translateY(-2px);
+      box-shadow: 
+        inset 0 1px 2px rgba(255,255,255,0.2),
+        inset 0 -2px 6px rgba(0,0,0,0.5),
+        0 15px 25px -12px rgba(0,0,0,0.7),
+        0 0 20px var(--hover-glow);
+    }
 
-        .chat-body::-webkit-scrollbar { width: 6px; }
-        .chat-body::-webkit-scrollbar-thumb { background-color: #222222; }
+    .bubble:hover::before {
+      width: 60%;
+      opacity: 0.9;
+    }
 
-        .log-row {
-            display: flex;
-            flex-direction: column;
-            max-width: 80%;
-            animation: fadeIn 0.1s ease-out;
-        }
+    .bubble::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.15) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
 
-        .log-row.bot { align-self: flex-start; }
-        .log-row.user { align-self: flex-end; text-align: right; }
+    [data-theme="light"] .bubble::after {
+      background: radial-gradient(circle at 20% 20%, rgba(0,0,0,0.05) 0%, transparent 60%);
+    }
 
-        .sender-tag {
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-        }
+    .bubble:hover::after {
+      opacity: 1;
+    }
 
-        .bot .sender-tag { color: #666666; }
-        .user .sender-tag { color: #3b82f6; }
+    /* ===== INDICADOR DE "PENSANDO..." ===== */
+    .thinking-bubble {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 20px;
+    }
 
-        .message-text {
-            font-size: 16px;
-            line-height: 1.5;
-            white-space: pre-line;
-        }
+    .typing-dots {
+      display: flex;
+      gap: 4px;
+    }
 
-        .bot .message-text {
-            color: #ffffff;
-            border-left: 2px solid #222222;
-            padding-left: 16px;
-        }
+    .typing-dots span {
+      width: 8px;
+      height: 8px;
+      background: var(--text-secondary);
+      border-radius: 50%;
+      animation: bounce 1.4s infinite ease-in-out both;
+    }
 
-        .user .message-text {
-            color: #e0e0e0;
-            border-right: 2px solid #3b82f6;
-            padding-right: 16px;
-        }
+    .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
 
-        .timestamp {
-            font-size: 11px;
-            color: #444444;
-            margin-top: 6px;
-        }
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+      40% { transform: scale(1); opacity: 1; }
+    }
 
-        .chat-footer {
-            background-color: #000000;
-            padding: 40px;
-            border-top: 1px solid #111111;
-        }
+    /* ===== INPUT ===== */
+    .input-area {
+      padding: 16px 20px;
+      border-top: var(--glass-border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: rgba(11, 15, 25, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 3;
+      transition: background 0.4s;
+    }
 
-        .input-line {
-            display: flex;
-            align-items: center;
-            width: 100%;
-            gap: 20px;
-        }
+    [data-theme="light"] .input-area {
+      background: rgba(255, 255, 255, 0.5);
+    }
+    [data-theme="gray"] .input-area {
+      background: rgba(255, 255, 255, 0.2);
+    }
 
-        .input-line input {
-            flex: 1;
-            background: none;
-            border: none;
-            color: #ffffff;
-            font-size: 16px;
-            outline: none;
-        }
+    .input-wrapper {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: var(--input-bg);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 8px 8px 8px 20px;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      box-shadow: inset 0 1px 1px rgba(255,255,255,0.1), 0 4px 12px rgba(0,0,0,0.4);
+      border-radius: 40px 14px 40px 14px / 30px 40px 30px 40px;
+    }
 
-        .input-line input::placeholder { color: #444444; }
+    .input-wrapper:focus-within {
+      border-color: var(--input-focus-border);
+      box-shadow: 
+        inset 0 1px 2px rgba(255,255,255,0.2),
+        0 0 25px var(--input-focus-border),
+        0 8px 20px rgba(0,0,0,0.6);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 50%, rgba(0, 0, 0, 0.4) 100%);
+      transform: scale(1.01);
+    }
 
-        .terminal-btn {
-            background-color: transparent;
-            border: 1px solid #333333;
-            color: #ffffff;
-            padding: 12px 28px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+    [data-theme="light"] .input-wrapper:focus-within {
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.05) 0%, rgba(255, 255, 255, 0.8) 50%, rgba(200, 200, 200, 0.5) 100%);
+    }
 
-        .terminal-btn:hover {
-            background-color: #ffffff;
-            color: #000000;
-            border-color: #ffffff;
-        }
+    .input-wrapper input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-primary);
+      font-size: 1rem;
+      padding: 8px 0;
+      caret-color: #888;
+      letter-spacing: 0.2px;
+    }
 
-        /* ================================================================
-           ANIMACIONES
-           ================================================================ */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to   { opacity: 1; }
-        }
+    .input-wrapper input::placeholder {
+      color: var(--placeholder-color);
+      font-style: italic;
+    }
 
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(12px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
+    .send-btn {
+      background: var(--send-btn-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 40% 60% 60% 40% / 45% 45% 55% 55%;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      color: var(--text-primary);
+      font-size: 1.3rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 0.3; }
-            50%       { opacity: 1; }
-        }
-    </style>
+    .send-btn:hover {
+      background: var(--send-btn-hover);
+      border-color: var(--input-focus-border);
+      box-shadow: 0 0 20px var(--input-focus-border), 0 6px 14px rgba(0,0,0,0.6);
+      transform: scale(1.08) rotate(5deg);
+    }
+
+    [data-theme="light"] .send-btn {
+      color: #222;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    /* ===== TOGGLE MÓVIL ===== */
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 1.8rem;
+      cursor: pointer;
+      z-index: 10;
+      padding: 8px;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .chat-app {
+        flex-direction: column;
+        border-radius: 24px;
+        height: 100vh;
+        max-height: 100vh;
+        margin: 0;
+      }
+
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 280px;
+        transform: translateX(-110%);
+        border-radius: 0 20px 20px 0 / 0 30px 30px 0;
+        z-index: 20;
+        box-shadow: 10px 0 40px rgba(0,0,0,0.8);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .menu-toggle {
+        display: block;
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        z-index: 25;
+        backdrop-filter: blur(8px);
+        background: rgba(11, 15, 25, 0.6);
+        border-radius: 16px;
+        padding: 10px;
+        border: 1px solid rgba(255,255,255,0.1);
+      }
+
+      .main-header {
+        padding-left: 60px;
+      }
+
+      .input-area {
+        padding: 12px 16px;
+      }
+
+      .bubble {
+        max-width: 85%;
+      }
+    }
+
+    /* Scrollbar neutra */
+    .messages-container::-webkit-scrollbar,
+    .sidebar::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .messages-container::-webkit-scrollbar-track,
+    .sidebar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .messages-container::-webkit-scrollbar-thumb,
+    .sidebar::-webkit-scrollbar-thumb {
+      background: rgba(128, 128, 128, 0.3);
+      border-radius: 10px;
+    }
+  </style>
 </head>
 <body>
+  <div class="chat-app" data-theme="dark">
+    <div class="bg-pattern" aria-hidden="true"></div>
 
-    <!-- ================================================================
-         PANTALLA DE BIENVENIDA
-         ================================================================ -->
-    <div id="welcomeScreen">
+    <button class="menu-toggle" id="menuToggle" aria-label="Abrir configuraciones">☰</button>
 
-        <div class="w-topbar">
-            <div class="w-wordmark">Atlas</div>
-            <div class="w-badge">En desarrollo</div>
+    <!-- Sidebar de configuraciones -->
+    <aside class="sidebar" id="sidebar" role="complementary" aria-label="Configuraciones">
+      <div class="sidebar-header">Configuraciones</div>
+      <div class="theme-options">
+        <button class="theme-btn active" data-theme="dark">🌙 Negro</button>
+        <button class="theme-btn" data-theme="gray">☁️ Gris</button>
+        <button class="theme-btn" data-theme="light">☀️ Blanco</button>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="main-header">
+        <h2>Asistente Líquido</h2>
+      </header>
+
+      <div class="messages-container" id="messagesContainer" role="log" aria-live="polite" aria-label="Mensajes"></div>
+
+      <div class="input-area">
+        <div class="input-wrapper">
+          <input 
+            type="text" 
+            id="messageInput" 
+            placeholder="Escribe un mensaje..." 
+            aria-label="Mensaje de chat"
+            autocomplete="off"
+          >
         </div>
+        <button class="send-btn" id="sendButton" aria-label="Enviar mensaje">↗</button>
+      </div>
+    </main>
+  </div>
 
-        <div class="w-body">
+  <script>
+    (() => {
+      const app = document.querySelector('.chat-app');
+      const msgContainer = document.getElementById('messagesContainer');
+      const msgInput = document.getElementById('messageInput');
+      const sendBtn = document.getElementById('sendButton');
+      const sidebar = document.getElementById('sidebar');
+      const menuBtn = document.getElementById('menuToggle');
+      const themeBtns = document.querySelectorAll('.theme-btn');
 
-            <div class="w-hero">
-                <div class="w-hero-label">Proyecto — Inteligencia Artificial</div>
-                <div class="w-hero-title">Bienvenidos<br>a <em>ATLAS</em></div>
-            </div>
+      // ----- Base de respuestas locales -----
+      const RESPUESTAS_LOCALES = {
+        "hola": [
+          "¡Hola! ¿En qué puedo ayudarte?",
+          "Hola, ¿cómo estás?",
+          "¡Hola! Soy tu asistente líquido."
+        ],
+        "como estas": [
+          "Estoy muy bien, gracias por preguntar.",
+          "Funcionando correctamente, ¿y tú?",
+          "Todo en orden, listo para ayudarte."
+        ],
+        "adios": [
+          "¡Hasta luego!",
+          "Nos vemos, vuelve cuando quieras.",
+          "Chao, que tengas buen día."
+        ],
+        "gracias": [
+          "De nada, para eso estoy.",
+          "¡Con gusto!",
+          "No hay de qué."
+        ],
+        "default": [
+          "Interesante, cuéntame más.",
+          "No tengo una respuesta para eso, pero puedo aprender.",
+          "Entendido, ¿algo más en lo que pueda ayudar?",
+          "Déjame pensar mejor en eso..."
+        ]
+      };
 
-            <div class="w-content">
-                <p class="w-paragraph">Gracias por visitar el proyecto. ATLAS es una inteligencia artificial que se está desarrollando con un enfoque claro en la privacidad, la seguridad y el control de los datos por parte del usuario. La idea surge de una preocupación que ha estado presente durante años en el desarrollo de Internet: el crecimiento constante de la recopilación de información personal y la reducción gradual de la privacidad digital.</p>
-
-                <p class="w-paragraph">Durante las últimas décadas, Internet pasó de ser una red relativamente abierta y descentralizada a un entorno donde gran parte de la actividad de los usuarios es registrada, analizada y almacenada. Muchas de las plataformas y servicios que utilizamos diariamente recopilan información sobre hábitos de navegación, intereses, ubicaciones aproximadas, interacciones, dispositivos utilizados y otros datos que permiten construir perfiles cada vez más detallados.</p>
-
-                <p class="w-paragraph">Este fenómeno no ocurrió de forma repentina. A medida que avanzaron la publicidad digital, las redes sociales, los sistemas de recomendación y los servicios basados en datos, la recopilación de información se convirtió en una parte fundamental del funcionamiento de gran parte de la infraestructura moderna de Internet. Aunque estas tecnologías aportaron beneficios importantes, también generaron preocupaciones sobre la privacidad, la transparencia y el nivel de control que las personas tienen sobre su propia información.</p>
-
-                <p class="w-paragraph">Actualmente, gran parte de la actividad digital depende de plataformas centralizadas que almacenan enormes volúmenes de datos. Como consecuencia, muchas personas tienen una visibilidad limitada sobre qué información se recopila, cómo se utiliza, cuánto tiempo se conserva o con quién se comparte.</p>
-
-                <p class="w-paragraph">ATLAS nace como un proyecto que busca tomar una dirección diferente. El objetivo es desarrollar una inteligencia artificial útil y capaz sin convertir la recopilación masiva de datos en un requisito para su funcionamiento. La privacidad no es considerada una característica secundaria, sino uno de los principios fundamentales sobre los que se construye el proyecto.</p>
-
-                <p class="w-paragraph">El desarrollo de ATLAS todavía se encuentra en una etapa temprana. Muchas funciones continúan en planificación o implementación, y el sistema seguirá evolucionando durante los próximos años. Como cualquier proyecto tecnológico de largo plazo, requerirá pruebas, correcciones, mejoras de rendimiento y nuevas herramientas que permitan alcanzar los objetivos planteados.</p>
-
-                <p class="w-paragraph">La intención no es prometer soluciones perfectas ni afirmar que todos los problemas actuales de Internet pueden resolverse con una única plataforma. El propósito es construir una alternativa que demuestre que es posible desarrollar tecnología moderna manteniendo un compromiso serio con la privacidad, la seguridad y la transparencia.</p>
-
-                <p class="w-paragraph">A medida que el proyecto avance, se irán publicando actualizaciones, cambios y nuevas funciones. Agradecemos el interés, la paciencia y el apoyo de todas las personas que siguen el desarrollo desde sus primeras etapas. — ATLAS continúa en construcción.</p>
-            </div>
-
-        </div>
-
-        <div class="w-footer">
-            <div class="w-status">Sistema activo</div>
-            <button class="w-enter-btn" id="enterBtn">Ingresar al asistente →</button>
-        </div>
-
-    </div>
-
-    <!-- ================================================================
-         CHAT (SIN CAMBIOS)
-         ================================================================ -->
-    <div id="chatApp">
-        <div class="chat-fullscreen">
-            <div class="chat-header">
-                <div class="chat-title">Asistente Virtual</div>
-                <div class="chat-status" id="sessionStatus">Sesión activa</div>
-            </div>
-
-            <div class="chat-body" id="chatBody">
-                <div class="log-row bot">
-                    <span class="sender-tag">Asistente</span>
-                    <div class="message-text">Hola. ¿En qué te puedo ayudar hoy?</div>
-                    <span class="timestamp" id="initTime">00:00</span>
-                </div>
-            </div>
-
-            <div class="chat-footer">
-                <form class="input-line" id="chatForm">
-                    <input type="text" id="userInput" placeholder="Escribí tu mensaje acá..." autocomplete="off" required>
-                    <button type="submit" class="terminal-btn">ENVIAR</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        /* ================================================================
-           TRANSICIÓN BIENVENIDA → CHAT
-           ================================================================ */
-        document.getElementById('enterBtn').addEventListener('click', () => {
-            const welcome = document.getElementById('welcomeScreen');
-            const chat    = document.getElementById('chatApp');
-
-            welcome.classList.add('exit');
-
-            setTimeout(() => {
-                welcome.style.display = 'none';
-                chat.classList.add('visible');
-                document.getElementById('userInput').focus();
-            }, 800);
-        });
-
-        /* ================================================================
-           CHAT — LÓGICA ORIGINAL SIN MODIFICACIONES (salvo la coma faltante)
-           ================================================================ */
-        const chatForm  = document.getElementById('chatForm');
-        const userInput = document.getElementById('userInput');
-        const chatBody  = document.getElementById('chatBody');
-
-        const RESPUESTAS_LOCALES = {
-            "hola": [
-                "Hola. Decime en qué te puedo ayudar.",
-                "Hola. Quedo a tu disposición para lo que necesités.",
-                "Hola. ¿Cómo va?",
-                "¡Hola!, ¿todo bien?, estoy aca para lo que necesites"
-            ],
-            "como estas": [
-                "Todo bien por acá. ¿Y vos?",
-                "Muy bien. ¿En qué te puedo colaborar?",
-                "Todo en orden. ¿Vos cómo estás?"
-            ],
-            "bien": [
-                "Me alegra escuchar eso. ¿Cómo te llamás?",
-                "Qué bueno. Decime tu nombre para continuar.",
-                "Excelente. ¿Cuál es tu nombre?"
-            ],
-            "benja": [
-                "Perfecto, Benja. Si necesitás asistencia con algo, avisame.",
-                "Hola, Benja. Decime en qué te puedo dar una mano.",
-                "Entendido, Benja. Quedo a tu disposición para lo que haga falta."
-            ],
-            "chau": [
-                "Chau. Nos vemos.",
-                "Hasta luego. Que andes bien.",
-                "Chau. Cuidate."
-            ]
-        };
-
-        function getTimestamp() {
-            const now = new Date();
-            return now.toTimeString().split(' ')[0].slice(0, 5);
+      // Buscar respuesta según el mensaje
+      function obtenerRespuesta(texto) {
+        const textoLimpio = texto.toLowerCase().trim();
+        for (const [clave, respuestas] of Object.entries(RESPUESTAS_LOCALES)) {
+          if (clave === 'default') continue;
+          if (textoLimpio.includes(clave)) {
+            // devuelve una respuesta aleatoria de esa categoría
+            return respuestas[Math.floor(Math.random() * respuestas.length)];
+          }
         }
+        // si no coincide, respuesta por defecto aleatoria
+        const defaults = RESPUESTAS_LOCALES.default;
+        return defaults[Math.floor(Math.random() * defaults.length)];
+      }
 
-        document.getElementById('initTime').innerText = getTimestamp();
+      // Temas
+      function setTheme(t) {
+        app.setAttribute('data-theme', t);
+        localStorage.setItem('chat-theme', t);
+        themeBtns.forEach(b => b.classList.toggle('active', b.dataset.theme === t));
+      }
+      const saved = localStorage.getItem('chat-theme') || 'dark';
+      setTheme(saved);
+      themeBtns.forEach(b => b.addEventListener('click', () => setTheme(b.dataset.theme)));
 
-        function appendMessage(sender, text, role) {
-            const logRow = document.createElement('div');
-            logRow.className = `log-row ${role}`;
-            logRow.innerHTML = `
-                <span class="sender-tag">${sender}</span>
-                <div class="message-text">${text}</div>
-                <span class="timestamp">${getTimestamp()}</span>
-            `;
-            chatBody.appendChild(logRow);
-            chatBody.scrollTop = chatBody.scrollHeight;
+      // Chat
+      function addMsg(text, sender) {
+        const div = document.createElement('div');
+        div.className = `message ${sender}`;
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.textContent = text;
+        div.appendChild(bubble);
+        msgContainer.appendChild(div);
+        scrollDown();
+      }
+
+      function showThinking() {
+        const div = document.createElement('div');
+        div.className = 'message bot thinking';
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble thinking-bubble';
+        bubble.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+        div.appendChild(bubble);
+        msgContainer.appendChild(div);
+        scrollDown();
+        return div;
+      }
+
+      function scrollDown() {
+        msgContainer.scrollTo({ top: msgContainer.scrollHeight, behavior: 'smooth' });
+      }
+
+      // Inicio: bienvenida
+      msgContainer.innerHTML = '';
+      addMsg('¡Hola! Soy tu asistente con vidrio líquido. ¿En qué puedo ayudarte?', 'bot');
+
+      // Enviar mensaje
+      sendBtn.addEventListener('click', () => {
+        const text = msgInput.value.trim();
+        if (!text) return;
+        addMsg(text, 'user');
+        msgInput.value = '';
+
+        // Mostrar "pensando..." y luego responder
+        const thinking = showThinking();
+        setTimeout(() => {
+          thinking.remove();
+          const respuesta = obtenerRespuesta(text);
+          addMsg(respuesta, 'bot');
+        }, 2000);
+      });
+
+      msgInput.addEventListener('keypress', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          sendBtn.click();
         }
+      });
 
-        async function buscarEnWikipedia(consulta) {
-            try {
-                const r = await fetch(`https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(consulta)}&format=json&origin=*`);
-                const d = await r.json();
-                if (!d.query.search.length) return null;
-
-                const titulo = d.query.search[0].title;
-                const [eR, iR] = await Promise.all([
-                    fetch(`https://es.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&titles=${encodeURIComponent(titulo)}&format=json&origin=*`).then(r=>r.json()),
-                    fetch(`https://es.wikipedia.org/w/api.php?action=query&prop=pageimages&pithumbsize=400&titles=${encodeURIComponent(titulo)}&format=json&origin=*`).then(r=>r.json())
-                ]);
-
-                const pid = Object.keys(eR.query.pages)[0];
-                if (eR.query.pages[pid].missing) return null;
-
-                let img = '';
-                const ip = iR.query.pages[pid];
-                if (ip && ip.thumbnail) img = ip.thumbnail.source;
-
-                return { extract: eR.query.pages[pid].extract, title: titulo, imageUrl: img };
-            } catch(e) {
-                return null;
-            }
+      // Menú móvil
+      menuBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        menuBtn.setAttribute('aria-expanded', sidebar.classList.contains('open'));
+      });
+      document.addEventListener('click', e => {
+        if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !menuBtn.contains(e.target) && sidebar.classList.contains('open')) {
+          sidebar.classList.remove('open');
+          menuBtn.setAttribute('aria-expanded', 'false');
         }
-
-        chatForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const message = userInput.value;
-            if (!message.trim()) return;
-
-            appendMessage('Vos', message, 'user');
-            userInput.value = '';
-
-            const cleanMessage = message.toLowerCase().trim();
-
-            if (RESPUESTAS_LOCALES[cleanMessage]) {
-                const opciones = RESPUESTAS_LOCALES[cleanMessage];
-                const index = Math.floor(Math.random() * opciones.length);
-                setTimeout(() => {
-                    appendMessage('Asistente', opciones[index], 'bot');
-                }, 400);
-            } else {
-                const info = await buscarEnWikipedia(message);
-                if (info) {
-                    let respuestaHTML = `<strong>${info.title}</strong>\n\n${info.extract}`;
-                    if (info.imageUrl) {
-                        respuestaHTML += `<img src="${info.imageUrl}" style="max-width: 100%; height: auto; margin-top: 15px; border-radius: 4px; display: block;">`;
-                    }
-                    appendMessage('Asistente', respuestaHTML, 'bot');
-                } else {
-                    appendMessage('Asistente', "No encontré información relevante sobre ese tema.", 'bot');
-                }
-            }
-        });
-    </script>
+      });
+      menuBtn.setAttribute('aria-expanded', 'false');
+      msgInput.focus();
+    })();
+  </script>
 </body>
 </html>
